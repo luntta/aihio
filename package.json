@@ -1,0 +1,27 @@
+{
+  "name": "aihio",
+  "version": "0.1.0",
+  "description": "Aihio is a user interface design system with user experience, accessibility and easy customization in mind.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "git+https://github.com/luntta/aihio.git",
+  "keywords": [
+    "css",
+    "ui",
+    "ux",
+    "design",
+    "designsystem",
+    "guidelines",
+    "userinterface",
+    "interface",
+    "userexperience"
+  ],
+  "author": "Raine Luntta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luntta/aihio/issues"
+  },
+  "homepage": "https://github.com/luntta/aihio#readme"
+}
