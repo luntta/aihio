@@ -1,0 +1,23 @@
+.alert {
+    --alert-padding-y: 1rem;
+    --alert-padding-x: 1rem;
+    display: flex;
+    align-items: center;
+    padding: var(--alert-padding-y) var(--alert-padding-x);
+}
+
+[type="info"] {
+    background: var(--info);
+}
+
+[type="danger"] {
+    background: var(--danger);
+}
+
+[type="warning"] {
+    background: var(--warning);
+}
+
+[type="success"] {
+    background: var(--success);
+}
