@@ -18,10 +18,18 @@
     "interface",
     "userexperience"
   ],
-  "author": "Raine Luntta",
+  "author": "Raine Luntta <raine.luntta@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/luntta/aihio/issues"
   },
-  "homepage": "https://github.com/luntta/aihio#readme"
+  "homepage": "https://github.com/luntta/aihio#readme",
+  "dependencies": {
+    "autoprefixer": "^9.3.1",
+    "postcss-modules": "^1.4.1"
+  },
+  "devDependencies": {
+    "cssnano": "^4.1.7",
+    "typescript": "^3.1.6"
+  }
 }
