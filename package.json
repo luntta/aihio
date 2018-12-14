@@ -1,7 +1,7 @@
 {
   "name": "aihio",
   "version": "0.1.0",
-  "description": "Aihio is a user interface design system and web component library with user experience, accessibility and easy customization in mind.",
+  "description": "Aihio is a minimalistic user interface design system and web component library with user experience, accessibility and easy customization in mind.",
   "main": "./src/js/aihio.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
