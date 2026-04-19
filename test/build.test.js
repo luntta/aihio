@@ -77,6 +77,53 @@ test('schema output includes the seeded patterns library with inlined markup', (
   );
 });
 
+test('generated TypeScript declarations snapshot the button API and JSX surface', () => {
+  const declarations = readFileSync(resolve(root, 'dist/aihio.d.ts'), 'utf8');
+  const componentDeclarations = readFileSync(resolve(root, 'dist/components.d.ts'), 'utf8');
+  const expectedButtonSnapshot = `export interface AihioButtonAttributes {
+  variant?: AihioButtonVariant;
+  size?: AihioButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+}
+export type AihioButtonProps = AihioIntrinsicElementProps & AihioButtonAttributes;
+
+export declare class AihioButton extends HTMLElement {
+  static tag: "aihio-button";
+  static schemaVersion: string | undefined;
+}`;
+
+  assert.match(declarations, /export type AihioIntent = "action" \| "primary-action"/);
+  assert.match(
+    declarations,
+    /export type AihioVariant = "default" \| "destructive" \| "secondary" \| "outline" \| "ghost" \| "link";/
+  );
+  assert.ok(declarations.includes(expectedButtonSnapshot), 'button declaration block matches the expected snapshot');
+  assert.match(declarations, /interface AihioJSXIntrinsicElements/);
+  assert.match(declarations, /"aihio-button": AihioButtonProps;/);
+  assert.match(componentDeclarations, /export \{\s+.*AihioButton,/s);
+  assert.match(componentDeclarations, /export type \{\s+.*AihioButtonAttributes,/s);
+});
+
+test('canonical prompt fragment is generated as markdown and as an importable module', async () => {
+  const promptMarkdown = readFileSync(resolve(root, 'dist/aihio.prompt.md'), 'utf8');
+  const promptTypes = readFileSync(resolve(root, 'dist/prompt.d.ts'), 'utf8');
+  const promptUrl = `${pathToFileURL(resolve(root, 'dist/prompt.js')).href}?t=${Date.now()}`;
+  const { default: prompt } = await import(promptUrl);
+
+  assert.match(promptMarkdown, /^# Aihio Prompt Fragment/m);
+  assert.match(promptMarkdown, /^## Component Inventory/m);
+  assert.match(promptMarkdown, /`aihio-button` - A button component with multiple visual variants and sizes\./);
+  assert.match(promptMarkdown, /^## Pattern Inventory/m);
+  assert.match(promptMarkdown, /`auth-form` -/);
+  assert.match(promptMarkdown, /^## Hard Rules from Counterexamples/m);
+  assert.match(promptMarkdown, /variant="primary"/);
+  assert.match(promptMarkdown, /^## Token Intent Vocabulary/m);
+  assert.match(promptMarkdown, /`color\.intent\.action-primary-bg` - Default filled action background\./);
+  assert.equal(prompt, promptMarkdown, 'prompt module default export matches the generated markdown');
+  assert.match(promptTypes, /declare const prompt: string;/);
+});
+
 test('runtime bundle exposes Aihio.describe and schema-backed component versions', async () => {
   const previousAihio = globalThis.Aihio;
 
@@ -97,6 +144,16 @@ test('runtime bundle exposes Aihio.describe and schema-backed component versions
   } finally {
     globalThis.Aihio = previousAihio;
   }
+});
+
+test('package exports include generated declaration entrypoints', () => {
+  const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
+
+  assert.equal(pkg.types, './dist/aihio.d.ts');
+  assert.equal(pkg.exports['.'].types, './dist/aihio.d.ts');
+  assert.equal(pkg.exports['./components'].types, './dist/components.d.ts');
+  assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
+  assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
 });
 
 test('schema output exposes intent vocabulary and every component carries required AI-first fields', () => {

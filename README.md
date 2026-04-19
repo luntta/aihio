@@ -40,6 +40,25 @@ const buttonSchema = Aihio.describe('aihio-button');
 // { $component: 'aihio-button', version: '1.0.0', ... }
 ```
 
+Schema-derived TypeScript declarations ship in `dist/aihio.d.ts`, including intent and variant unions plus JSX element typings:
+
+```tsx
+import type { AihioButtonVariant, AihioIntent } from 'aihio';
+
+const variant: AihioButtonVariant = 'outline';
+const intent: AihioIntent = 'primary-action';
+
+export function Toolbar() {
+  return <aihio-button data-aihio-intent={intent} variant={variant}>Save</aihio-button>;
+}
+```
+
+The package also exports a canonical prompt fragment for AI systems:
+
+```js
+import prompt from 'aihio/prompt';
+```
+
 ## Components
 
 | Component | Description |

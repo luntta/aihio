@@ -4,9 +4,20 @@
   "description": "AI-first design system built on native web components. Zero dependencies.",
   "type": "module",
   "main": "./dist/aihio.js",
+  "types": "./dist/aihio.d.ts",
   "exports": {
-    ".": "./dist/aihio.js",
-    "./components": "./dist/components.js",
+    ".": {
+      "types": "./dist/aihio.d.ts",
+      "default": "./dist/aihio.js"
+    },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "default": "./dist/components.js"
+    },
+    "./prompt": {
+      "types": "./dist/prompt.d.ts",
+      "default": "./dist/prompt.js"
+    },
     "./css": "./dist/aihio.css",
     "./schema": "./dist/schema.json"
   },

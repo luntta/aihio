@@ -41,8 +41,31 @@
   ],
   "related": [
     { "$component": "aihio-tab-list", "description": "Container for tab triggers" },
-    { "$component": "aihio-tab", "description": "Individual tab trigger" },
-    { "$component": "aihio-tab-panel", "description": "Content panel for a tab" }
+    {
+      "$component": "aihio-tab",
+      "description": "Individual tab trigger",
+      "attributes": {
+        "value": {
+          "type": "string",
+          "description": "Stable value that matches a corresponding aihio-tab-panel."
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disables the tab and removes it from keyboard navigation."
+        }
+      }
+    },
+    {
+      "$component": "aihio-tab-panel",
+      "description": "Content panel for a tab",
+      "attributes": {
+        "value": {
+          "type": "string",
+          "description": "Stable value that matches a corresponding aihio-tab."
+        }
+      }
+    }
   ],
   "examples": [
     "<aihio-tabs value=\"one\">\n  <aihio-tab-list>\n    <aihio-tab value=\"one\">Tab 1</aihio-tab>\n    <aihio-tab value=\"two\">Tab 2</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"one\">Content 1</aihio-tab-panel>\n  <aihio-tab-panel value=\"two\">Content 2</aihio-tab-panel>\n</aihio-tabs>"

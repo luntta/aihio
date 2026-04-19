@@ -51,19 +51,19 @@ Let live DOM reason about itself; warn authors in dev when they violate the sche
 
 One source of truth for API surface; TypeScript editors get validation for free.
 
-- [ ] Codegen step in `src/schema/build.js` that emits `dist/aihio.d.ts`
-- [ ] Per-component attribute types + JSX intrinsic element augmentations
-- [ ] Exported union types for intents and variants
-- [ ] Add `"types": "./dist/aihio.d.ts"` to `package.json` exports
-- [ ] Add a build test asserting generated types match a known snapshot for at least one component
+- [x] Codegen step in `src/schema/build.js` that emits `dist/aihio.d.ts`
+- [x] Per-component attribute types + JSX intrinsic element augmentations
+- [x] Exported union types for intents and variants
+- [x] Add `"types": "./dist/aihio.d.ts"` to `package.json` exports
+- [x] Add a build test asserting generated types match a known snapshot for at least one component
 
 ## Phase 6 — Canonical prompt fragment
 
 Curated guidance beats raw schemas for steering. Ship a tight system-prompt deliverable.
 
-- [ ] Author `dist/aihio.prompt.md` (~300 lines) — component inventory with one-line purpose, intent→component map, pattern inventory, hard rules flattened from counterExamples, token intent vocabulary
-- [ ] Script regenerates schema-derived sections on build; hand-written strategy sections stay manual
-- [ ] Expose as `./prompt` package export so `import prompt from 'aihio/prompt'` works
+- [x] Author `dist/aihio.prompt.md` (~300 lines) — component inventory with one-line purpose, intent→component map, pattern inventory, hard rules flattened from counterExamples, token intent vocabulary
+- [x] Script regenerates schema-derived sections on build; hand-written strategy sections stay manual
+- [x] Expose as `./prompt` package export so `import prompt from 'aihio/prompt'` works
 
 ## Phase 7 — Counter-examples & a11y contracts surfacing
 
@@ -71,7 +71,7 @@ Content pass that rides on Phases 1 + 4.
 
 - [~] Fill in `counterExamples` + `a11yContract` on every component (seeded in Phase 1; revisit after patterns are authored)
 - [ ] Phase 4 warnings also fire on a11yContract violations
-- [ ] Prompt fragment (Phase 6) auto-includes counter-examples
+- [x] Prompt fragment (Phase 6) auto-includes counter-examples
 
 ## Phase 8 — Validator + MCP server (deferred)
 
