@@ -55,10 +55,23 @@
       await runTest('dev warnings report schema and a11y violations', async () => {
         sandbox.innerHTML = `
           <aihio-button id="bad-button" variant="primary" size="icon">&#x2715;</aihio-button>
+          <aihio-alert id="bad-alert" variant="destructive"></aihio-alert>
+          <aihio-avatar id="bad-avatar" src="/avatar.jpg"></aihio-avatar>
           <aihio-input id="bad-input" error></aihio-input>
           <aihio-dialog id="bad-dialog" open>
             <p>Delete?</p>
           </aihio-dialog>
+          <aihio-dropdown id="bad-dropdown">
+            <aihio-button slot="trigger" size="icon">&#x22ef;</aihio-button>
+            <aihio-dropdown-item>Profile</aihio-dropdown-item>
+          </aihio-dropdown>
+          <aihio-tabs id="bad-tabs" value="one">
+            <aihio-tab-list>
+              <aihio-tab value="one">One</aihio-tab>
+            </aihio-tab-list>
+            <aihio-tab-panel value="two">Panel</aihio-tab-panel>
+          </aihio-tabs>
+          <aihio-toggle id="bad-toggle"></aihio-toggle>
         `;
         await nextFrame(4);
 
@@ -67,11 +80,19 @@
           'invalid enum warning should mention the button variant'
         );
         assert(
-          warnings.some((message) => message.includes('aihio-button') && message.includes('missing accessible name')),
+          warnings.some((message) => message.includes('aihio-button') && message.includes('Provide aria-label describing the action')),
           'button should warn when an icon-only control lacks an accessible name'
         );
         assert(
-          warnings.some((message) => message.includes('aihio-input') && message.includes('missing associated label')),
+          warnings.some((message) => message.includes('aihio-alert') && message.includes('slot="title" or slot="description"')),
+          'destructive alerts should warn when they have no announced content'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-avatar') && message.includes('Provide alt describing the person or entity')),
+          'avatars with src should warn when alt is missing'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-input') && message.includes('Provide aria-label on aihio-input')),
           'input should warn when no label is associated'
         );
         assert(
@@ -79,8 +100,20 @@
           'input should warn when error state has no describedby message'
         );
         assert(
-          warnings.some((message) => message.includes('aihio-dialog') && message.includes('missing dialog name')),
+          warnings.some((message) => message.includes('aihio-dialog') && message.includes('Provide aria-label on aihio-dialog')),
           'dialog should warn when neither a title nor aria-label is present'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-dropdown') && message.includes('Provide aria-label on the trigger')),
+          'dropdown should warn when an icon-only trigger has no accessible name'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-tabs') && message.includes('Match each tab\'s value to exactly one panel\'s value')),
+          'tabs should warn when tab and panel values do not match one-to-one'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-toggle') && message.includes('Provide aria-label describing what the toggle controls')),
+          'toggle should warn when icon-only content has no accessible name'
         );
       });
 
@@ -95,6 +128,29 @@
           <aihio-dialog id="good-dialog" aria-label="Confirm archive">
             <p>Archive this project?</p>
           </aihio-dialog>
+
+          <aihio-alert id="good-alert" variant="destructive">
+            <div slot="title">Delete failed</div>
+            <div slot="description">Try again.</div>
+          </aihio-alert>
+
+          <aihio-avatar id="good-avatar" src="/avatar.jpg" alt="Jane Doe"></aihio-avatar>
+
+          <aihio-dropdown id="good-dropdown">
+            <aihio-button slot="trigger" size="icon" aria-label="Open menu">&#x22ef;</aihio-button>
+            <aihio-dropdown-item>Profile</aihio-dropdown-item>
+          </aihio-dropdown>
+
+          <aihio-tabs id="good-tabs" value="one">
+            <aihio-tab-list>
+              <aihio-tab value="one">One</aihio-tab>
+              <aihio-tab value="two">Two</aihio-tab>
+            </aihio-tab-list>
+            <aihio-tab-panel value="one">Panel one</aihio-tab-panel>
+            <aihio-tab-panel value="two">Panel two</aihio-tab-panel>
+          </aihio-tabs>
+
+          <aihio-toggle id="good-toggle" aria-label="Bold"></aihio-toggle>
         `;
         await nextFrame(4);
 

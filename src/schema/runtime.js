@@ -33,8 +33,53 @@ export function collectDevWarnings(element) {
 
 export function formatDevWarning(element, warning) {
   const tag = normalizeTag(element) ?? 'aihio-element';
-  return `[aihio] ${tag}: ${warning.message}`;
+  const severity = typeof warning?.severity === 'string' ? `${warning.severity}: ` : '';
+  return `[aihio] ${tag}: ${severity}${warning.message}`;
 }
+
+const a11yRequirementCheckers = {
+  'aihio-alert': {
+    'variant="destructive"': (element) =>
+      element.getAttribute?.('variant') === 'destructive' &&
+      !hasNamedSlotContent(element, 'title') &&
+      !hasNamedSlotContent(element, 'description'),
+  },
+  'aihio-avatar': {
+    'src is set': (element) =>
+      hasNonEmptyAttribute(element, 'src') && !element.hasAttribute?.('alt'),
+    'src is not set and fallback is empty': (element) =>
+      !hasNonEmptyAttribute(element, 'src') &&
+      normalizeText(element.getAttribute?.('fallback')).length === 0 &&
+      normalizeText(element.getAttribute?.('alt')).length === 0,
+  },
+  'aihio-button': {
+    'size="icon" or the button has no visible text': (element) =>
+      requiresExplicitAccessibleName(element) && !hasAccessibleName(element),
+  },
+  'aihio-dialog': {
+    'dialog has no aihio-dialog-title': (element) =>
+      !element.querySelector?.('aihio-dialog-title') &&
+      !hasNonEmptyAttribute(element, 'aria-label'),
+  },
+  'aihio-dropdown': {
+    'the trigger is icon-only': (element) => {
+      const trigger = getDropdownTrigger(element);
+      return Boolean(trigger && requiresExplicitAccessibleName(trigger) && !hasAccessibleName(trigger));
+    },
+  },
+  'aihio-input': {
+    'input has no visible <label> associated by for/id': (element) => !hasAssociatedLabel(element),
+    'error=true': (element) =>
+      element.hasAttribute?.('error') && !referencesExistingIds(element, 'aria-describedby'),
+  },
+  'aihio-tabs': {
+    'every aihio-tab and aihio-tab-panel': (element) => !hasExactTabValuePairs(element),
+  },
+  'aihio-toggle': {
+    'toggle has no visible text (icon-only)': (element) =>
+      requiresExplicitAccessibleName(element) && !hasAccessibleName(element),
+  },
+};
 
 function collectEnumWarnings(element, schema) {
   const warnings = [];
@@ -56,61 +101,22 @@ function collectEnumWarnings(element, schema) {
 }
 
 function collectA11yWarnings(element, schema) {
-  switch (schema.$component) {
-    case 'aihio-button':
-      return collectButtonWarnings(element);
-    case 'aihio-dialog':
-      return collectDialogWarnings(element);
-    case 'aihio-input':
-      return collectInputWarnings(element);
-    default:
-      return [];
-  }
-}
-
-function collectButtonWarnings(element) {
-  const requiresExplicitName =
-    element.getAttribute?.('size') === 'icon' ||
-    normalizeText(element.textContent).length === 0;
-
-  if (!requiresExplicitName || hasAccessibleName(element)) {
-    return [];
-  }
-
-  return [{
-    key: 'a11y:accessible-name',
-    message: 'missing accessible name. Add aria-label or aria-labelledby to the button.',
-  }];
-}
-
-function collectDialogWarnings(element) {
-  const hasTitle = Boolean(element.querySelector?.('aihio-dialog-title'));
-  const hasAriaLabel = hasNonEmptyAttribute(element, 'aria-label');
-
-  if (hasTitle || hasAriaLabel) {
-    return [];
-  }
-
-  return [{
-    key: 'a11y:dialog-name',
-    message: 'missing dialog name. Add <aihio-dialog-title> or aria-label on the host.',
-  }];
-}
-
-function collectInputWarnings(element) {
   const warnings = [];
+  const checkers = a11yRequirementCheckers[schema.$component];
 
-  if (!hasAssociatedLabel(element)) {
-    warnings.push({
-      key: 'a11y:input-label',
-      message: 'missing associated label. Wrap in <label>, add label[for], aria-label, or aria-labelledby.',
-    });
+  if (!checkers) {
+    return warnings;
   }
 
-  if (element.hasAttribute?.('error') && !referencesExistingIds(element, 'aria-describedby')) {
+  for (const requirement of schema.a11yContract?.required ?? []) {
+    const checker = checkers[requirement.when];
+    if (!checker) continue;
+    if (!checker(element, requirement, schema)) continue;
+
     warnings.push({
-      key: 'a11y:error-description',
-      message: 'error state needs aria-describedby pointing to a visible message.',
+      key: `a11y:${schema.$component}:${requirement.when}`,
+      message: requirement.requirement,
+      severity: requirement.severity,
     });
   }
 
@@ -139,6 +145,69 @@ function hasAccessibleName(element) {
     referencesExistingIds(element, 'aria-labelledby') ||
     normalizeText(element.textContent).length > 0
   );
+}
+
+function requiresExplicitAccessibleName(element) {
+  return (
+    element?.getAttribute?.('size') === 'icon' ||
+    normalizeText(element?.textContent).length === 0
+  );
+}
+
+function hasNamedSlotContent(element, slotName) {
+  return [...element.querySelectorAll?.(`[slot="${slotName}"]`) ?? []].some((node) => {
+    if (normalizeText(node.textContent).length > 0) return true;
+    return node.childElementCount > 0;
+  });
+}
+
+function getDropdownTrigger(element) {
+  return element.querySelector?.('[slot="trigger"]') ?? null;
+}
+
+function hasExactTabValuePairs(element) {
+  const tabs = [...element.querySelectorAll?.('aihio-tab') ?? []];
+  const panels = [...element.querySelectorAll?.('aihio-tab-panel') ?? []];
+
+  if (tabs.length === 0 && panels.length === 0) {
+    return true;
+  }
+
+  if (tabs.length === 0 || panels.length === 0) {
+    return false;
+  }
+
+  const tabCounts = countAttributeValues(tabs, 'value');
+  const panelCounts = countAttributeValues(panels, 'value');
+
+  if (tabCounts.size !== panelCounts.size) {
+    return false;
+  }
+
+  for (const [value, count] of tabCounts) {
+    if (count !== 1 || panelCounts.get(value) !== 1) {
+      return false;
+    }
+  }
+
+  for (const count of panelCounts.values()) {
+    if (count !== 1) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function countAttributeValues(elements, attrName) {
+  const counts = new Map();
+
+  for (const element of elements) {
+    const value = element.getAttribute?.(attrName) ?? '';
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+
+  return counts;
 }
 
 function referencesExistingIds(element, attrName) {

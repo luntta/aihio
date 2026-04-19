@@ -70,7 +70,7 @@ Curated guidance beats raw schemas for steering. Ship a tight system-prompt deli
 Content pass that rides on Phases 1 + 4.
 
 - [~] Fill in `counterExamples` + `a11yContract` on every component (seeded in Phase 1; revisit after patterns are authored)
-- [ ] Phase 4 warnings also fire on a11yContract violations
+- [x] Phase 4 warnings also fire on a11yContract violations
 - [x] Prompt fragment (Phase 6) auto-includes counter-examples
 
 ## Phase 8 — Validator + MCP server (deferred)

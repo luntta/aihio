@@ -87,7 +87,7 @@ AI agents can use this schema to understand and generate correct markup without 
 
 The seeded patterns cover higher-level compositions such as auth forms, settings sections, destructive confirmations, tabbed settings, and toast-style alert stacks.
 
-In dev builds, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes, unnamed icon buttons, unnamed dialogs, and unlabeled inputs.
+In dev builds, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes and machine-checkable `a11yContract` violations including unnamed icon buttons and toggles, unnamed dialogs, unlabeled inputs, icon-only dropdown triggers without labels, destructive alerts without announced content, and mismatched tab/panel values.
 
 ## Tokens
 
