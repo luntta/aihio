@@ -59,6 +59,19 @@ The package also exports a canonical prompt fragment for AI systems:
 import prompt from 'aihio/prompt';
 ```
 
+Schema-backed markup linting is available both as a library and a CLI:
+
+```js
+import { lintMarkup } from 'aihio/lint';
+
+const result = lintMarkup('<aihio-button variant="primary"></aihio-button>');
+```
+
+```bash
+aihio-lint ./example.html
+cat ./example.html | aihio-lint -
+```
+
 ## Components
 
 | Component | Description |
@@ -86,6 +99,8 @@ const schema = await fetch('node_modules/aihio/dist/schema.json').then(r => r.js
 AI agents can use this schema to understand and generate correct markup without reading documentation. For styling decisions, the generated intent-token vocabulary is available at `dist/intent-tokens.md`.
 
 The seeded patterns cover higher-level compositions such as auth forms, settings sections, destructive confirmations, tabbed settings, and toast-style alert stacks.
+
+The component schemas also include author-facing `a11yContract` requirements and multiple `counterExamples` per component, so prompts, docs, and dev warnings can all point back to the same source-of-truth rules.
 
 In dev builds, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes and machine-checkable `a11yContract` violations including unnamed icon buttons and toggles, unnamed dialogs, unlabeled inputs, icon-only dropdown triggers without labels, destructive alerts without announced content, and mismatched tab/panel values.
 
@@ -127,7 +142,7 @@ Override CSS custom properties to theme the entire system:
 npm install
 npm run dev       # Dev server at localhost:3000/docs/
 npm run build     # Build dist/
-npm run test      # Run node and headless browser checks
+npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Build and run all checks
 npm run tokens    # Rebuild tokens only
 npm run styles    # Rebuild generated component CSS

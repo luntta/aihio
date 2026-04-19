@@ -25,7 +25,9 @@
     ]
   },
   "a11yContract": {
-    "handled": [],
+    "handled": [
+      "Card only adds visual grouping; headings, paragraphs, links, and buttons inside keep their native semantics."
+    ],
     "required": [
       {
         "when": "card acts as a link or button (entire surface is clickable)",
@@ -38,6 +40,10 @@
     {
       "markup": "<aihio-card><aihio-card-title>Hi</aihio-card-title></aihio-card>",
       "reason": "Title must live inside aihio-card-header, not directly inside aihio-card."
+    },
+    {
+      "markup": "<aihio-card onclick=\"openDetails()\"><p>Open details</p></aihio-card>",
+      "reason": "Clickable cards need keyboard-accessible semantics. Wrap the card in a link, or add role=\"button\" plus keyboard handlers to the interactive surface."
     }
   ],
   "related": [

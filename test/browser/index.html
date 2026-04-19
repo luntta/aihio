@@ -11,6 +11,9 @@
   <pre id="results"></pre>
 
   <script type="module">
+    globalThis.requestAnimationFrame = (callback) => setTimeout(() => callback(performance.now()), 0);
+    globalThis.cancelAnimationFrame = (handle) => clearTimeout(handle);
+
     import '../../dist/aihio.js';
 
     const sandbox = document.querySelector('#sandbox');

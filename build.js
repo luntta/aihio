@@ -18,6 +18,7 @@ await esbuild.build({
   entryPoints: [
     { in: 'src/aihio.js', out: 'aihio' },
     { in: 'src/components/index.js', out: 'components' },
+    { in: 'src/lint/index.js', out: 'lint' },
   ],
   bundle: true,
   define: {
@@ -29,6 +30,18 @@ await esbuild.build({
 });
 
 await esbuild.build({
+  entryPoints: ['src/lint/cli.js'],
+  bundle: true,
+  banner: {
+    js: '#!/usr/bin/env node',
+  },
+  format: 'esm',
+  outfile: 'dist/aihio-lint.js',
+  platform: 'node',
+  minify: true,
+});
+
+await esbuild.build({
   entryPoints: ['src/css/base.css'],
   bundle: true,
   outfile: 'dist/aihio.css',
@@ -36,5 +49,6 @@ await esbuild.build({
 });
 
 copyFileSync('docs/intent-tokens.md', 'dist/intent-tokens.md');
+copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
-console.log('build → dist/aihio.js, dist/components.js, dist/aihio.css');
+console.log('build → dist/aihio.js, dist/components.js, dist/lint.js, dist/aihio-lint.js, dist/aihio.css');

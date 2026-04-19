@@ -69,7 +69,7 @@ Curated guidance beats raw schemas for steering. Ship a tight system-prompt deli
 
 Content pass that rides on Phases 1 + 4.
 
-- [~] Fill in `counterExamples` + `a11yContract` on every component (seeded in Phase 1; revisit after patterns are authored)
+- [x] Fill in `counterExamples` + `a11yContract` on every component (seeded in Phase 1; revisit after patterns are authored)
 - [x] Phase 4 warnings also fire on a11yContract violations
 - [x] Prompt fragment (Phase 6) auto-includes counter-examples
 
@@ -77,7 +77,7 @@ Content pass that rides on Phases 1 + 4.
 
 Explicitly later. When it lands, reuses Phase 1's schema format, Phase 3's patterns, and Phase 7's rules with zero rework.
 
-- [ ] `aihio-lint` — takes HTML, returns structured errors against the schema
+- [x] `aihio-lint` — takes HTML, returns structured errors against the schema
 - [ ] MCP server exposing `describe(component)` + `lint(markup)` over stdio
 - [ ] Test suite of known-bad markup snippets the linter must catch
 

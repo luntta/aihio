@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -124,6 +125,55 @@ test('canonical prompt fragment is generated as markdown and as an importable mo
   assert.match(promptTypes, /declare const prompt: string;/);
 });
 
+test('built lint API and CLI return structured issues for invalid markup', async () => {
+  const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
+  const cliUrl = `${pathToFileURL(resolve(root, 'dist/aihio-lint.js')).href}?t=${Date.now()}`;
+  const { lintMarkup } = await import(lintUrl);
+  const { runCli } = await import(cliUrl);
+  const badMarkup = `
+    <aihio-button variant="primary" size="icon"></aihio-button>
+    <aihio-dropdown>
+      <aihio-dropdown-item>Profile</aihio-dropdown-item>
+    </aihio-dropdown>
+    <aihio-tabs value="one">
+      <aihio-tab-list>
+        <aihio-tab value="one">One</aihio-tab>
+      </aihio-tab-list>
+      <aihio-tab-panel value="two">Two</aihio-tab-panel>
+    </aihio-tabs>
+  `;
+  const fixtureDir = mkdtempSync(resolve(tmpdir(), 'aihio-lint-'));
+  const fixturePath = resolve(fixtureDir, 'fixture.html');
+  writeFileSync(fixturePath, badMarkup, 'utf8');
+
+  try {
+    const result = lintMarkup(badMarkup, { source: 'fixture.html' });
+    let cliOutput = '';
+    const cliStatus = runCli({
+      argv: [fixturePath],
+      write: (text) => {
+        cliOutput += text;
+      },
+    });
+
+    assert.equal(result.ok, false);
+    assert.ok(result.issues.length >= 4, 'lint should report multiple schema-backed issues');
+    assert.ok(result.issues.some((issue) => issue.ruleId === 'invalid-enum-attribute'));
+    assert.ok(result.issues.some((issue) => issue.ruleId === 'missing-required-slot'));
+    assert.ok(result.issues.some((issue) => issue.ruleId === 'a11y-contract' && issue.component === 'aihio-button'));
+    assert.ok(result.issues.some((issue) => issue.ruleId === 'a11y-contract' && issue.component === 'aihio-tabs'));
+    assert.ok(result.issues.every((issue) => typeof issue.location.line === 'number' && issue.location.line >= 1));
+    assert.ok(result.issues.every((issue) => typeof issue.path === 'string' && issue.path.length > 0));
+
+    assert.equal(cliStatus, 1);
+    const cliResult = JSON.parse(cliOutput);
+    assert.equal(cliResult.ok, false);
+    assert.ok(Array.isArray(cliResult.issues) && cliResult.issues.length === result.issues.length);
+  } finally {
+    rmSync(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('runtime bundle exposes Aihio.describe and schema-backed component versions', async () => {
   const previousAihio = globalThis.Aihio;
 
@@ -152,8 +202,11 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.types, './dist/aihio.d.ts');
   assert.equal(pkg.exports['.'].types, './dist/aihio.d.ts');
   assert.equal(pkg.exports['./components'].types, './dist/components.d.ts');
+  assert.equal(pkg.exports['./lint'].types, './dist/lint.d.ts');
+  assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
+  assert.equal(pkg.bin['aihio-lint'], './dist/aihio-lint.js');
 });
 
 test('schema output exposes intent vocabulary and every component carries required AI-first fields', () => {
@@ -170,6 +223,25 @@ test('schema output exposes intent vocabulary and every component carries requir
     }
     assert.ok(component.a11yContract && Array.isArray(component.a11yContract.handled), `${component.$component} has a11yContract.handled`);
     assert.ok(Array.isArray(component.counterExamples), `${component.$component} has counterExamples`);
+  }
+});
+
+test('schema content pass keeps a11y guidance and counterexamples populated for every component', () => {
+  const schema = JSON.parse(readFileSync(resolve(root, 'dist/schema.json'), 'utf8'));
+
+  for (const component of schema.components) {
+    assert.ok(
+      component.a11yContract?.handled?.length >= 1,
+      `${component.$component} should document at least one handled a11y behavior`
+    );
+    assert.ok(
+      component.a11yContract?.required?.length >= 1,
+      `${component.$component} should document at least one author a11y obligation`
+    );
+    assert.ok(
+      component.counterExamples?.length >= 2,
+      `${component.$component} should include at least two counterexamples`
+    );
   }
 });
 

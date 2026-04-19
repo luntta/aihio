@@ -11,6 +11,8 @@
 
   <script type="module">
     globalThis.__AIHIO_DEV__ = true;
+    globalThis.requestAnimationFrame = (callback) => setTimeout(() => callback(performance.now()), 0);
+    globalThis.cancelAnimationFrame = (handle) => clearTimeout(handle);
 
     const sandbox = document.querySelector('#sandbox');
     const resultsNode = document.querySelector('#results');

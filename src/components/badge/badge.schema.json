@@ -19,7 +19,9 @@
     "forbiddenChildren": ["aihio-button", "aihio-input", "aihio-dialog"]
   },
   "a11yContract": {
-    "handled": [],
+    "handled": [
+      "Badge stays semantically neutral: it does not add button, alert, status, or live-region roles automatically."
+    ],
     "required": [
       {
         "when": "badge conveys information not present elsewhere (e.g. unread count)",
