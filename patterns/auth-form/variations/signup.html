@@ -1,0 +1,46 @@
+<aihio-card data-aihio-intent="surface">
+  <aihio-card-header>
+    <aihio-card-title>Create your account</aihio-card-title>
+    <aihio-card-description>Set up a new workspace login for your team.</aihio-card-description>
+  </aihio-card-header>
+  <aihio-card-content>
+    <form novalidate>
+      <label>
+        <span>Full name</span>
+        <aihio-input
+          data-aihio-intent="form-field text-entry"
+          placeholder="Jane Doe"
+        ></aihio-input>
+      </label>
+
+      <label>
+        <span>Email</span>
+        <aihio-input
+          data-aihio-intent="form-field text-entry"
+          type="email"
+          placeholder="jane@company.com"
+        ></aihio-input>
+      </label>
+
+      <label>
+        <span>Password</span>
+        <aihio-input
+          data-aihio-intent="form-field text-entry"
+          type="password"
+        ></aihio-input>
+      </label>
+
+      <label>
+        <span>Confirm password</span>
+        <aihio-input
+          data-aihio-intent="form-field text-entry"
+          type="password"
+        ></aihio-input>
+      </label>
+    </form>
+  </aihio-card-content>
+  <aihio-card-footer>
+    <aihio-button data-aihio-intent="secondary-action" variant="outline">Already have an account?</aihio-button>
+    <aihio-button data-aihio-intent="primary-action">Create account</aihio-button>
+  </aihio-card-footer>
+</aihio-card>

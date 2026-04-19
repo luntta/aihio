@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aihio — Design System Preview</title>
+  <link rel="stylesheet" href="/dist/aihio.css">
+  <script type="module" src="/dist/aihio.js"></script>
+  <style>
+    .preview {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .section {
+      margin-bottom: 3rem;
+    }
+    .section-title {
+      font-size: var(--fontSize-xl);
+      font-weight: var(--fontWeight-semibold);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+      color: oklch(var(--foreground));
+    }
+    .section-subtitle {
+      font-size: var(--fontSize-sm);
+      color: oklch(var(--muted-foreground));
+      margin-bottom: 1rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid oklch(var(--border));
+      margin: 2rem 0;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid oklch(var(--border));
+    }
+    .header h1 {
+      font-size: var(--fontSize-2xl);
+      font-weight: var(--fontWeight-bold);
+      letter-spacing: -0.03em;
+    }
+    .theme-toggle {
+      display: flex;
+      gap: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview">
+    <div class="header">
+      <h1>Aihio</h1>
+      <div class="theme-toggle">
+        <aihio-button variant="ghost" size="sm" onclick="setTheme('light')">Light</aihio-button>
+        <aihio-button variant="ghost" size="sm" onclick="setTheme('dark')">Dark</aihio-button>
+        <aihio-button variant="ghost" size="sm" onclick="setTheme(null)">System</aihio-button>
+      </div>
+    </div>
+
+    <!-- Button -->
+    <div class="section">
+      <div class="section-title">Button</div>
+      <div class="row">
+        <aihio-button>Default</aihio-button>
+        <aihio-button variant="secondary">Secondary</aihio-button>
+        <aihio-button variant="outline">Outline</aihio-button>
+        <aihio-button variant="ghost">Ghost</aihio-button>
+        <aihio-button variant="link">Link</aihio-button>
+        <aihio-button variant="destructive">Destructive</aihio-button>
+      </div>
+      <div class="row">
+        <aihio-button size="sm">Small</aihio-button>
+        <aihio-button>Medium</aihio-button>
+        <aihio-button size="lg">Large</aihio-button>
+        <aihio-button size="icon">&#x2715;</aihio-button>
+      </div>
+      <div class="row">
+        <aihio-button disabled>Disabled</aihio-button>
+        <aihio-button loading>Loading</aihio-button>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Badge -->
+    <div class="section">
+      <div class="section-title">Badge</div>
+      <div class="row">
+        <aihio-badge>Default</aihio-badge>
+        <aihio-badge variant="secondary">Secondary</aihio-badge>
+        <aihio-badge variant="outline">Outline</aihio-badge>
+        <aihio-badge variant="destructive">Destructive</aihio-badge>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Input -->
+    <div class="section">
+      <div class="section-title">Input</div>
+      <div class="col" style="max-width: 24rem;">
+        <aihio-input placeholder="Default input"></aihio-input>
+        <aihio-input size="sm" placeholder="Small input"></aihio-input>
+        <aihio-input size="lg" placeholder="Large input"></aihio-input>
+        <aihio-input type="password" placeholder="Password"></aihio-input>
+        <aihio-input error placeholder="Error state"></aihio-input>
+        <aihio-input disabled placeholder="Disabled"></aihio-input>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Toggle -->
+    <div class="section">
+      <div class="section-title">Toggle</div>
+      <div class="row">
+        <aihio-toggle><strong>B</strong></aihio-toggle>
+        <aihio-toggle pressed><em>I</em></aihio-toggle>
+        <aihio-toggle variant="outline">Outline</aihio-toggle>
+        <aihio-toggle disabled>Disabled</aihio-toggle>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Avatar -->
+    <div class="section">
+      <div class="section-title">Avatar</div>
+      <div class="row">
+        <aihio-avatar alt="Jane Doe" size="sm"></aihio-avatar>
+        <aihio-avatar alt="Jane Doe"></aihio-avatar>
+        <aihio-avatar alt="Jane Doe" size="lg"></aihio-avatar>
+        <aihio-avatar fallback="RL"></aihio-avatar>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Alert -->
+    <div class="section">
+      <div class="section-title">Alert</div>
+      <div class="col">
+        <aihio-alert>
+          <div slot="title">Heads up!</div>
+          <div slot="description">You can add components to your app using the CLI.</div>
+        </aihio-alert>
+        <aihio-alert variant="destructive">
+          <div slot="title">Error</div>
+          <div slot="description">Your session has expired. Please log in again.</div>
+        </aihio-alert>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Card -->
+    <div class="section">
+      <div class="section-title">Card</div>
+      <div class="col" style="max-width: 24rem;">
+        <aihio-card>
+          <aihio-card-header>
+            <aihio-card-title>Create project</aihio-card-title>
+            <aihio-card-description>Deploy your new project in one click.</aihio-card-description>
+          </aihio-card-header>
+          <aihio-card-content>
+            <aihio-input placeholder="Project name"></aihio-input>
+          </aihio-card-content>
+          <aihio-card-footer>
+            <aihio-button variant="outline">Cancel</aihio-button>
+            <aihio-button>Deploy</aihio-button>
+          </aihio-card-footer>
+        </aihio-card>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Tabs -->
+    <div class="section">
+      <div class="section-title">Tabs</div>
+      <aihio-tabs value="account">
+        <aihio-tab-list>
+          <aihio-tab value="account">Account</aihio-tab>
+          <aihio-tab value="password">Password</aihio-tab>
+          <aihio-tab value="settings">Settings</aihio-tab>
+        </aihio-tab-list>
+        <aihio-tab-panel value="account">
+          <aihio-card>
+            <aihio-card-header>
+              <aihio-card-title>Account</aihio-card-title>
+              <aihio-card-description>Make changes to your account here.</aihio-card-description>
+            </aihio-card-header>
+            <aihio-card-content>
+              <aihio-input placeholder="Name" value="Raine Luntta"></aihio-input>
+            </aihio-card-content>
+            <aihio-card-footer>
+              <aihio-button>Save changes</aihio-button>
+            </aihio-card-footer>
+          </aihio-card>
+        </aihio-tab-panel>
+        <aihio-tab-panel value="password">
+          <aihio-card>
+            <aihio-card-header>
+              <aihio-card-title>Password</aihio-card-title>
+              <aihio-card-description>Change your password here.</aihio-card-description>
+            </aihio-card-header>
+            <aihio-card-content>
+              <aihio-input type="password" placeholder="Current password"></aihio-input>
+            </aihio-card-content>
+            <aihio-card-footer>
+              <aihio-button>Update password</aihio-button>
+            </aihio-card-footer>
+          </aihio-card>
+        </aihio-tab-panel>
+        <aihio-tab-panel value="settings">
+          <aihio-card>
+            <aihio-card-header>
+              <aihio-card-title>Settings</aihio-card-title>
+              <aihio-card-description>Manage your preferences.</aihio-card-description>
+            </aihio-card-header>
+            <aihio-card-content>
+              <div class="row">
+                <aihio-toggle pressed>Notifications</aihio-toggle>
+                <aihio-toggle>Marketing emails</aihio-toggle>
+              </div>
+            </aihio-card-content>
+          </aihio-card>
+        </aihio-tab-panel>
+      </aihio-tabs>
+    </div>
+
+    <hr>
+
+    <!-- Dropdown -->
+    <div class="section">
+      <div class="section-title">Dropdown</div>
+      <div class="row">
+        <aihio-dropdown>
+          <aihio-button slot="trigger" variant="outline">Open menu</aihio-button>
+          <aihio-dropdown-item>Profile</aihio-dropdown-item>
+          <aihio-dropdown-item>Billing</aihio-dropdown-item>
+          <aihio-dropdown-item>Settings</aihio-dropdown-item>
+          <aihio-dropdown-separator></aihio-dropdown-separator>
+          <aihio-dropdown-item>Logout</aihio-dropdown-item>
+        </aihio-dropdown>
+
+        <aihio-dropdown align="end">
+          <aihio-button slot="trigger" variant="ghost" size="icon">&#x22EE;</aihio-button>
+          <aihio-dropdown-item>Edit</aihio-dropdown-item>
+          <aihio-dropdown-item>Duplicate</aihio-dropdown-item>
+          <aihio-dropdown-separator></aihio-dropdown-separator>
+          <aihio-dropdown-item>Delete</aihio-dropdown-item>
+        </aihio-dropdown>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Dialog -->
+    <div class="section">
+      <div class="section-title">Dialog</div>
+      <aihio-button variant="outline" onclick="document.querySelector('#demo-dialog').open()">Open dialog</aihio-button>
+
+      <aihio-dialog id="demo-dialog">
+        <aihio-dialog-header>
+          <aihio-dialog-title>Are you absolutely sure?</aihio-dialog-title>
+          <aihio-dialog-description>This action cannot be undone. This will permanently delete your account and remove your data from our servers.</aihio-dialog-description>
+        </aihio-dialog-header>
+        <aihio-dialog-footer>
+          <aihio-button variant="outline" onclick="document.querySelector('#demo-dialog').close()">Cancel</aihio-button>
+          <aihio-button onclick="document.querySelector('#demo-dialog').close()">Continue</aihio-button>
+        </aihio-dialog-footer>
+      </aihio-dialog>
+    </div>
+  </div>
+
+  <script>
+    function setTheme(theme) {
+      if (theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+  </script>
+</body>
+</html>

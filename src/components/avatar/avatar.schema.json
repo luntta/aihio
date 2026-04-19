@@ -1,0 +1,62 @@
+{
+  "$component": "aihio-avatar",
+  "version": "1.0.0",
+  "description": "An avatar component that shows an image or text fallback.",
+  "intents": ["identity", "labeling"],
+  "attributes": {
+    "src": {
+      "type": "string",
+      "description": "Image URL for the avatar"
+    },
+    "alt": {
+      "type": "string",
+      "description": "Alt text for the image. Initials are derived from this if no fallback is set."
+    },
+    "fallback": {
+      "type": "string",
+      "description": "Fallback text displayed when image is unavailable"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md",
+      "description": "Avatar size"
+    }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "Image alt is forwarded from the alt attribute",
+      "Falls back to initials derived from alt when the image fails to load"
+    ],
+    "required": [
+      {
+        "when": "src is set",
+        "requirement": "Provide alt describing the person or entity (e.g. alt=\"Jane Doe\"). Empty alt is only acceptable for purely decorative avatars.",
+        "severity": "error"
+      },
+      {
+        "when": "src is not set and fallback is empty",
+        "requirement": "Provide alt so initials can be derived, or set fallback explicitly.",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-avatar src=\"/u.jpg\"></aihio-avatar>",
+      "reason": "Missing alt. Screen readers will announce only the filename."
+    },
+    {
+      "markup": "<aihio-avatar>JD</aihio-avatar>",
+      "reason": "Avatar renders its own content; passed children are replaced. Use the fallback attribute instead."
+    }
+  ],
+  "examples": [
+    "<aihio-avatar src=\"/avatar.jpg\" alt=\"Jane Doe\"></aihio-avatar>",
+    "<aihio-avatar alt=\"Jane Doe\"></aihio-avatar>",
+    "<aihio-avatar fallback=\"JD\" size=\"lg\"></aihio-avatar>"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$component": "aihio-badge",
+  "version": "1.0.0",
+  "description": "A small status indicator label.",
+  "intents": ["status", "labeling", "metadata"],
+  "attributes": {
+    "variant": {
+      "type": "enum",
+      "values": ["default", "secondary", "outline", "destructive"],
+      "default": "default",
+      "description": "Visual style variant"
+    }
+  },
+  "slots": {
+    "default": { "description": "Badge text content" }
+  },
+  "composition": {
+    "allowedChildren": ["#text"],
+    "forbiddenChildren": ["aihio-button", "aihio-input", "aihio-dialog"]
+  },
+  "a11yContract": {
+    "handled": [],
+    "required": [
+      {
+        "when": "badge conveys information not present elsewhere (e.g. unread count)",
+        "requirement": "Include the meaning in visible text or an aria-label on the surrounding context. Badges have no inherent role.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-badge><aihio-button>Delete</aihio-button></aihio-badge>",
+      "reason": "Badges are non-interactive labels. Put interactive elements outside the badge."
+    },
+    {
+      "markup": "<aihio-badge variant=\"primary\">New</aihio-badge>",
+      "reason": "variant=\"primary\" is not valid. Use variant=\"default\" for the primary style."
+    }
+  ],
+  "examples": [
+    "<aihio-badge>New</aihio-badge>",
+    "<aihio-badge variant=\"secondary\">Draft</aihio-badge>",
+    "<aihio-badge variant=\"outline\">v2.0</aihio-badge>",
+    "<aihio-badge variant=\"destructive\">Error</aihio-badge>"
+  ]
+}

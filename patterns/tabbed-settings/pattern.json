@@ -1,0 +1,8 @@
+{
+  "id": "tabbed-settings",
+  "name": "Tabbed Settings",
+  "intents": ["tabs", "navigation", "layout", "surface", "form-field", "toggle-state", "primary-action"],
+  "description": "A settings view split across tabs so related configuration stays grouped without overwhelming the page.",
+  "requiredComponents": ["aihio-tabs", "aihio-card", "aihio-input", "aihio-toggle", "aihio-button"],
+  "variations": []
+}

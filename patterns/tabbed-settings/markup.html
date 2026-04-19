@@ -1,0 +1,71 @@
+<aihio-tabs data-aihio-intent="tabs navigation layout" value="profile">
+  <aihio-tab-list>
+    <aihio-tab value="profile">Profile</aihio-tab>
+    <aihio-tab value="notifications">Notifications</aihio-tab>
+    <aihio-tab value="security">Security</aihio-tab>
+  </aihio-tab-list>
+
+  <aihio-tab-panel value="profile">
+    <aihio-card data-aihio-intent="surface">
+      <aihio-card-header>
+        <aihio-card-title>Profile</aihio-card-title>
+        <aihio-card-description>Update how your name and email appear to the team.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        <label>
+          <span>Full name</span>
+          <aihio-input data-aihio-intent="form-field text-entry" value="Jane Doe"></aihio-input>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <aihio-input data-aihio-intent="form-field text-entry" type="email" value="jane@company.com"></aihio-input>
+        </label>
+      </aihio-card-content>
+      <aihio-card-footer>
+        <aihio-button data-aihio-intent="primary-action">Save profile</aihio-button>
+      </aihio-card-footer>
+    </aihio-card>
+  </aihio-tab-panel>
+
+  <aihio-tab-panel value="notifications">
+    <aihio-card data-aihio-intent="surface">
+      <aihio-card-header>
+        <aihio-card-title>Notifications</aihio-card-title>
+        <aihio-card-description>Choose which updates should interrupt your day.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        <div>
+          <span>Incident digests</span>
+          <aihio-toggle data-aihio-intent="toggle-state" pressed>Enabled</aihio-toggle>
+        </div>
+
+        <div>
+          <span>Weekly summary</span>
+          <aihio-toggle data-aihio-intent="toggle-state">Disabled</aihio-toggle>
+        </div>
+      </aihio-card-content>
+      <aihio-card-footer>
+        <aihio-button data-aihio-intent="primary-action">Save notifications</aihio-button>
+      </aihio-card-footer>
+    </aihio-card>
+  </aihio-tab-panel>
+
+  <aihio-tab-panel value="security">
+    <aihio-card data-aihio-intent="surface">
+      <aihio-card-header>
+        <aihio-card-title>Security</aihio-card-title>
+        <aihio-card-description>Rotate credentials and confirm recovery options.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        <label>
+          <span>Recovery email</span>
+          <aihio-input data-aihio-intent="form-field text-entry" type="email" value="security@company.com"></aihio-input>
+        </label>
+      </aihio-card-content>
+      <aihio-card-footer>
+        <aihio-button data-aihio-intent="primary-action">Save security settings</aihio-button>
+      </aihio-card-footer>
+    </aihio-card>
+  </aihio-tab-panel>
+</aihio-tabs>

@@ -1,0 +1,48 @@
+{
+  "$component": "aihio-alert",
+  "version": "1.0.0",
+  "description": "A callout component for important messages.",
+  "intents": ["alert", "informational", "status"],
+  "attributes": {
+    "variant": {
+      "type": "enum",
+      "values": ["default", "destructive"],
+      "default": "default",
+      "description": "Visual style variant"
+    }
+  },
+  "slots": {
+    "default": { "description": "Alert content" },
+    "title": { "description": "Alert title (use slot=\"title\")" },
+    "description": { "description": "Alert description (use slot=\"description\")" }
+  },
+  "composition": {
+    "allowedSlots": ["default", "title", "description"]
+  },
+  "a11yContract": {
+    "handled": [
+      "role=\"alert\" is set automatically if none is provided"
+    ],
+    "required": [
+      {
+        "when": "variant=\"destructive\"",
+        "requirement": "Include slot=\"title\" or slot=\"description\" so assistive tech has content to announce. Colour alone is not a sufficient signal.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-alert variant=\"error\">Oops</aihio-alert>",
+      "reason": "variant=\"error\" is not valid. Use variant=\"destructive\" for error states."
+    },
+    {
+      "markup": "<aihio-alert><aihio-button>OK</aihio-button></aihio-alert>",
+      "reason": "Alerts are non-interactive surfaces. For acknowledgeable prompts use aihio-dialog."
+    }
+  ],
+  "examples": [
+    "<aihio-alert>\n  <div slot=\"title\">Heads up!</div>\n  <div slot=\"description\">You can add components to your app.</div>\n</aihio-alert>",
+    "<aihio-alert variant=\"destructive\">\n  <div slot=\"title\">Error</div>\n  <div slot=\"description\">Something went wrong.</div>\n</aihio-alert>"
+  ]
+}

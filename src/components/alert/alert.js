@@ -1,18 +1,51 @@
-import styles from './alert.css';
+import { AihioElement } from '../base.js';
 
-export class AihioAlert extends HTMLElement {
-    constructor() {
-        super();
-        console.log("Constructor: AihioAlert");
+export class AihioAlert extends AihioElement {
+  static tag = 'aihio-alert';
+  static observedAttributes = ['variant'];
+  static styles = `
+    aihio-alert {
+      display: flex;
+      gap: var(--spacing-intent-stack-sm);
+      width: 100%;
+      border-radius: var(--radius-intent-surface);
+      border: 1px solid oklch(var(--color-intent-border-subtle));
+      padding: var(--spacing-intent-stack-md);
+      font-size: var(--fontSize-intent-body-sm);
+      line-height: var(--lineHeight-intent-body);
+    }
 
-        this.classList.add(styles.alert);
+    aihio-alert:not([variant]),
+    aihio-alert[variant="default"] {
+      background-color: oklch(var(--color-intent-surface-bg));
+      color: oklch(var(--color-intent-surface-fg));
+    }
 
-        if (!this.getAttribute('role')) this.setAttribute('role', 'alert');
+    aihio-alert[variant="destructive"] {
+      border-color: oklch(var(--color-intent-state-destructive-bg) / 0.5);
+      color: oklch(var(--color-intent-state-destructive-bg));
+    }
+    aihio-alert[variant="destructive"] [slot="title"] {
+      color: oklch(var(--color-intent-state-destructive-bg));
+    }
 
-        if (this.getAttribute('dismissable')) {
-            document.createElement('aihio-button');
-        };
+    aihio-alert [slot="title"] {
+      font-weight: var(--fontWeight-intent-control);
+      line-height: var(--lineHeight-intent-compact);
+      letter-spacing: -0.01em;
+      margin-bottom: var(--spacing-intent-cluster-gap-tight);
+    }
 
-        if (!this.getAttribute('type')) this.setAttribute('type', 'info');
-    };
-};
+    aihio-alert [slot="description"] {
+      font-size: var(--fontSize-intent-body-sm);
+      opacity: 0.9;
+    }
+  `;
+
+  constructor() {
+    super();
+    if (!this.getAttribute('role')) {
+      this.setAttribute('role', 'alert');
+    }
+  }
+}

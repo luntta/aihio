@@ -1,0 +1,14 @@
+{
+  "id": "inline-form-validation",
+  "name": "Inline Form With Validation",
+  "intents": ["form-field", "text-entry", "alert", "primary-action", "secondary-action"],
+  "description": "A compact form that keeps the invalid field, visible message, and corrective action in one place.",
+  "requiredComponents": ["aihio-input", "aihio-alert", "aihio-button"],
+  "variations": [
+    {
+      "id": "success",
+      "name": "Success",
+      "description": "Resolved state after the invalid field has been corrected."
+    }
+  ]
+}

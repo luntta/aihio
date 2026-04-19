@@ -1,0 +1,70 @@
+{
+  "$component": "aihio-dialog",
+  "version": "1.0.0",
+  "description": "A modal dialog with backdrop, focus trap, and ESC to close.",
+  "intents": ["overlay", "modal", "dismissible"],
+  "attributes": {
+    "open": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the dialog is open"
+    }
+  },
+  "methods": {
+    "open()": { "description": "Opens the dialog" },
+    "close()": { "description": "Closes the dialog" }
+  },
+  "events": {
+    "open": { "description": "Fired when the dialog opens" },
+    "close": { "description": "Fired when the dialog closes" }
+  },
+  "composition": {
+    "allowedChildren": [
+      "aihio-dialog-header",
+      "aihio-dialog-footer",
+      "#flow"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "role=\"dialog\" and aria-modal=\"true\" are set on the panel",
+      "aria-labelledby is wired to aihio-dialog-title when present",
+      "aria-describedby is wired to aihio-dialog-description when present",
+      "Focus is trapped within the dialog while open",
+      "Escape closes the dialog",
+      "Background scroll is locked while open",
+      "Focus is restored to the trigger on close"
+    ],
+    "required": [
+      {
+        "when": "dialog has no aihio-dialog-title",
+        "requirement": "Provide aria-label on aihio-dialog describing the dialog's purpose; otherwise screen readers announce an unnamed dialog.",
+        "severity": "error"
+      },
+      {
+        "when": "dialog confirms a destructive action",
+        "requirement": "Label the confirming button with variant=\"destructive\" and keep Cancel as the first focusable control.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-dialog open><p>Delete?</p></aihio-dialog>",
+      "reason": "Missing header and footer. Provide aihio-dialog-title for a name and aihio-dialog-footer for actions."
+    },
+    {
+      "markup": "<aihio-dialog><aihio-dialog><p>Nested</p></aihio-dialog></aihio-dialog>",
+      "reason": "Dialogs must not be nested. Close the current dialog before opening another."
+    }
+  ],
+  "related": [
+    { "$component": "aihio-dialog-header", "description": "Dialog header container" },
+    { "$component": "aihio-dialog-title", "description": "Dialog title text" },
+    { "$component": "aihio-dialog-description", "description": "Dialog description text" },
+    { "$component": "aihio-dialog-footer", "description": "Dialog footer with actions" }
+  ],
+  "examples": [
+    "<aihio-dialog>\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>"
+  ]
+}

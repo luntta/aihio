@@ -1,0 +1,88 @@
+{
+  "$component": "aihio-dropdown",
+  "version": "1.0.0",
+  "description": "A dropdown menu with trigger, keyboard navigation, and click-outside to close.",
+  "intents": ["menu", "overlay", "selection", "dismissible"],
+  "attributes": {
+    "open": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the dropdown is open"
+    },
+    "align": {
+      "type": "enum",
+      "values": ["start", "end"],
+      "default": "start",
+      "description": "Alignment of the dropdown content relative to the trigger"
+    }
+  },
+  "methods": {
+    "open()": { "description": "Opens the dropdown" },
+    "close()": { "description": "Closes the dropdown" },
+    "toggle()": { "description": "Toggles the dropdown" }
+  },
+  "events": {
+    "open": { "description": "Fired when the dropdown opens" },
+    "close": { "description": "Fired when the dropdown closes" }
+  },
+  "slots": {
+    "trigger": { "description": "The element that opens the dropdown. Must be focusable." },
+    "default": { "description": "Dropdown items and separators." }
+  },
+  "composition": {
+    "requiredSlots": ["trigger"],
+    "allowedChildren": ["aihio-dropdown-item", "aihio-dropdown-separator", "aihio-button"]
+  },
+  "a11yContract": {
+    "handled": [
+      "aria-haspopup=\"menu\" is set on the trigger",
+      "aria-expanded is toggled on the trigger",
+      "aria-controls links the trigger to the content panel",
+      "role=\"menu\" is set on the content panel",
+      "role=\"menuitem\" is set on each dropdown item",
+      "Arrow keys move focus between items; Home/End jump to first/last",
+      "Escape closes and restores focus to the trigger",
+      "Click outside closes the menu"
+    ],
+    "required": [
+      {
+        "when": "the trigger is icon-only",
+        "requirement": "Provide aria-label on the trigger (e.g. aria-label=\"Open menu\").",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-dropdown>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n</aihio-dropdown>",
+      "reason": "Missing slot=\"trigger\". The dropdown has nothing to open it."
+    },
+    {
+      "markup": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\">Menu</aihio-button>\n  <a href=\"/x\">Link</a>\n</aihio-dropdown>",
+      "reason": "Children should be aihio-dropdown-item/separator so keyboard navigation and menuitem roles work. Wrap links in aihio-dropdown-item."
+    }
+  ],
+  "related": [
+    {
+      "$component": "aihio-dropdown-item",
+      "description": "A selectable item in the dropdown",
+      "attributes": {
+        "value": { "type": "string", "description": "Item value (defaults to text content)" },
+        "disabled": { "type": "boolean", "default": false }
+      },
+      "events": {
+        "select": {
+          "description": "Fired when the item is selected",
+          "detail": { "value": "string" }
+        }
+      }
+    },
+    {
+      "$component": "aihio-dropdown-separator",
+      "description": "A visual separator between dropdown items"
+    }
+  ],
+  "examples": [
+    "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Open</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n  <aihio-dropdown-item>Settings</aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item>Logout</aihio-dropdown-item>\n</aihio-dropdown>"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$component": "aihio-tabs",
+  "version": "1.0.0",
+  "description": "A tabbed interface component with keyboard navigation.",
+  "intents": ["tabs", "navigation", "layout"],
+  "attributes": {
+    "value": {
+      "type": "string",
+      "description": "The currently active tab value"
+    }
+  },
+  "composition": {
+    "requiredChildren": ["aihio-tab-list", "aihio-tab-panel"],
+    "allowedChildren": ["aihio-tab-list", "aihio-tab-panel"]
+  },
+  "a11yContract": {
+    "handled": [
+      "role=\"tablist\" on aihio-tab-list",
+      "role=\"tab\" on aihio-tab with aria-selected and tabindex roving",
+      "role=\"tabpanel\" on aihio-tab-panel with aria-labelledby wired to its tab",
+      "Arrow keys, Home, End move between tabs",
+      "Panels are hidden when inactive"
+    ],
+    "required": [
+      {
+        "when": "every aihio-tab and aihio-tab-panel",
+        "requirement": "Match each tab's value to exactly one panel's value. Mismatched values leave panels orphaned.",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-tabs>\n  <aihio-tab value=\"a\">A</aihio-tab>\n  <aihio-tab-panel value=\"a\">Content</aihio-tab-panel>\n</aihio-tabs>",
+      "reason": "aihio-tab must sit inside an aihio-tab-list; keyboard navigation is bound to the list."
+    },
+    {
+      "markup": "<aihio-tabs value=\"a\">\n  <aihio-tab-list>\n    <aihio-tab value=\"a\">A</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"b\">Content</aihio-tab-panel>\n</aihio-tabs>",
+      "reason": "Panel value does not match any tab value; the panel will never activate."
+    }
+  ],
+  "related": [
+    { "$component": "aihio-tab-list", "description": "Container for tab triggers" },
+    { "$component": "aihio-tab", "description": "Individual tab trigger" },
+    { "$component": "aihio-tab-panel", "description": "Content panel for a tab" }
+  ],
+  "examples": [
+    "<aihio-tabs value=\"one\">\n  <aihio-tab-list>\n    <aihio-tab value=\"one\">Tab 1</aihio-tab>\n    <aihio-tab value=\"two\">Tab 2</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"one\">Content 1</aihio-tab-panel>\n  <aihio-tab-panel value=\"two\">Content 2</aihio-tab-panel>\n</aihio-tabs>"
+  ]
+}

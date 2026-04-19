@@ -1,22 +1,37 @@
 {
   "name": "aihio",
-  "version": "0.1.0",
-  "description": "Aihio is a minimalistic user interface design system and web component library with user experience, accessibility and easy customization in mind.",
-  "main": "./src/js/aihio.js",
+  "version": "2.0.0",
+  "description": "AI-first design system built on native web components. Zero dependencies.",
+  "type": "module",
+  "main": "./dist/aihio.js",
+  "exports": {
+    ".": "./dist/aihio.js",
+    "./components": "./dist/components.js",
+    "./css": "./dist/aihio.css",
+    "./schema": "./dist/schema.json"
+  },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tokens": "node src/tokens/build.js",
+    "styles": "node src/schema/build.js && node src/css/build.js",
+    "schema": "node src/schema/build.js",
+    "dev": "node dev.js",
+    "build": "node build.js",
+    "test": "node --test",
+    "check": "npm run build && npm test",
+    "prepare": "npm run build"
   },
   "repository": "git+https://github.com/luntta/aihio.git",
   "keywords": [
-    "css",
+    "design-system",
+    "web-components",
+    "ai-first",
+    "design-tokens",
     "ui",
-    "ux",
-    "design",
-    "designsystem",
-    "guidelines",
-    "userinterface",
-    "interface",
-    "userexperience"
+    "components",
+    "zero-dependency"
   ],
   "author": "Raine Luntta <raine.luntta@gmail.com>",
   "license": "MIT",
@@ -24,12 +39,7 @@
     "url": "https://github.com/luntta/aihio/issues"
   },
   "homepage": "https://github.com/luntta/aihio#readme",
-  "dependencies": {
-    "autoprefixer": "^9.3.1",
-    "postcss-modules": "^1.4.1"
-  },
   "devDependencies": {
-    "cssnano": "^4.1.7",
-    "typescript": "^3.1.6"
+    "esbuild": "^0.25.0"
   }
 }

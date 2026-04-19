@@ -1,0 +1,81 @@
+{
+  "$component": "aihio-button",
+  "version": "1.0.0",
+  "description": "A button component with multiple visual variants and sizes.",
+  "intents": ["action", "primary-action", "secondary-action", "destructive-action"],
+  "attributes": {
+    "variant": {
+      "type": "enum",
+      "values": ["default", "secondary", "outline", "ghost", "link", "destructive"],
+      "default": "default",
+      "description": "Visual style variant"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg", "icon"],
+      "default": "md",
+      "description": "Button size"
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the button"
+    },
+    "loading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows loading state and disables interaction"
+    }
+  },
+  "slots": {
+    "default": { "description": "Button label content" }
+  },
+  "events": {
+    "click": { "description": "Fired when the button is clicked" }
+  },
+  "composition": {
+    "forbiddenChildren": ["aihio-button", "aihio-input", "aihio-dialog", "aihio-dropdown"]
+  },
+  "a11yContract": {
+    "handled": [
+      "role=\"button\" is set",
+      "tabindex is managed — removed from tab order when disabled or loading",
+      "aria-disabled reflects disabled state",
+      "aria-busy reflects loading state",
+      "Enter and Space activate the button",
+      "Click events are suppressed while disabled or loading"
+    ],
+    "required": [
+      {
+        "when": "size=\"icon\" or the button has no visible text",
+        "requirement": "Provide aria-label describing the action (e.g. aria-label=\"Close\").",
+        "severity": "error"
+      },
+      {
+        "when": "the button submits a form",
+        "requirement": "Place the button inside a <form> and set type=\"submit\"; aihio-button does not set submit semantics automatically.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-button variant=\"primary\">Save</aihio-button>",
+      "reason": "variant=\"primary\" is not valid. The primary style is variant=\"default\"."
+    },
+    {
+      "markup": "<aihio-button><aihio-button>Save</aihio-button></aihio-button>",
+      "reason": "Buttons must not be nested. Use sibling buttons or aihio-dropdown for grouped actions."
+    },
+    {
+      "markup": "<aihio-button size=\"icon\">&#x2715;</aihio-button>",
+      "reason": "Icon-only button is missing an accessible name. Add aria-label=\"Close\" (or similar)."
+    }
+  ],
+  "examples": [
+    "<aihio-button>Click me</aihio-button>",
+    "<aihio-button variant=\"outline\" size=\"sm\">Cancel</aihio-button>",
+    "<aihio-button variant=\"destructive\">Delete</aihio-button>",
+    "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>"
+  ]
+}

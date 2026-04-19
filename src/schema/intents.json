@@ -1,0 +1,32 @@
+{
+  "$schema": "aihio-intent-vocabulary/v1",
+  "description": "Curated vocabulary of intent tags used in component schemas. Agents reason about components by these intents rather than by name, so changes here are breaking.",
+  "intents": {
+    "action": "Any user-triggerable action.",
+    "primary-action": "The dominant action in a given context (e.g. submit, confirm).",
+    "secondary-action": "A supporting action (e.g. cancel, reset).",
+    "destructive-action": "An action with irreversible or data-losing consequences.",
+    "toggle-state": "Toggles a binary state without navigating or submitting.",
+    "navigation": "Moves the user to a different view, section, or URL.",
+    "selection": "Lets the user pick one item from a set.",
+    "form-field": "Collects a single value from the user as part of a form.",
+    "text-entry": "A form field specifically for free-form text.",
+    "status": "Displays current state (badges, pills, counts).",
+    "informational": "Non-blocking guidance or context.",
+    "alert": "Important message that requires attention.",
+    "error": "Communicates a failure or invalid state.",
+    "container": "Groups related content without imposing meaning.",
+    "surface": "A raised or bordered region that frames content (card, panel).",
+    "layout": "Arranges other components spatially (tab list, grid).",
+    "header": "A titled heading region inside a surface.",
+    "footer": "An actions or summary region inside a surface.",
+    "overlay": "Content that renders on top of the page (dialog, popover).",
+    "modal": "An overlay that blocks interaction with the rest of the page.",
+    "menu": "A list of actions triggered from an anchor element.",
+    "identity": "Represents a person or entity (avatar, name chip).",
+    "labeling": "Short label or tag attached to other content.",
+    "metadata": "Ancillary descriptive text (titles, descriptions, captions).",
+    "tabs": "Switches between sibling panels using a row of triggers.",
+    "dismissible": "Can be closed or hidden by the user."
+  }
+}

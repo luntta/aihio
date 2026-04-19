@@ -1,0 +1,14 @@
+{
+  "id": "empty-state",
+  "name": "Empty State",
+  "intents": ["surface", "informational", "primary-action", "secondary-action"],
+  "description": "A blank-slate surface that explains what is missing and points the user toward the next action.",
+  "requiredComponents": ["aihio-card", "aihio-button"],
+  "variations": [
+    {
+      "id": "search-results",
+      "name": "Search Results",
+      "description": "No-results variant that suggests clearing filters before creating a new item."
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "$component": "aihio-input",
+  "version": "1.0.0",
+  "description": "A text input component with size variants and error state.",
+  "intents": ["form-field", "text-entry"],
+  "attributes": {
+    "type": {
+      "type": "string",
+      "default": "text",
+      "description": "HTML input type (text, email, password, number, etc.)"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md",
+      "description": "Input size"
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Placeholder text"
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the input"
+    },
+    "error": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows error styling"
+    },
+    "value": {
+      "type": "string",
+      "description": "Initial value"
+    }
+  },
+  "events": {
+    "change": {
+      "description": "Fired on input, detail contains { value }",
+      "detail": { "value": "string" }
+    }
+  },
+  "properties": {
+    "value": { "type": "string", "description": "Get or set the current value" }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "aria-invalid reflects the error attribute",
+      "The inner <input> inherits placeholder, value, type, and disabled state"
+    ],
+    "required": [
+      {
+        "when": "input has no visible <label> associated by for/id",
+        "requirement": "Provide aria-label on aihio-input, or wrap in a <label>. Placeholder is not a label.",
+        "severity": "error"
+      },
+      {
+        "when": "error=true",
+        "requirement": "Describe the error via aria-describedby pointing to a visible message; the red border alone is not conveyed to screen readers.",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-input placeholder=\"Email\"></aihio-input>",
+      "reason": "Placeholder is not a label. Associate a <label> or add aria-label."
+    },
+    {
+      "markup": "<aihio-input error></aihio-input>",
+      "reason": "error=true without an aria-describedby message leaves screen reader users without context."
+    }
+  ],
+  "examples": [
+    "<label>\n  Email\n  <aihio-input type=\"email\" placeholder=\"you@example.com\"></aihio-input>\n</label>",
+    "<aihio-input aria-label=\"Search\" placeholder=\"Search…\"></aihio-input>",
+    "<aihio-input error aria-describedby=\"pw-error\" type=\"password\"></aihio-input>\n<p id=\"pw-error\">Password is too short.</p>"
+  ]
+}

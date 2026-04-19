@@ -1,0 +1,8 @@
+{
+  "id": "destructive-confirmation",
+  "name": "Destructive Confirmation",
+  "intents": ["overlay", "modal", "destructive-action", "secondary-action", "dismissible"],
+  "description": "A modal confirmation flow for irreversible actions with cancel-first ordering.",
+  "requiredComponents": ["aihio-dialog", "aihio-button"],
+  "variations": []
+}

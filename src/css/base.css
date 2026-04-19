@@ -1,0 +1,17 @@
+@import './tokens.css';
+@import './reset.css';
+@import './components.css';
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: var(--fontSize-intent-body);
+  font-weight: var(--fontWeight-intent-body);
+  line-height: var(--lineHeight-intent-body);
+  color: oklch(var(--color-intent-page-fg));
+  background-color: oklch(var(--color-intent-page-bg));
+}
+
+:focus-visible {
+  outline: 2px solid oklch(var(--color-intent-focus-ring));
+  outline-offset: 2px;
+}

@@ -1,0 +1,19 @@
+{
+  "id": "auth-form",
+  "name": "Auth Form",
+  "intents": ["surface", "form-field", "text-entry", "primary-action", "secondary-action"],
+  "description": "Card-based authentication form with labeled fields and a dominant submit action.",
+  "requiredComponents": ["aihio-card", "aihio-input", "aihio-button"],
+  "variations": [
+    {
+      "id": "passwordless",
+      "name": "Passwordless",
+      "description": "Email-only sign-in flow that requests a magic link."
+    },
+    {
+      "id": "signup",
+      "name": "Sign Up",
+      "description": "Account-creation variant with name, email, and password confirmation."
+    }
+  ]
+}

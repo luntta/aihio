@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aihio Dev Warning Tests</title>
+</head>
+<body data-status="running">
+  <main id="sandbox"></main>
+  <pre id="results"></pre>
+
+  <script type="module">
+    globalThis.__AIHIO_DEV__ = true;
+
+    const sandbox = document.querySelector('#sandbox');
+    const resultsNode = document.querySelector('#results');
+    const warnings = [];
+    const results = [];
+    const originalWarn = console.warn.bind(console);
+
+    console.warn = (...args) => {
+      warnings.push(args.map((arg) => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' '));
+    };
+
+    function assert(condition, message) {
+      if (!condition) {
+        throw new Error(message);
+      }
+    }
+
+    async function nextFrame(count = 1) {
+      for (let index = 0; index < count; index += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+    }
+
+    async function runTest(name, fn) {
+      try {
+        warnings.length = 0;
+        sandbox.replaceChildren();
+        await fn();
+        results.push({ name, pass: true });
+      } catch (error) {
+        results.push({
+          name,
+          pass: false,
+          message: error?.stack ?? String(error),
+        });
+      }
+    }
+
+    try {
+      await import('../../src/define.js');
+
+      await runTest('dev warnings report schema and a11y violations', async () => {
+        sandbox.innerHTML = `
+          <aihio-button id="bad-button" variant="primary" size="icon">&#x2715;</aihio-button>
+          <aihio-input id="bad-input" error></aihio-input>
+          <aihio-dialog id="bad-dialog" open>
+            <p>Delete?</p>
+          </aihio-dialog>
+        `;
+        await nextFrame(4);
+
+        assert(
+          warnings.some((message) => message.includes('aihio-button') && message.includes('invalid variant="primary"')),
+          'invalid enum warning should mention the button variant'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-button') && message.includes('missing accessible name')),
+          'button should warn when an icon-only control lacks an accessible name'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-input') && message.includes('missing associated label')),
+          'input should warn when no label is associated'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-input') && message.includes('aria-describedby')),
+          'input should warn when error state has no describedby message'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-dialog') && message.includes('missing dialog name')),
+          'dialog should warn when neither a title nor aria-label is present'
+        );
+      });
+
+      await runTest('dev runtime introspection and aria sync remain available', async () => {
+        sandbox.innerHTML = `
+          <label>
+            Email
+            <aihio-input id="good-input" aria-describedby="good-help" aria-label="Email"></aihio-input>
+          </label>
+          <p id="good-help">Use your work address.</p>
+
+          <aihio-dialog id="good-dialog" aria-label="Confirm archive">
+            <p>Archive this project?</p>
+          </aihio-dialog>
+        `;
+        await nextFrame(4);
+
+        const input = document.querySelector('#good-input');
+        const innerInput = input.querySelector('input');
+        const dialog = document.querySelector('#good-dialog');
+        const panel = dialog.shadowRoot.querySelector('.panel');
+
+        assert(globalThis.Aihio.describe('aihio-input')?.version === '1.0.0', 'Aihio.describe should expose the input schema');
+        assert(innerInput.getAttribute('aria-label') === 'Email', 'input host aria-label should sync to the inner input');
+        assert(innerInput.getAttribute('aria-describedby') === 'good-help', 'input host aria-describedby should sync to the inner input');
+        assert(panel.getAttribute('aria-label') === 'Confirm archive', 'dialog host aria-label should sync to the panel');
+        assert(warnings.length === 0, `valid markup should not warn, received: ${warnings.join('\n')}`);
+      });
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    const failed = results.some((result) => !result.pass);
+    document.body.dataset.status = failed ? 'fail' : 'pass';
+    resultsNode.textContent = JSON.stringify(results, null, 2);
+  </script>
+</body>
+</html>

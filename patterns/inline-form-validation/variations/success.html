@@ -1,0 +1,23 @@
+<section data-aihio-intent="form-field">
+  <label>
+    <span>Password</span>
+    <aihio-input
+      data-aihio-intent="form-field text-entry"
+      type="password"
+      value="correct horse battery staple"
+      aria-describedby="password-success"
+    ></aihio-input>
+  </label>
+
+  <p id="password-success">Password strength looks good.</p>
+
+  <aihio-alert data-aihio-intent="informational status">
+    <div slot="title">Ready to save</div>
+    <div slot="description">You can submit the form without additional changes.</div>
+  </aihio-alert>
+
+  <div>
+    <aihio-button data-aihio-intent="secondary-action" variant="outline">Cancel</aihio-button>
+    <aihio-button data-aihio-intent="primary-action">Save password</aihio-button>
+  </div>
+</section>

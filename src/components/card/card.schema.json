@@ -1,0 +1,53 @@
+{
+  "$component": "aihio-card",
+  "version": "1.0.0",
+  "description": "A container component for grouping related content.",
+  "intents": ["container", "surface"],
+  "attributes": {
+    "variant": {
+      "type": "enum",
+      "values": ["default", "outline"],
+      "default": "default",
+      "description": "Visual style variant. Outline removes the shadow."
+    }
+  },
+  "slots": {
+    "default": {
+      "description": "Card content. Use aihio-card-header, aihio-card-content, aihio-card-footer for structure."
+    }
+  },
+  "composition": {
+    "allowedChildren": [
+      "aihio-card-header",
+      "aihio-card-content",
+      "aihio-card-footer",
+      "#flow"
+    ]
+  },
+  "a11yContract": {
+    "handled": [],
+    "required": [
+      {
+        "when": "card acts as a link or button (entire surface is clickable)",
+        "requirement": "Wrap the card in an <a> or attach role=\"button\" + keyboard handlers on the outer element. aihio-card itself has no interactive role.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-card><aihio-card-title>Hi</aihio-card-title></aihio-card>",
+      "reason": "Title must live inside aihio-card-header, not directly inside aihio-card."
+    }
+  ],
+  "related": [
+    { "$component": "aihio-card-header", "description": "Card header container" },
+    { "$component": "aihio-card-title", "description": "Card title text" },
+    { "$component": "aihio-card-description", "description": "Card description text" },
+    { "$component": "aihio-card-content", "description": "Card main content area" },
+    { "$component": "aihio-card-footer", "description": "Card footer with actions" }
+  ],
+  "examples": [
+    "<aihio-card>\n  <aihio-card-header>\n    <aihio-card-title>Card Title</aihio-card-title>\n    <aihio-card-description>Card description.</aihio-card-description>\n  </aihio-card-header>\n  <aihio-card-content>\n    <p>Card content here.</p>\n  </aihio-card-content>\n  <aihio-card-footer>\n    <aihio-button>Action</aihio-button>\n  </aihio-card-footer>\n</aihio-card>"
+  ]
+}

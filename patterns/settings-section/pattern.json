@@ -1,0 +1,8 @@
+{
+  "id": "settings-section",
+  "name": "Settings Section",
+  "intents": ["surface", "form-field", "selection", "toggle-state", "primary-action", "secondary-action"],
+  "description": "A configurable settings panel with labeled fields, a menu-based selector, and save actions.",
+  "requiredComponents": ["aihio-card", "aihio-input", "aihio-dropdown", "aihio-toggle", "aihio-button", "aihio-badge"],
+  "variations": []
+}

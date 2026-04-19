@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aihio Browser Tests</title>
+  <link rel="stylesheet" href="../../dist/aihio.css">
+</head>
+<body data-status="running">
+  <main id="sandbox"></main>
+  <pre id="results"></pre>
+
+  <script type="module">
+    import '../../dist/aihio.js';
+
+    const sandbox = document.querySelector('#sandbox');
+    const resultsNode = document.querySelector('#results');
+    const results = [];
+
+    function assert(condition, message) {
+      if (!condition) {
+        throw new Error(message);
+      }
+    }
+
+    function dispatchKey(target, key, options = {}) {
+      target.dispatchEvent(new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        composed: true,
+        ...options,
+      }));
+    }
+
+    function dataUriSvg(markup) {
+      return `data:image/svg+xml,${encodeURIComponent(markup)}`;
+    }
+
+    async function nextFrame(count = 1) {
+      for (let index = 0; index < count; index += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+    }
+
+    async function runTest(name, fn) {
+      try {
+        sandbox.replaceChildren();
+        await fn();
+        results.push({ name, pass: true });
+      } catch (error) {
+        results.push({
+          name,
+          pass: false,
+          message: error?.stack ?? String(error),
+        });
+      }
+    }
+
+    await runTest('button and toggle sync disabled state', async () => {
+      sandbox.innerHTML = `
+        <aihio-button id="button" disabled>Save</aihio-button>
+        <aihio-toggle id="toggle" pressed disabled>Bold</aihio-toggle>
+      `;
+      await nextFrame(2);
+
+      const button = document.querySelector('#button');
+      const toggle = document.querySelector('#toggle');
+
+      assert(button.getAttribute('aria-disabled') === 'true', 'button should expose aria-disabled');
+      assert(button.tabIndex === -1, 'disabled button should not be tabbable');
+
+      let clicks = 0;
+      button.addEventListener('click', () => {
+        clicks += 1;
+      });
+      button.click();
+      assert(clicks === 0, 'disabled button click should be suppressed');
+
+      button.removeAttribute('disabled');
+      await nextFrame();
+      assert(button.tabIndex === 0, 'enabled button should restore tabIndex');
+
+      assert(toggle.getAttribute('aria-pressed') === 'true', 'toggle should reflect pressed state');
+      toggle.removeAttribute('disabled');
+      await nextFrame();
+      toggle.click();
+      await nextFrame();
+      assert(toggle.getAttribute('aria-pressed') === 'false', 'toggle should sync aria-pressed after click');
+    });
+
+    await runTest('input and avatar resync after attribute changes', async () => {
+      sandbox.innerHTML = `
+        <aihio-input id="input" value="A" placeholder="Hello"></aihio-input>
+        <aihio-avatar id="avatar" alt="Jane Doe"></aihio-avatar>
+      `;
+      await nextFrame(2);
+
+      const input = document.querySelector('#input');
+      const innerInput = input.querySelector('input');
+      const avatar = document.querySelector('#avatar');
+
+      assert(innerInput.value === 'A', 'input value should be initialized');
+      input.setAttribute('value', 'B');
+      input.setAttribute('placeholder', 'Updated');
+      input.setAttribute('disabled', '');
+      await nextFrame();
+      assert(innerInput.value === 'B', 'input value should update after attribute change');
+      assert(innerInput.placeholder === 'Updated', 'input placeholder should update');
+      assert(innerInput.disabled === true, 'input disabled should sync');
+
+      input.value = 'C';
+      await nextFrame();
+      assert(innerInput.value === 'C', 'setting input.value should sync to inner input');
+
+      assert(avatar.textContent.trim() === 'JD', 'avatar should derive initials from alt');
+      avatar.setAttribute('fallback', 'ZZ');
+      await nextFrame();
+      assert(avatar.textContent.trim() === 'ZZ', 'avatar fallback should update');
+
+      avatar.setAttribute('src', dataUriSvg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 4"><rect width="4" height="4" fill="black"/></svg>'));
+      await nextFrame(2);
+      assert(Boolean(avatar.querySelector('img')), 'avatar should render an image when src is set');
+
+      avatar.removeAttribute('src');
+      await nextFrame();
+      assert(avatar.textContent.trim() === 'ZZ', 'avatar should return to fallback text when src is removed');
+    });
+
+    await runTest('tabs wire aria relationships and keyboard navigation', async () => {
+      sandbox.innerHTML = `
+        <aihio-tabs id="tabs">
+          <aihio-tab-list>
+            <aihio-tab value="account">Account</aihio-tab>
+            <aihio-tab value="password">Password</aihio-tab>
+          </aihio-tab-list>
+          <aihio-tab-panel value="account">Account panel</aihio-tab-panel>
+          <aihio-tab-panel value="password">Password panel</aihio-tab-panel>
+        </aihio-tabs>
+      `;
+      await nextFrame(2);
+
+      const tabs = document.querySelector('#tabs');
+      const tabList = tabs.querySelector('aihio-tab-list');
+      const [accountTab, passwordTab] = tabs.querySelectorAll('aihio-tab');
+      const [accountPanel, passwordPanel] = tabs.querySelectorAll('aihio-tab-panel');
+
+      assert(accountTab.hasAttribute('active'), 'first enabled tab should be active by default');
+      assert(accountTab.getAttribute('aria-controls') === accountPanel.id, 'tab should reference its panel');
+      assert(accountPanel.getAttribute('aria-labelledby') === accountTab.id, 'panel should reference its tab');
+
+      passwordTab.click();
+      await nextFrame();
+      assert(tabs.getAttribute('value') === 'password', 'clicking a tab should update the tabs value');
+      assert(passwordPanel.hidden === false && accountPanel.hidden === true, 'panels should toggle visibility');
+
+      passwordTab.focus();
+      dispatchKey(tabList, 'ArrowLeft');
+      await nextFrame();
+      assert(accountTab.hasAttribute('active'), 'ArrowLeft should move selection to the previous tab');
+      assert(document.activeElement === accountTab, 'keyboard navigation should move focus');
+    });
+
+    await runTest('dropdown keyboard flow opens, navigates, and restores focus', async () => {
+      sandbox.innerHTML = `
+        <aihio-dropdown id="dropdown">
+          <aihio-button id="trigger" slot="trigger">Open</aihio-button>
+          <aihio-dropdown-item>Profile</aihio-dropdown-item>
+          <aihio-dropdown-item>Billing</aihio-dropdown-item>
+        </aihio-dropdown>
+      `;
+      await nextFrame(2);
+
+      const dropdown = document.querySelector('#dropdown');
+      const trigger = document.querySelector('#trigger');
+      const items = dropdown.querySelectorAll('aihio-dropdown-item');
+
+      trigger.focus();
+      dispatchKey(trigger, 'ArrowDown');
+      await nextFrame(2);
+      assert(dropdown.hasAttribute('open'), 'ArrowDown on the trigger should open the dropdown');
+      assert(document.activeElement === items[0], 'opening the dropdown should focus the first item');
+
+      dispatchKey(items[0], 'ArrowDown');
+      await nextFrame();
+      assert(document.activeElement === items[1], 'ArrowDown should move focus to the next item');
+
+      dispatchKey(items[1], 'Escape');
+      await nextFrame();
+      assert(!dropdown.hasAttribute('open'), 'Escape should close the dropdown');
+      assert(document.activeElement === trigger, 'closing the dropdown should restore focus to the trigger');
+    });
+
+    await runTest('dialog focuses content, traps focus, and restores opener focus', async () => {
+      sandbox.innerHTML = `
+        <button id="opener">Open</button>
+        <aihio-dialog id="dialog">
+          <aihio-dialog-header>
+            <aihio-dialog-title>Dialog title</aihio-dialog-title>
+            <aihio-dialog-description>Dialog description</aihio-dialog-description>
+          </aihio-dialog-header>
+          <button id="first">First</button>
+          <button id="last">Last</button>
+        </aihio-dialog>
+      `;
+      await nextFrame(2);
+
+      const opener = document.querySelector('#opener');
+      const dialog = document.querySelector('#dialog');
+      const first = dialog.querySelector('#first');
+      const last = dialog.querySelector('#last');
+
+      opener.focus();
+      dialog.open();
+      await nextFrame(3);
+
+      assert(dialog.hasAttribute('open'), 'dialog.open() should set the open attribute');
+      assert(document.activeElement === first, 'opening the dialog should focus the first slotted focus target');
+      assert(dialog.shadowRoot.querySelector('.panel').getAttribute('aria-labelledby'), 'dialog panel should be labelled');
+
+      last.focus();
+      dispatchKey(last, 'Tab');
+      await nextFrame();
+      assert(document.activeElement === first, 'Tab on the last item should wrap to the first item');
+
+      dispatchKey(document, 'Escape');
+      await nextFrame();
+      assert(!dialog.hasAttribute('open'), 'Escape should close the dialog');
+      assert(document.activeElement === opener, 'closing the dialog should restore focus to the opener');
+    });
+
+    const failed = results.some((result) => !result.pass);
+    document.body.dataset.status = failed ? 'fail' : 'pass';
+    resultsNode.textContent = JSON.stringify(results, null, 2);
+  </script>
+</body>
+</html>

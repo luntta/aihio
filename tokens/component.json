@@ -1,0 +1,47 @@
+{
+  "button": {
+    "height": {
+      "sm":   { "$value": "2.25rem", "$type": "dimension" },
+      "md":   { "$value": "2.5rem", "$type": "dimension" },
+      "lg":   { "$value": "2.75rem", "$type": "dimension" },
+      "icon": { "$value": "2.5rem", "$type": "dimension" }
+    },
+    "padding-x": {
+      "sm":   { "$value": "0.75rem", "$type": "dimension" },
+      "md":   { "$value": "1rem", "$type": "dimension" },
+      "lg":   { "$value": "2rem", "$type": "dimension" },
+      "icon": { "$value": "0", "$type": "dimension" }
+    },
+    "font-size": {
+      "sm":   { "$value": "{fontSize.sm}", "$type": "dimension" },
+      "md":   { "$value": "{fontSize.sm}", "$type": "dimension" },
+      "lg":   { "$value": "{fontSize.base}", "$type": "dimension" }
+    }
+  },
+  "input": {
+    "height": {
+      "sm":   { "$value": "2.25rem", "$type": "dimension" },
+      "md":   { "$value": "2.5rem", "$type": "dimension" },
+      "lg":   { "$value": "2.75rem", "$type": "dimension" }
+    }
+  },
+  "badge": {
+    "padding-x": { "$value": "0.625rem", "$type": "dimension" },
+    "padding-y": { "$value": "0.125rem", "$type": "dimension" },
+    "font-size": { "$value": "{fontSize.xs}", "$type": "dimension" }
+  },
+  "avatar": {
+    "size": {
+      "sm":   { "$value": "2rem", "$type": "dimension" },
+      "md":   { "$value": "2.5rem", "$type": "dimension" },
+      "lg":   { "$value": "3rem", "$type": "dimension" }
+    }
+  },
+  "card": {
+    "padding": { "$value": "1.5rem", "$type": "dimension" }
+  },
+  "dialog": {
+    "width": { "$value": "32rem", "$type": "dimension" },
+    "padding": { "$value": "1.5rem", "$type": "dimension" }
+  }
+}

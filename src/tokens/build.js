@@ -1,0 +1,312 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, '../..');
+
+const base = JSON.parse(readFileSync(resolve(root, 'tokens/base.json'), 'utf8'));
+const semantic = JSON.parse(readFileSync(resolve(root, 'tokens/semantic.json'), 'utf8'));
+const component = JSON.parse(readFileSync(resolve(root, 'tokens/component.json'), 'utf8'));
+const intent = JSON.parse(readFileSync(resolve(root, 'tokens/intent.json'), 'utf8'));
+
+function deepMerge(...sources) {
+  const target = {};
+
+  for (const source of sources) {
+    mergeInto(target, source);
+  }
+
+  return target;
+}
+
+function mergeInto(target, source) {
+  if (!source || typeof source !== 'object' || Array.isArray(source)) return target;
+
+  for (const [key, value] of Object.entries(source)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      !Object.prototype.hasOwnProperty.call(value, '$value')
+    ) {
+      if (
+        !target[key] ||
+        typeof target[key] !== 'object' ||
+        Array.isArray(target[key]) ||
+        Object.prototype.hasOwnProperty.call(target[key], '$value')
+      ) {
+        target[key] = {};
+      }
+
+      mergeInto(target[key], value);
+      continue;
+    }
+
+    target[key] = value;
+  }
+
+  return target;
+}
+
+const tokenRoot = deepMerge(base, component, intent.shared, { semantic });
+
+function resolvePath(path, tokens, parts = path.split('.'), matched = []) {
+  if (!tokens || typeof tokens !== 'object') return null;
+  if (parts.length === 0) return { keys: matched, node: tokens };
+
+  for (let size = parts.length; size > 0; size -= 1) {
+    const key = parts.slice(0, size).join('.');
+    if (!Object.prototype.hasOwnProperty.call(tokens, key)) continue;
+
+    const resolved = resolvePath(path, tokens[key], parts.slice(size), [...matched, key]);
+    if (resolved) return resolved;
+  }
+
+  return null;
+}
+
+function lookup(path, tokens) {
+  return resolvePath(path, tokens)?.node;
+}
+
+function toCssVarName(path, tokens) {
+  if (path.startsWith('semantic.light.')) {
+    return toCssVarName(path.slice('semantic.light.'.length), semantic.light);
+  }
+
+  if (path.startsWith('semantic.dark.')) {
+    return toCssVarName(path.slice('semantic.dark.'.length), semantic.dark);
+  }
+
+  const resolved = resolvePath(path, tokens);
+  if (!resolved) {
+    throw new Error(`Unresolved token reference: ${path}`);
+  }
+
+  return resolved.keys.map((key) => key.replace(/\./g, '\\.')).join('-');
+}
+
+function validateReferences(value, tokens, trail = []) {
+  if (typeof value !== 'string') return value;
+
+  value.replace(/\{([^}]+)\}/g, (_, path) => {
+    if (trail.includes(path)) {
+      throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
+    }
+
+    const node = lookup(path, tokens);
+    if (!node || node.$value === undefined) {
+      throw new Error(`Unresolved token reference: ${path}`);
+    }
+
+    validateReferences(node.$value, tokens, [...trail, path]);
+    return '';
+  });
+
+  return value;
+}
+
+function toCSSValue(value, tokens, trail = []) {
+  if (typeof value !== 'string') return value;
+
+  validateReferences(value, tokens, trail);
+
+  return value.replace(/\{([^}]+)\}/g, (_, path) => `var(--${toCssVarName(path, tokens)})`);
+}
+
+/** Flatten nested token object into [name, value] pairs */
+function flatten(obj, prefix = '', tokens = tokenRoot) {
+  if (!obj || typeof obj !== 'object') return [];
+
+  const entries = [];
+  for (const [key, val] of Object.entries(obj)) {
+    if (key.startsWith('$')) continue;
+
+    const safeName = key.replace(/\./g, '\\.');
+    const name = prefix ? `${prefix}-${safeName}` : safeName;
+    if (!val || typeof val !== 'object') continue;
+
+    if (Object.prototype.hasOwnProperty.call(val, '$value')) {
+      entries.push([name, toCSSValue(val.$value, tokens)]);
+    } else {
+      entries.push(...flatten(val, name, tokens));
+    }
+  }
+  return entries;
+}
+
+function toCSS(entries, indent = '  ') {
+  return entries.map(([name, value]) => `${indent}--${name}: ${value};`).join('\n');
+}
+
+// Build primitive tokens (non-color, since colors are only used via semantic)
+const primitiveEntries = flatten(
+  Object.fromEntries(
+    Object.entries(base).filter(([key]) => key !== 'color')
+  )
+);
+
+// Build semantic tokens for light and dark
+const lightEntries = flatten(semantic.light, '', tokenRoot);
+const darkEntries = flatten(semantic.dark, '', tokenRoot);
+
+// Build component tokens
+const componentEntries = flatten(component, '', tokenRoot);
+
+// Build intent tokens
+const sharedIntentEntries = flatten(intent.shared, '', tokenRoot);
+const lightIntentEntries = flatten(intent.light, '', tokenRoot);
+const darkIntentEntries = flatten(intent.dark, '', tokenRoot);
+
+const css = `/* Generated by src/tokens/build.js — do not edit */
+
+:root {
+  --radius: 0.5rem;
+
+  /* Primitives */
+${toCSS(primitiveEntries)}
+
+  /* Component tokens */
+${toCSS(componentEntries)}
+
+  /* Semantic (light) */
+${toCSS(lightEntries)}
+
+  /* Intent (shared) */
+${toCSS(sharedIntentEntries)}
+
+  /* Intent (light) */
+${toCSS(lightIntentEntries)}
+}
+
+[data-theme="dark"] {
+  /* Semantic (dark) */
+${toCSS(darkEntries)}
+
+  /* Intent (dark) */
+${toCSS(darkIntentEntries)}
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Semantic (dark) — auto */
+${toCSS(darkEntries, '    ')}
+
+    /* Intent (dark) — auto */
+${toCSS(darkIntentEntries, '    ')}
+  }
+}
+`;
+
+function listTokens(node, prefix = '') {
+  if (!node || typeof node !== 'object') return [];
+
+  const entries = [];
+  for (const [key, value] of Object.entries(node)) {
+    if (key.startsWith('$')) continue;
+
+    const next = prefix ? `${prefix}.${key}` : key;
+    if (!value || typeof value !== 'object') continue;
+
+    if (Object.prototype.hasOwnProperty.call(value, '$value')) {
+      entries.push({
+        path: next,
+        value: value.$value,
+        description: value.$description ?? '',
+      });
+      continue;
+    }
+
+    entries.push(...listTokens(value, next));
+  }
+
+  return entries;
+}
+
+function normalizeSource(value) {
+  if (typeof value !== 'string') return String(value);
+  const match = value.match(/^\{([^}]+)\}$/);
+  if (!match) return value;
+  return match[1].replace(/^semantic\.(light|dark)\./, 'semantic.');
+}
+
+function toDocRow(path, entry) {
+  return `| \`${path}\` | \`--${path.replace(/\./g, '-')}\` | \`${entry.source}\` | ${entry.description || 'No description.'} |`;
+}
+
+function buildIntentDocs() {
+  const shared = listTokens(intent.shared);
+  const light = listTokens(intent.light);
+  const dark = listTokens(intent.dark);
+  const combined = new Map();
+
+  for (const token of [...shared, ...light, ...dark]) {
+    const current = combined.get(token.path);
+    const source = normalizeSource(token.value);
+
+    if (!current) {
+      combined.set(token.path, {
+        description: token.description,
+        source,
+      });
+      continue;
+    }
+
+    current.description ||= token.description;
+    if (current.source !== source) {
+      current.source = `${current.source}; ${source}`;
+    }
+  }
+
+  const sections = [
+    ['color', 'Theme-aware color intents used by components and page-level chrome.'],
+    ['spacing', 'Layout spacing tokens that encode component rhythm rather than raw scale values.'],
+    ['radius', 'Corner-radius choices for surfaced and interactive affordances.'],
+    ['fontSize', 'Text-size intents for body copy, controls, and surfaced headings.'],
+    ['fontWeight', 'Weight intents for body text, controls, and headings.'],
+    ['lineHeight', 'Line-height intents for readable body copy and compact labels.'],
+    ['shadow', 'Elevation intents for surfaces and overlays.'],
+    ['duration', 'Motion timing intents for feedback and overlay entrance.'],
+  ];
+
+  const lines = [
+    '# Aihio Intent Tokens',
+    '',
+    'Generated from `tokens/intent.json` by `src/tokens/build.js`.',
+    '',
+    'Intent tokens sit above semantic and primitive tokens so component styles can ask for meaning, not raw scale positions.',
+    '',
+    '- `color.intent.*` tokens are theme-aware and map through `tokens/semantic.json`.',
+    '- Shared intent tokens for spacing, radius, typography, elevation, and motion map through primitive or component tokens.',
+    '- Components should prefer intent tokens for public-facing styling decisions and keep raw primitive usage for internal wiring only.',
+    '',
+  ];
+
+  for (const [section, intro] of sections) {
+    const rows = [...combined.entries()]
+      .filter(([path]) => path.startsWith(`${section}.intent.`))
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([path, entry]) => toDocRow(path, entry));
+
+    if (rows.length === 0) continue;
+
+    lines.push(`## ${section}`);
+    lines.push('');
+    lines.push(intro);
+    lines.push('');
+    lines.push('| Token | CSS Variable | Source | Description |');
+    lines.push('| --- | --- | --- | --- |');
+    lines.push(...rows);
+    lines.push('');
+  }
+
+  return `${lines.join('\n').trim()}\n`;
+}
+
+const outPath = resolve(__dirname, '../css/tokens.css');
+writeFileSync(outPath, css, 'utf8');
+const docsPath = resolve(root, 'docs/intent-tokens.md');
+writeFileSync(docsPath, buildIntentDocs(), 'utf8');
+console.log(`tokens → ${outPath}`);
+console.log(`intent docs → ${docsPath}`);

@@ -1,0 +1,72 @@
+{
+  "$component": "aihio-toggle",
+  "version": "1.0.0",
+  "description": "A toggle button that can be pressed or unpressed.",
+  "intents": ["toggle-state", "action"],
+  "attributes": {
+    "pressed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the toggle is pressed"
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the toggle"
+    },
+    "variant": {
+      "type": "enum",
+      "values": ["default", "outline"],
+      "default": "default",
+      "description": "Visual style variant"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md",
+      "description": "Toggle size"
+    }
+  },
+  "slots": {
+    "default": { "description": "Toggle label content" }
+  },
+  "events": {
+    "toggle": {
+      "description": "Fired when pressed state changes",
+      "detail": { "pressed": "boolean" }
+    }
+  },
+  "composition": {
+    "forbiddenChildren": ["aihio-button", "aihio-toggle", "aihio-input"]
+  },
+  "a11yContract": {
+    "handled": [
+      "role=\"button\" is set",
+      "aria-pressed reflects the pressed state",
+      "aria-disabled reflects the disabled state",
+      "tabindex is removed when disabled",
+      "Enter and Space activate the toggle"
+    ],
+    "required": [
+      {
+        "when": "toggle has no visible text (icon-only)",
+        "requirement": "Provide aria-label describing what the toggle controls (e.g. aria-label=\"Bold\").",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-toggle><aihio-button>B</aihio-button></aihio-toggle>",
+      "reason": "Nested interactives. Use aihio-toggle alone — it already behaves like a button."
+    },
+    {
+      "markup": "<aihio-toggle pressed=\"false\">Bold</aihio-toggle>",
+      "reason": "Boolean attributes toggle on presence. Omit the attribute for unpressed; write `pressed` for pressed."
+    }
+  ],
+  "examples": [
+    "<aihio-toggle>Bold</aihio-toggle>",
+    "<aihio-toggle pressed variant=\"outline\">Italic</aihio-toggle>"
+  ]
+}

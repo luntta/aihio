@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aihio-component-schema/v1",
+  "title": "Aihio Component Schema",
+  "description": "Shape of a single component's schema file (src/components/<name>/<name>.schema.json). AI agents consume the merged output at dist/schema.json to reason about markup.",
+  "type": "object",
+  "required": [
+    "$component",
+    "version",
+    "description",
+    "intents",
+    "a11yContract",
+    "counterExamples",
+    "examples"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$component": {
+      "type": "string",
+      "pattern": "^aihio-[a-z][a-z0-9-]*$",
+      "description": "Tag name, kebab-case, prefixed with aihio-."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Per-component schema version (semver). Bump on breaking changes to the component's API."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intents": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string" },
+      "description": "Intent tags from the curated vocabulary in intents.json. Agents use these to pick components by meaning."
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/attribute" }
+    },
+    "slots": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/slot" }
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/event" }
+    },
+    "methods": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/method" }
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/property" }
+    },
+    "composition": { "$ref": "#/$defs/composition" },
+    "a11yContract": { "$ref": "#/$defs/a11yContract" },
+    "counterExamples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/counterExample" }
+    },
+    "related": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/related" }
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "attribute": {
+      "type": "object",
+      "required": ["type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "enum"]
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required when type is enum."
+        },
+        "default": {},
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "accepts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tag names (or tokens #text, #flow) allowed in this slot."
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "detail": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "property": {
+      "type": "object",
+      "required": ["type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string" },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Composition constraints. Tokens: '*' = any, '#text' = text nodes, '#flow' = any flow content, '#root' = not a child of any aihio component.",
+      "properties": {
+        "allowedParents": { "type": "array", "items": { "type": "string" } },
+        "requiredAncestors": { "type": "array", "items": { "type": "string" } },
+        "allowedChildren": { "type": "array", "items": { "type": "string" } },
+        "requiredChildren": { "type": "array", "items": { "type": "string" } },
+        "forbiddenChildren": { "type": "array", "items": { "type": "string" } },
+        "allowedSlots": { "type": "array", "items": { "type": "string" } },
+        "requiredSlots": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "a11yContract": {
+      "type": "object",
+      "required": ["handled"],
+      "additionalProperties": false,
+      "properties": {
+        "handled": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "What the component takes care of automatically (roles, focus, ARIA wiring)."
+        },
+        "required": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/a11yRequirement" },
+          "description": "Author obligations the component cannot infer."
+        }
+      }
+    },
+    "a11yRequirement": {
+      "type": "object",
+      "required": ["when", "requirement", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "type": "string", "minLength": 1 },
+        "requirement": { "type": "string", "minLength": 1 },
+        "severity": { "type": "string", "enum": ["error", "warn"] }
+      }
+    },
+    "counterExample": {
+      "type": "object",
+      "required": ["markup", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "markup": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "related": {
+      "type": "object",
+      "required": ["$component", "description"],
+      "additionalProperties": true,
+      "properties": {
+        "$component": { "type": "string", "pattern": "^aihio-[a-z][a-z0-9-]*$" },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

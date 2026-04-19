@@ -1,0 +1,429 @@
+{
+  "$description": "Intent tokens expose component-facing meaning above semantic and primitive tiers.",
+  "shared": {
+    "color": {
+      "intent": {
+        "overlay-scrim": {
+          "$value": "0 0 0 / 0.8",
+          "$type": "color",
+          "$description": "Modal backdrop scrim behind blocking overlays."
+        }
+      }
+    },
+    "radius": {
+      "intent": {
+        "surface": {
+          "$value": "{radius.lg}",
+          "$type": "dimension",
+          "$description": "Corner radius for cards, alerts, and other framed surfaces."
+        },
+        "interactive": {
+          "$value": "{radius.md}",
+          "$type": "dimension",
+          "$description": "Default corner radius for buttons, inputs, toggles, and menus."
+        },
+        "interactive-compact": {
+          "$value": "{radius.sm}",
+          "$type": "dimension",
+          "$description": "Tighter radius for dense interactive children such as tabs and menu items."
+        },
+        "pill": {
+          "$value": "{radius.full}",
+          "$type": "dimension",
+          "$description": "Fully rounded presentation for badges, avatars, and pill-shaped affordances."
+        }
+      }
+    },
+    "spacing": {
+      "intent": {
+        "cluster-gap-tight": {
+          "$value": "{spacing.1}",
+          "$type": "dimension",
+          "$description": "Tight spacing inside grouped interactive controls and menu chrome."
+        },
+        "stack-tight": {
+          "$value": "{spacing.1.5}",
+          "$type": "dimension",
+          "$description": "Compact vertical rhythm for headings with short supporting copy."
+        },
+        "control-gap": {
+          "$value": "{spacing.2}",
+          "$type": "dimension",
+          "$description": "Default inline gap between icons, labels, and grouped actions."
+        },
+        "stack-sm": {
+          "$value": "{spacing.3}",
+          "$type": "dimension",
+          "$description": "Short vertical separation between related blocks such as alert content and panels."
+        },
+        "stack-md": {
+          "$value": "{spacing.4}",
+          "$type": "dimension",
+          "$description": "Standard section spacing within surfaced components."
+        },
+        "stack-lg": {
+          "$value": "{spacing.6}",
+          "$type": "dimension",
+          "$description": "Large separation for footer action areas and major section breaks."
+        },
+        "field-padding-inline-sm": {
+          "$value": "{spacing.2}",
+          "$type": "dimension",
+          "$description": "Inline padding for compact form fields."
+        },
+        "field-padding-inline": {
+          "$value": "{spacing.3}",
+          "$type": "dimension",
+          "$description": "Inline padding for default form fields."
+        },
+        "field-padding-inline-lg": {
+          "$value": "{spacing.4}",
+          "$type": "dimension",
+          "$description": "Inline padding for spacious form fields."
+        },
+        "field-padding-block-sm": {
+          "$value": "{spacing.1}",
+          "$type": "dimension",
+          "$description": "Block padding for compact form fields."
+        },
+        "field-padding-block": {
+          "$value": "{spacing.2}",
+          "$type": "dimension",
+          "$description": "Block padding for default form fields."
+        },
+        "field-padding-block-lg": {
+          "$value": "{spacing.2.5}",
+          "$type": "dimension",
+          "$description": "Block padding for spacious form fields."
+        },
+        "form-field-gap": {
+          "$value": "{spacing.3}",
+          "$type": "dimension",
+          "$description": "Recommended gap between labels, help text, and form controls."
+        }
+      }
+    },
+    "fontSize": {
+      "intent": {
+        "body": {
+          "$value": "{fontSize.base}",
+          "$type": "dimension",
+          "$description": "Default document body text size."
+        },
+        "body-sm": {
+          "$value": "{fontSize.sm}",
+          "$type": "dimension",
+          "$description": "Supporting text size for descriptions and secondary copy."
+        },
+        "control": {
+          "$value": "{fontSize.sm}",
+          "$type": "dimension",
+          "$description": "Default text size for controls."
+        },
+        "control-sm": {
+          "$value": "{fontSize.xs}",
+          "$type": "dimension",
+          "$description": "Compact text size for small controls."
+        },
+        "control-lg": {
+          "$value": "{fontSize.base}",
+          "$type": "dimension",
+          "$description": "Larger text size for prominent controls."
+        },
+        "badge": {
+          "$value": "{fontSize.xs}",
+          "$type": "dimension",
+          "$description": "Dense label size for badges and tiny metadata chips."
+        },
+        "heading": {
+          "$value": "{fontSize.2xl}",
+          "$type": "dimension",
+          "$description": "Large surface title size."
+        },
+        "heading-sm": {
+          "$value": "{fontSize.lg}",
+          "$type": "dimension",
+          "$description": "Compact surface title size for dialogs and smaller panels."
+        }
+      }
+    },
+    "fontWeight": {
+      "intent": {
+        "body": {
+          "$value": "{fontWeight.normal}",
+          "$type": "fontWeight",
+          "$description": "Default document body weight."
+        },
+        "control": {
+          "$value": "{fontWeight.medium}",
+          "$type": "fontWeight",
+          "$description": "Emphasized but compact weight for controls and inline titles."
+        },
+        "heading": {
+          "$value": "{fontWeight.semibold}",
+          "$type": "fontWeight",
+          "$description": "Strong surface-heading weight."
+        },
+        "badge": {
+          "$value": "{fontWeight.semibold}",
+          "$type": "fontWeight",
+          "$description": "Dense emphasis weight for badges."
+        }
+      }
+    },
+    "lineHeight": {
+      "intent": {
+        "body": {
+          "$value": "{lineHeight.normal}",
+          "$type": "number",
+          "$description": "Default readable line height for body and field text."
+        },
+        "compact": {
+          "$value": "{lineHeight.none}",
+          "$type": "number",
+          "$description": "Tight line height for headings, labels, and short control text."
+        }
+      }
+    },
+    "shadow": {
+      "intent": {
+        "surface": {
+          "$value": "{shadow.sm}",
+          "$type": "shadow",
+          "$description": "Subtle elevation for surfaced content."
+        },
+        "overlay": {
+          "$value": "{shadow.md}",
+          "$type": "shadow",
+          "$description": "Elevation for popovers and transient overlays."
+        },
+        "modal": {
+          "$value": "{shadow.lg}",
+          "$type": "shadow",
+          "$description": "Deeper elevation for blocking modal dialogs."
+        }
+      }
+    },
+    "duration": {
+      "intent": {
+        "feedback-fast": {
+          "$value": "{duration.fast}",
+          "$type": "duration",
+          "$description": "Fast hover and menu-item feedback transitions."
+        },
+        "feedback": {
+          "$value": "{duration.normal}",
+          "$type": "duration",
+          "$description": "Default control feedback transition duration."
+        },
+        "overlay": {
+          "$value": "{duration.slow}",
+          "$type": "duration",
+          "$description": "Entrance timing for larger blocking overlays."
+        }
+      }
+    }
+  },
+  "light": {
+    "color": {
+      "intent": {
+        "page-bg": {
+          "$value": "{semantic.light.background}",
+          "$type": "color",
+          "$description": "Default page canvas and neutral active backgrounds."
+        },
+        "page-fg": {
+          "$value": "{semantic.light.foreground}",
+          "$type": "color",
+          "$description": "Primary foreground on the page canvas."
+        },
+        "surface-bg": {
+          "$value": "{semantic.light.card}",
+          "$type": "color",
+          "$description": "Raised surface background for cards, alerts, and dialog panels."
+        },
+        "surface-fg": {
+          "$value": "{semantic.light.card-foreground}",
+          "$type": "color",
+          "$description": "Primary foreground on raised surfaces."
+        },
+        "overlay-bg": {
+          "$value": "{semantic.light.popover}",
+          "$type": "color",
+          "$description": "Surface background for transient overlays such as dropdowns."
+        },
+        "overlay-fg": {
+          "$value": "{semantic.light.popover-foreground}",
+          "$type": "color",
+          "$description": "Foreground on transient overlays."
+        },
+        "surface-muted-bg": {
+          "$value": "{semantic.light.muted}",
+          "$type": "color",
+          "$description": "Muted fill for grouped controls and subdued surfaces."
+        },
+        "surface-muted-fg": {
+          "$value": "{semantic.light.muted-foreground}",
+          "$type": "color",
+          "$description": "Supporting foreground on muted fills."
+        },
+        "action-primary-bg": {
+          "$value": "{semantic.light.primary}",
+          "$type": "color",
+          "$description": "Default filled action background."
+        },
+        "action-primary-fg": {
+          "$value": "{semantic.light.primary-foreground}",
+          "$type": "color",
+          "$description": "Foreground on default filled actions."
+        },
+        "action-secondary-bg": {
+          "$value": "{semantic.light.secondary}",
+          "$type": "color",
+          "$description": "Lower-emphasis filled action background."
+        },
+        "action-secondary-fg": {
+          "$value": "{semantic.light.secondary-foreground}",
+          "$type": "color",
+          "$description": "Foreground on lower-emphasis filled actions."
+        },
+        "action-accent-bg": {
+          "$value": "{semantic.light.accent}",
+          "$type": "color",
+          "$description": "Hover and pressed highlight background for neutral controls."
+        },
+        "action-accent-fg": {
+          "$value": "{semantic.light.accent-foreground}",
+          "$type": "color",
+          "$description": "Foreground on hover and pressed highlight backgrounds."
+        },
+        "state-destructive-bg": {
+          "$value": "{semantic.light.destructive}",
+          "$type": "color",
+          "$description": "Destructive emphasis background and error color."
+        },
+        "state-destructive-fg": {
+          "$value": "{semantic.light.destructive-foreground}",
+          "$type": "color",
+          "$description": "Foreground on destructive emphasis backgrounds."
+        },
+        "border-subtle": {
+          "$value": "{semantic.light.border}",
+          "$type": "color",
+          "$description": "Default border color for surfaces and outlines."
+        },
+        "field-border": {
+          "$value": "{semantic.light.input}",
+          "$type": "color",
+          "$description": "Default border color for editable form fields."
+        },
+        "focus-ring": {
+          "$value": "{semantic.light.ring}",
+          "$type": "color",
+          "$description": "Focus indication ring for keyboard interactions."
+        }
+      }
+    }
+  },
+  "dark": {
+    "color": {
+      "intent": {
+        "page-bg": {
+          "$value": "{semantic.dark.background}",
+          "$type": "color",
+          "$description": "Default page canvas and neutral active backgrounds."
+        },
+        "page-fg": {
+          "$value": "{semantic.dark.foreground}",
+          "$type": "color",
+          "$description": "Primary foreground on the page canvas."
+        },
+        "surface-bg": {
+          "$value": "{semantic.dark.card}",
+          "$type": "color",
+          "$description": "Raised surface background for cards, alerts, and dialog panels."
+        },
+        "surface-fg": {
+          "$value": "{semantic.dark.card-foreground}",
+          "$type": "color",
+          "$description": "Primary foreground on raised surfaces."
+        },
+        "overlay-bg": {
+          "$value": "{semantic.dark.popover}",
+          "$type": "color",
+          "$description": "Surface background for transient overlays such as dropdowns."
+        },
+        "overlay-fg": {
+          "$value": "{semantic.dark.popover-foreground}",
+          "$type": "color",
+          "$description": "Foreground on transient overlays."
+        },
+        "surface-muted-bg": {
+          "$value": "{semantic.dark.muted}",
+          "$type": "color",
+          "$description": "Muted fill for grouped controls and subdued surfaces."
+        },
+        "surface-muted-fg": {
+          "$value": "{semantic.dark.muted-foreground}",
+          "$type": "color",
+          "$description": "Supporting foreground on muted fills."
+        },
+        "action-primary-bg": {
+          "$value": "{semantic.dark.primary}",
+          "$type": "color",
+          "$description": "Default filled action background."
+        },
+        "action-primary-fg": {
+          "$value": "{semantic.dark.primary-foreground}",
+          "$type": "color",
+          "$description": "Foreground on default filled actions."
+        },
+        "action-secondary-bg": {
+          "$value": "{semantic.dark.secondary}",
+          "$type": "color",
+          "$description": "Lower-emphasis filled action background."
+        },
+        "action-secondary-fg": {
+          "$value": "{semantic.dark.secondary-foreground}",
+          "$type": "color",
+          "$description": "Foreground on lower-emphasis filled actions."
+        },
+        "action-accent-bg": {
+          "$value": "{semantic.dark.accent}",
+          "$type": "color",
+          "$description": "Hover and pressed highlight background for neutral controls."
+        },
+        "action-accent-fg": {
+          "$value": "{semantic.dark.accent-foreground}",
+          "$type": "color",
+          "$description": "Foreground on hover and pressed highlight backgrounds."
+        },
+        "state-destructive-bg": {
+          "$value": "{semantic.dark.destructive}",
+          "$type": "color",
+          "$description": "Destructive emphasis background and error color."
+        },
+        "state-destructive-fg": {
+          "$value": "{semantic.dark.destructive-foreground}",
+          "$type": "color",
+          "$description": "Foreground on destructive emphasis backgrounds."
+        },
+        "border-subtle": {
+          "$value": "{semantic.dark.border}",
+          "$type": "color",
+          "$description": "Default border color for surfaces and outlines."
+        },
+        "field-border": {
+          "$value": "{semantic.dark.input}",
+          "$type": "color",
+          "$description": "Default border color for editable form fields."
+        },
+        "focus-ring": {
+          "$value": "{semantic.dark.ring}",
+          "$type": "color",
+          "$description": "Focus indication ring for keyboard interactions."
+        }
+      }
+    }
+  }
+}

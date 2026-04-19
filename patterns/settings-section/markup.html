@@ -1,0 +1,38 @@
+<aihio-card data-aihio-intent="surface">
+  <aihio-card-header>
+    <aihio-card-title>Workspace settings</aihio-card-title>
+    <aihio-card-description>Update the defaults your team sees on first login.</aihio-card-description>
+  </aihio-card-header>
+  <aihio-card-content>
+    <div>
+      <aihio-badge data-aihio-intent="status" variant="secondary">Live</aihio-badge>
+    </div>
+
+    <label>
+      <span>Workspace name</span>
+      <aihio-input
+        data-aihio-intent="form-field text-entry"
+        value="Northwind"
+      ></aihio-input>
+    </label>
+
+    <div>
+      <span>Default landing page</span>
+      <aihio-dropdown data-aihio-intent="menu selection">
+        <aihio-button slot="trigger" data-aihio-intent="secondary-action" variant="outline">Projects</aihio-button>
+        <aihio-dropdown-item>Overview</aihio-dropdown-item>
+        <aihio-dropdown-item>Projects</aihio-dropdown-item>
+        <aihio-dropdown-item>Settings</aihio-dropdown-item>
+      </aihio-dropdown>
+    </div>
+
+    <div>
+      <span>Email notifications</span>
+      <aihio-toggle data-aihio-intent="toggle-state" pressed>Enabled</aihio-toggle>
+    </div>
+  </aihio-card-content>
+  <aihio-card-footer>
+    <aihio-button data-aihio-intent="secondary-action" variant="outline">Reset</aihio-button>
+    <aihio-button data-aihio-intent="primary-action">Save changes</aihio-button>
+  </aihio-card-footer>
+</aihio-card>
