@@ -65,7 +65,7 @@ eleventyComputed:
       <aihio-card-content>
         <ul class="docs-link-list">
           {% for component in pattern.componentEntries %}
-            <li><a class="docs-inline-link" href="{{ component.path }}">{{ component.name }}</a></li>
+            <li><a class="docs-inline-link" href="{{ component.path | docsUrl(page.url) }}">{{ component.name }}</a></li>
           {% endfor %}
         </ul>
       </aihio-card-content>

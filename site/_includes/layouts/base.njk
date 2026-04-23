@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if title %}{{ title }} · {% endif %}Aihio</title>
   <meta name="description" content="{{ description or 'Aihio is an AI-first design system built on native web components.' }}">
-  <link rel="stylesheet" href="/dist/aihio.css">
-  <link rel="stylesheet" href="/assets/docs.css">
-  <script type="module" src="/dist/aihio.js"></script>
+  <link rel="stylesheet" href="{{ '/dist/aihio.css' | docsUrl(page.url) }}">
+  <link rel="stylesheet" href="{{ '/assets/docs.css' | docsUrl(page.url) }}">
+  <script type="module" src="{{ '/dist/aihio.js' | docsUrl(page.url) }}"></script>
 </head>
 <body>
   <div class="docs-shell">
     <header class="docs-header">
       <div class="docs-header__brand">
-        <a class="docs-brand" href="/">
+        <a class="docs-brand" href="{{ '/' | docsUrl(page.url) }}">
           <span class="docs-brand__mark">A</span>
           <span class="docs-brand__copy">
             <strong>Aihio</strong>
@@ -26,7 +26,7 @@
       <nav class="docs-nav" aria-label="Primary">
         {% for item in navigation %}
           {% set isActive = page.url == item.url or (item.url != '/' and (page.url | startsWith(item.url))) %}
-          <a class="docs-nav__link{% if isActive %} is-active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
+          <a class="docs-nav__link{% if isActive %} is-active{% endif %}" href="{{ item.url | docsUrl(page.url) }}">{{ item.title }}</a>
         {% endfor %}
       </nav>
 
@@ -47,7 +47,7 @@
         <span>Schema version {{ docs.schemaVersion }} · {{ docs.componentCount }} components · {{ docs.patternCount }} patterns</span>
       </div>
       <div class="docs-footer__links">
-        <a href="/components/">Browse components</a>
+        <a href="{{ '/components/' | docsUrl(page.url) }}">Browse components</a>
       </div>
     </footer>
   </div>

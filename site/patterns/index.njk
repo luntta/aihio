@@ -36,13 +36,13 @@ description: Generated multi-component patterns for the Aihio design system.
 
           <ul class="docs-link-list docs-link-list--compact">
             {% for component in pattern.componentEntries %}
-              <li><a class="docs-inline-link" href="{{ component.path }}">{{ component.name }}</a></li>
+              <li><a class="docs-inline-link" href="{{ component.path | docsUrl(page.url) }}">{{ component.name }}</a></li>
             {% endfor %}
           </ul>
         </aihio-card-content>
 
         <aihio-card-footer>
-          <a class="docs-inline-link" href="{{ pattern.path }}">View pattern</a>
+          <a class="docs-inline-link" href="{{ pattern.path | docsUrl(page.url) }}">View pattern</a>
         </aihio-card-footer>
       </aihio-card>
     {% endfor %}

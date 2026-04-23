@@ -172,8 +172,9 @@ npm install
 npm run dev       # Dev server at localhost:3000/
 npm run build     # Build dist/
 npm run docs:build  # Build the Eleventy docs site into _site/
+npm run docs:test   # Validate generated docs HTML assumptions
 npm run test      # Rebuild dist/ and run node and headless browser checks
-npm run check     # Run tests and verify the docs site build
+npm run check     # Run tests, build docs, and validate the docs output
 npm exec aihio-mcp  # Start the local MCP server over stdio
 npm run tokens    # Rebuild tokens only
 npm run styles    # Rebuild generated component CSS

@@ -46,8 +46,8 @@ description: Schema-derived reference docs and implementation guidance for the A
         </form>
       </aihio-card-content>
       <aihio-card-footer>
-        <aihio-button onclick="window.location.href='/components/'">Browse components</aihio-button>
-        <aihio-button variant="outline" onclick="window.location.href='/components/'">View reference index</aihio-button>
+        <aihio-button onclick="window.location.href='{{ '/components/' | docsUrl(page.url) }}'">Browse components</aihio-button>
+        <aihio-button variant="outline" onclick="window.location.href='{{ '/components/' | docsUrl(page.url) }}'">View reference index</aihio-button>
       </aihio-card-footer>
     </aihio-card>
   </div>
@@ -77,19 +77,19 @@ description: Schema-derived reference docs and implementation guidance for the A
   </div>
 
   <div class="docs-feature-grid">
-    <a class="docs-feature-card docs-feature-card--link" href="/components/">
+    <a class="docs-feature-card docs-feature-card--link" href="{{ '/components/' | docsUrl(page.url) }}">
       <h3>Component Reference</h3>
       <p>API facts, intents, examples, and accessibility obligations sourced from the generated schema.</p>
     </a>
-    <a class="docs-feature-card docs-feature-card--link" href="/patterns/">
+    <a class="docs-feature-card docs-feature-card--link" href="{{ '/patterns/' | docsUrl(page.url) }}">
       <h3>Pattern Library</h3>
       <p>Higher-level markup compositions such as auth flows, settings panels, tabbed settings, and toast stacks.</p>
     </a>
-    <a class="docs-feature-card docs-feature-card--link" href="/foundations/tokens/">
+    <a class="docs-feature-card docs-feature-card--link" href="{{ '/foundations/tokens/' | docsUrl(page.url) }}">
       <h3>Design Foundations</h3>
       <p>Intent-token vocabulary and the semantic bridge from raw values to component-facing roles.</p>
     </a>
-    <a class="docs-feature-card docs-feature-card--link" href="/ai/">
+    <a class="docs-feature-card docs-feature-card--link" href="{{ '/ai/' | docsUrl(page.url) }}">
       <h3>AI Tooling</h3>
       <p>Schema exports, linting, prompt fragments, and the local MCP server all documented in one place.</p>
     </a>
@@ -102,7 +102,7 @@ description: Schema-derived reference docs and implementation guidance for the A
       <h2>Featured Components</h2>
       <p>Phase 1 exposes the index first so the generated data model and docs shell are stable before per-component deep dives land.</p>
     </div>
-    <a class="docs-inline-link" href="/components/">See the full component index</a>
+    <a class="docs-inline-link" href="{{ '/components/' | docsUrl(page.url) }}">See the full component index</a>
   </div>
 
   <div class="docs-component-grid">

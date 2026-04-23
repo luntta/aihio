@@ -40,8 +40,9 @@
     "build": "node build.js",
     "docs:build": "npm run build && eleventy",
     "docs:dev": "node dev.js",
-    "test": "npm run build && node --test",
-    "check": "npm test && npm run docs:build",
+    "docs:test": "node --test test/docs-build.check.js",
+    "test": "npm run build && node --test test/browser.test.js test/build.test.js test/lint-fixtures.test.js test/mcp.test.js",
+    "check": "npm test && npm run docs:build && npm run docs:test",
     "prepare": "npm run build"
   },
   "repository": {

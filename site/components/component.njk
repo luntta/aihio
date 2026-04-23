@@ -220,7 +220,7 @@ eleventyComputed:
         {% if component.patternsUsing.length %}
           <ul class="docs-link-list">
             {% for pattern in component.patternsUsing %}
-              <li><a class="docs-inline-link" href="{{ pattern.path }}">{{ pattern.name }}</a></li>
+              <li><a class="docs-inline-link" href="{{ pattern.path | docsUrl(page.url) }}">{{ pattern.name }}</a></li>
             {% endfor %}
           </ul>
         {% else %}
@@ -238,7 +238,7 @@ eleventyComputed:
         <aihio-card-content>
           <ul class="docs-link-list">
             {% for related in component.relatedEntries %}
-              <li><a class="docs-inline-link" href="{{ related.path }}">{{ related.name }}</a></li>
+              <li><a class="docs-inline-link" href="{{ related.path | docsUrl(page.url) }}">{{ related.name }}</a></li>
             {% endfor %}
           </ul>
         </aihio-card-content>

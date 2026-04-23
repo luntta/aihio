@@ -140,12 +140,8 @@ function toCSS(entries, indent = '  ') {
   return entries.map(([name, value]) => `${indent}--${name}: ${value};`).join('\n');
 }
 
-// Build primitive tokens (non-color, since colors are only used via semantic)
-const primitiveEntries = flatten(
-  Object.fromEntries(
-    Object.entries(base).filter(([key]) => key !== 'color')
-  )
-);
+// Build primitive tokens, including color scales used by semantic aliases.
+const primitiveEntries = flatten(base);
 
 // Build semantic tokens for light and dark
 const lightEntries = flatten(semantic.light, '', tokenRoot);

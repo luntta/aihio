@@ -19,6 +19,8 @@ test('dist CSS includes generated light DOM component styles', () => {
 test('dist CSS exposes intent tokens and component styles consume them', () => {
   const css = readFileSync(resolve(root, 'dist/aihio.css'), 'utf8');
 
+  assert.match(css, /--color-zinc-900:\s*\.?24 \.?01 256;/);
+  assert.match(css, /--color-red-500:\s*\.?63 \.?196 25;/);
   assert.match(css, /--color-intent-action-primary-bg:\s*var\(--primary\)/);
   assert.match(css, /--spacing-intent-control-gap:\s*var\(--spacing-2\)/);
   assert.match(css, /--radius-intent-interactive:\s*var\(--radius-md\)/);
