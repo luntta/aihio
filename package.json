@@ -6,7 +6,8 @@
   "main": "./dist/aihio.js",
   "types": "./dist/aihio.d.ts",
   "bin": {
-    "aihio-lint": "./dist/aihio-lint.js"
+    "aihio-lint": "dist/aihio-lint.js",
+    "aihio-mcp": "dist/aihio-mcp.js"
   },
   "exports": {
     ".": {
@@ -41,7 +42,10 @@
     "check": "npm test",
     "prepare": "npm run build"
   },
-  "repository": "git+https://github.com/luntta/aihio.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luntta/aihio.git"
+  },
   "keywords": [
     "design-system",
     "web-components",

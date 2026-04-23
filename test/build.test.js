@@ -206,7 +206,8 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
-  assert.equal(pkg.bin['aihio-lint'], './dist/aihio-lint.js');
+  assert.match(pkg.bin['aihio-lint'], /^\.?\/?dist\/aihio-lint\.js$/);
+  assert.match(pkg.bin['aihio-mcp'], /^\.?\/?dist\/aihio-mcp\.js$/);
 });
 
 test('schema output exposes intent vocabulary and every component carries required AI-first fields', () => {

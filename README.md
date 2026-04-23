@@ -72,6 +72,18 @@ aihio-lint ./example.html
 cat ./example.html | aihio-lint -
 ```
 
+For MCP clients that launch local stdio servers, the package also ships `aihio-mcp` with two tools: `describe` and `lint`.
+
+```json
+{
+  "mcpServers": {
+    "aihio": {
+      "command": "aihio-mcp"
+    }
+  }
+}
+```
+
 ## Components
 
 | Component | Description |
@@ -144,6 +156,7 @@ npm run dev       # Dev server at localhost:3000/docs/
 npm run build     # Build dist/
 npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Build and run all checks
+npm exec aihio-mcp  # Start the local MCP server over stdio
 npm run tokens    # Rebuild tokens only
 npm run styles    # Rebuild generated component CSS
 npm run schema    # Rebuild schema only

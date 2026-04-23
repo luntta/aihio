@@ -42,6 +42,18 @@ await esbuild.build({
 });
 
 await esbuild.build({
+  entryPoints: ['src/mcp/cli.js'],
+  bundle: true,
+  banner: {
+    js: '#!/usr/bin/env node',
+  },
+  format: 'esm',
+  outfile: 'dist/aihio-mcp.js',
+  platform: 'node',
+  minify: true,
+});
+
+await esbuild.build({
   entryPoints: ['src/css/base.css'],
   bundle: true,
   outfile: 'dist/aihio.css',
@@ -51,4 +63,4 @@ await esbuild.build({
 copyFileSync('docs/intent-tokens.md', 'dist/intent-tokens.md');
 copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
-console.log('build → dist/aihio.js, dist/components.js, dist/lint.js, dist/aihio-lint.js, dist/aihio.css');
+console.log('build → dist/aihio.js, dist/components.js, dist/lint.js, dist/aihio-lint.js, dist/aihio-mcp.js, dist/aihio.css');

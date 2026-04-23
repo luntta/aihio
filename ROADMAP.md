@@ -78,8 +78,8 @@ Content pass that rides on Phases 1 + 4.
 Explicitly later. When it lands, reuses Phase 1's schema format, Phase 3's patterns, and Phase 7's rules with zero rework.
 
 - [x] `aihio-lint` — takes HTML, returns structured errors against the schema
-- [ ] MCP server exposing `describe(component)` + `lint(markup)` over stdio
-- [ ] Test suite of known-bad markup snippets the linter must catch
+- [x] MCP server exposing `describe(component)` + `lint(markup)` over stdio
+- [x] Test suite of known-bad markup snippets the linter must catch
 
 ## Sequencing notes
 
