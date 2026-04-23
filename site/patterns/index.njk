@@ -1,0 +1,50 @@
+---
+layout: layouts/base.njk
+title: Patterns
+description: Generated multi-component patterns for the Aihio design system.
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>Pattern library</aihio-badge>
+    <aihio-badge variant="outline">{{ docs.patternCount }} seeded patterns</aihio-badge>
+  </div>
+  <h1>Reusable Markup Patterns</h1>
+  <p>
+    These patterns are generated from the same schema bundle that powers linting, prompt output, and runtime introspection.
+    Each one documents a higher-level UI composition rather than a single component.
+  </p>
+</section>
+
+<section>
+  <div class="docs-component-grid">
+    {% for pattern in docs.patterns %}
+      <aihio-card class="docs-component-card">
+        <aihio-card-header>
+          <div class="docs-component-card__meta">
+            <aihio-badge variant="outline">{{ pattern.id }}</aihio-badge>
+          </div>
+          <aihio-card-title>{{ pattern.name }}</aihio-card-title>
+          <aihio-card-description>{{ pattern.description }}</aihio-card-description>
+        </aihio-card-header>
+
+        <aihio-card-content>
+          <div class="docs-component-card__intents">
+            {% for intent in pattern.intentsDetailed %}
+              <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
+            {% endfor %}
+          </div>
+
+          <ul class="docs-link-list docs-link-list--compact">
+            {% for component in pattern.componentEntries %}
+              <li><a class="docs-inline-link" href="{{ component.path }}">{{ component.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </aihio-card-content>
+
+        <aihio-card-footer>
+          <a class="docs-inline-link" href="{{ pattern.path }}">View pattern</a>
+        </aihio-card-footer>
+      </aihio-card>
+    {% endfor %}
+  </div>
+</section>

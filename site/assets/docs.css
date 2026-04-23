@@ -266,11 +266,13 @@ a {
 }
 
 .docs-feature-card {
+  display: block;
   padding: var(--spacing-5);
   border-radius: calc(var(--radius-intent-surface) + 0.2rem);
   border: 1px solid oklch(var(--color-intent-border-subtle));
   background: linear-gradient(180deg, oklch(var(--color-intent-surface-bg)), oklch(var(--color-intent-surface-muted-bg)));
   box-shadow: var(--shadow-intent-surface);
+  text-decoration: none;
 }
 
 .docs-feature-card h3 {
@@ -283,6 +285,19 @@ a {
   color: oklch(var(--color-intent-surface-muted-fg));
 }
 
+.docs-feature-card--link {
+  transition:
+    transform var(--duration-intent-feedback) ease,
+    box-shadow var(--duration-intent-feedback) ease,
+    border-color var(--duration-intent-feedback) ease;
+}
+
+.docs-feature-card--link:hover {
+  transform: translateY(-2px);
+  border-color: oklch(var(--color-intent-action-primary-bg) / 0.25);
+  box-shadow: var(--shadow-intent-overlay);
+}
+
 .docs-component-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -291,6 +306,10 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-4);
+}
+
+.docs-example-grid--single {
+  grid-template-columns: 1fr;
 }
 
 .docs-example-card--warning {
@@ -433,6 +452,11 @@ a {
 
 .docs-link-list {
   padding-left: 1rem;
+}
+
+.docs-link-list--compact {
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
 }
 
 .docs-tag-list {

@@ -1,0 +1,74 @@
+---
+pagination:
+  data: docs.patterns
+  size: 1
+  alias: pattern
+permalink: "/patterns/{{ pattern.id }}/index.html"
+layout: layouts/base.njk
+eleventyComputed:
+  title: "{{ pattern.name }}"
+  description: "{{ pattern.description }}"
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>{{ pattern.id }}</aihio-badge>
+    {% for intent in pattern.intentsDetailed %}
+      <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
+    {% endfor %}
+  </div>
+  <h1>{{ pattern.name }}</h1>
+  <p>{{ pattern.description }}</p>
+</section>
+
+<section class="docs-detail-grid">
+  <div class="docs-detail-grid__main">
+    <div class="docs-example-grid docs-example-grid--single">
+      {% set label = "Pattern" %}
+      {% set title = "Base markup" %}
+      {% set description = pattern.description %}
+      {% set markup = pattern.previewMarkup %}
+      {% set source = pattern.markup %}
+      {% set tone = "default" %}
+      {% include "partials/example-frame.njk" %}
+    </div>
+
+    {% if pattern.variationEntries.length %}
+      <section>
+        <div class="docs-section-heading">
+          <div>
+            <h2>Variations</h2>
+            <p>Alternative authored shapes shipped with the seeded pattern.</p>
+          </div>
+        </div>
+
+        <div class="docs-example-grid">
+          {% for variation in pattern.variationEntries %}
+            {% set label = "Variation" %}
+            {% set title = variation.title %}
+            {% set description = variation.description %}
+            {% set markup = variation.previewMarkup %}
+            {% set source = variation.markup %}
+            {% set tone = "default" %}
+            {% include "partials/example-frame.njk" %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+
+  <aside class="docs-detail-grid__sidebar">
+    <aihio-card>
+      <aihio-card-header>
+        <aihio-card-title>Required Components</aihio-card-title>
+        <aihio-card-description>Schema entries this composition depends on.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        <ul class="docs-link-list">
+          {% for component in pattern.componentEntries %}
+            <li><a class="docs-inline-link" href="{{ component.path }}">{{ component.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </aihio-card-content>
+    </aihio-card>
+  </aside>
+</section>

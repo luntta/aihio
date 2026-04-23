@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { readdirSync, watch } from 'node:fs';
 import { join } from 'node:path';
 
@@ -80,14 +80,27 @@ const watchers = [
     .map((file) => watch(file, rebuildStyles)),
 ];
 
-const { port } = await jsCtx.serve({
-  servedir: '.',
-  host: '127.0.0.1',
-  port: 3000,
-});
+const eleventy = spawn(
+  process.execPath,
+  ['node_modules/@11ty/eleventy/cmd.cjs', '--serve', '--port=3000'],
+  {
+    stdio: 'inherit',
+  }
+);
 
-console.log(`dev → http://127.0.0.1:${port}/docs/`);
+console.log('dev → http://127.0.0.1:3000/');
 
-process.on('exit', () => {
+function cleanup() {
   watchers.forEach((watcher) => watcher.close());
+  eleventy.kill('SIGTERM');
+}
+
+process.on('exit', cleanup);
+process.on('SIGINT', () => {
+  cleanup();
+  process.exit(0);
+});
+process.on('SIGTERM', () => {
+  cleanup();
+  process.exit(0);
 });

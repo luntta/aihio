@@ -218,9 +218,9 @@ eleventyComputed:
       </aihio-card-header>
       <aihio-card-content>
         {% if component.patternsUsing.length %}
-          <ul class="docs-tag-list">
+          <ul class="docs-link-list">
             {% for pattern in component.patternsUsing %}
-              <li><aihio-badge variant="secondary">{{ pattern.name }}</aihio-badge></li>
+              <li><a class="docs-inline-link" href="{{ pattern.path }}">{{ pattern.name }}</a></li>
             {% endfor %}
           </ul>
         {% else %}

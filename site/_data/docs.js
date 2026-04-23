@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..', '..');
 const schemaPath = resolve(root, 'dist/schema.json');
 const packagePath = resolve(root, 'package.json');
+const intentTokensPath = resolve(root, 'docs/intent-tokens.md');
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -40,10 +41,22 @@ if (!existsSync(schemaPath)) {
 
 const schema = readJson(schemaPath);
 const pkg = readJson(packagePath);
+const intentTokensMarkdown = readFileSync(intentTokensPath, 'utf8');
 
 const rawPatterns = schema.patterns.map((pattern) => ({
   ...pattern,
   path: `/patterns/${pattern.id}/`,
+  intentsDetailed: (pattern.intents ?? []).map((intent) => ({
+    name: intent,
+    description: schema.intents[intent] ?? '',
+  })),
+  previewMarkup: pattern.markup,
+  variationEntries: (pattern.variations ?? []).map((variation, index) => ({
+    ...variation,
+    id: `${pattern.id}-variation-${index + 1}`,
+    title: variation.name,
+    previewMarkup: variation.markup,
+  })),
 }));
 
 const patternsByComponent = new Map();
@@ -139,4 +152,5 @@ export default {
     name,
     description,
   })),
+  intentTokensMarkdown,
 };

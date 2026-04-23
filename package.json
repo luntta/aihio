@@ -39,9 +39,9 @@
     "dev": "node dev.js",
     "build": "node build.js",
     "docs:build": "npm run build && eleventy",
-    "docs:dev": "npm run build && eleventy --serve",
+    "docs:dev": "node dev.js",
     "test": "npm run build && node --test",
-    "check": "npm test",
+    "check": "npm test && npm run docs:build",
     "prepare": "npm run build"
   },
   "repository": {

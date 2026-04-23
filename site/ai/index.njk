@@ -1,0 +1,50 @@
+---
+layout: layouts/base.njk
+title: AI & Tooling
+description: Schema, lint, prompt, and MCP tooling for Aihio.
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>AI-first tooling</aihio-badge>
+    <aihio-badge variant="outline">Schema · lint · prompt · MCP</aihio-badge>
+  </div>
+  <h1>Machine-readable surfaces for agents and authoring tools</h1>
+  <p>
+    Aihio’s docs are only one consumer of the generated schema. The same build also emits a prompt fragment,
+    a structured linter, and a local MCP server for component discovery and markup validation.
+  </p>
+</section>
+
+<section class="docs-feature-grid">
+  <div class="docs-feature-card">
+    <h3><code>dist/schema.json</code></h3>
+    <p>Human-readable schema bundle containing components, intents, patterns, a11y contracts, examples, and counterexamples.</p>
+    <pre class="docs-code"><code>import schema from 'aihio/schema';</code></pre>
+  </div>
+
+  <div class="docs-feature-card">
+    <h3><code>aihio/lint</code></h3>
+    <p>Structured schema-backed HTML validation that returns machine-consumable issues.</p>
+    <pre class="docs-code"><code>import { lintMarkup } from 'aihio/lint';
+
+const result = lintMarkup('&lt;aihio-button size="icon"&gt;&lt;/aihio-button&gt;');</code></pre>
+  </div>
+
+  <div class="docs-feature-card">
+    <h3><code>aihio/prompt</code></h3>
+    <p>Canonical prompt fragment summarizing components, patterns, hard rules, and the token vocabulary.</p>
+    <pre class="docs-code"><code>import prompt from 'aihio/prompt';</code></pre>
+  </div>
+
+  <div class="docs-feature-card">
+    <h3><code>aihio-mcp</code></h3>
+    <p>Local stdio MCP server exposing <code>describe</code> and <code>lint</code> tools for clients that can launch subprocesses.</p>
+    <pre class="docs-code"><code>{
+  "mcpServers": {
+    "aihio": {
+      "command": "aihio-mcp"
+    }
+  }
+}</code></pre>
+  </div>
+</section>

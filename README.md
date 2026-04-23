@@ -148,14 +148,32 @@ Override CSS custom properties to theme the entire system:
 }
 ```
 
+## Docs Site
+
+The design system docs site is built with Eleventy and generated from the same emitted schema and token artifacts that ship in `dist/`.
+
+```bash
+npm run docs:build   # Build the package and the Eleventy docs site into _site/
+npm run docs:dev     # Watch dist/ + docs source and serve the Eleventy site
+```
+
+The site uses Aihio components in the docs UI itself and currently includes:
+
+- Overview page
+- Generated component index and per-component reference pages
+- Pattern library
+- Token foundations page
+- AI and tooling overview
+
 ## Development
 
 ```bash
 npm install
-npm run dev       # Dev server at localhost:3000/docs/
+npm run dev       # Dev server at localhost:3000/
 npm run build     # Build dist/
+npm run docs:build  # Build the Eleventy docs site into _site/
 npm run test      # Rebuild dist/ and run node and headless browser checks
-npm run check     # Build and run all checks
+npm run check     # Run tests and verify the docs site build
 npm exec aihio-mcp  # Start the local MCP server over stdio
 npm run tokens    # Rebuild tokens only
 npm run styles    # Rebuild generated component CSS

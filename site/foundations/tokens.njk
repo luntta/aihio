@@ -1,0 +1,47 @@
+---
+layout: layouts/base.njk
+title: Token Foundations
+description: Intent tokens and schema-linked design foundations in Aihio.
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>Foundations</aihio-badge>
+    <aihio-badge variant="outline">Intent tokens</aihio-badge>
+  </div>
+  <h1>Intent Tokens</h1>
+  <p>
+    Aihio’s token model is layered so primitive values flow into semantic roles, then into intent-facing variables,
+    and finally into component-level decisions. The docs site reads the generated token vocabulary directly.
+  </p>
+</section>
+
+<section>
+  <div class="docs-feature-grid">
+    {% for intent in docs.intents %}
+      <div class="docs-feature-card">
+        <h3>{{ intent.name }}</h3>
+        <p>{{ intent.description }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>Generated Reference</h2>
+      <p>The full generated markdown reference is emitted during the build and linked directly below.</p>
+    </div>
+    <a class="docs-inline-link" href="/dist/intent-tokens.md">Open generated markdown</a>
+  </div>
+
+  <aihio-card>
+    <aihio-card-header>
+      <aihio-card-title><code>dist/intent-tokens.md</code></aihio-card-title>
+      <aihio-card-description>The same markdown artifact shipped with the package.</aihio-card-description>
+    </aihio-card-header>
+    <aihio-card-content>
+      <pre class="docs-code"><code>{{ docs.intentTokensMarkdown | escape }}</code></pre>
+    </aihio-card-content>
+  </aihio-card>
+</section>
