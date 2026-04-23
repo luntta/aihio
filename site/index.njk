@@ -1,0 +1,113 @@
+---
+layout: layouts/base.njk
+title: Overview
+description: Schema-derived reference docs and implementation guidance for the Aihio design system.
+---
+<section class="docs-hero">
+  <div class="docs-hero__copy">
+    <div class="docs-eyebrow">
+      <aihio-badge>Schema-derived</aihio-badge>
+      <aihio-badge variant="secondary">Eleventy docs</aihio-badge>
+      <aihio-badge variant="outline">Zero-dependency components</aihio-badge>
+    </div>
+
+    <h1 class="docs-title">Design system docs that stay in sync with the source of truth.</h1>
+    <p class="docs-lede">
+      Aihio ships machine-readable component contracts, intent tokens, patterns, lint tooling, and MCP surfaces.
+      This site reads those generated artifacts directly and uses the same components it documents.
+    </p>
+
+    <div class="docs-callouts">
+      <aihio-alert>
+        <div slot="title">Generated from build artifacts</div>
+        <div slot="description">Component inventory, pattern counts, and API facts all come from the same schema emitted into <code>dist/</code>.</div>
+      </aihio-alert>
+    </div>
+  </div>
+
+  <div class="docs-hero__preview">
+    <aihio-card class="docs-hero-card">
+      <aihio-card-header>
+        <aihio-card-title>Reference Preview</aihio-card-title>
+        <aihio-card-description>The docs shell is assembled with Aihio cards, badges, alerts, tabs, inputs, and buttons.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        <form>
+          <label class="docs-field">
+            <span>Component search</span>
+            <aihio-input placeholder="button, dialog, tabs"></aihio-input>
+          </label>
+
+          <div class="docs-chip-row">
+            <aihio-badge variant="secondary">Attributes</aihio-badge>
+            <aihio-badge variant="secondary">A11y contract</aihio-badge>
+            <aihio-badge variant="secondary">Counterexamples</aihio-badge>
+          </div>
+        </form>
+      </aihio-card-content>
+      <aihio-card-footer>
+        <aihio-button onclick="window.location.href='/components/'">Browse components</aihio-button>
+        <aihio-button variant="outline" onclick="window.location.href='/components/'">View reference index</aihio-button>
+      </aihio-card-footer>
+    </aihio-card>
+  </div>
+</section>
+
+<section class="docs-stat-grid">
+  <div class="docs-stat-card">
+    <strong>{{ docs.componentCount }}</strong>
+    <span>Schema-backed components with generated runtime and type metadata.</span>
+  </div>
+  <div class="docs-stat-card">
+    <strong>{{ docs.patternCount }}</strong>
+    <span>Seeded composition patterns reused by docs, prompts, linting, and agent tooling.</span>
+  </div>
+  <div class="docs-stat-card">
+    <strong>{{ docs.intentCount }}</strong>
+    <span>Intent vocabulary entries mapping author meaning onto tokens and components.</span>
+  </div>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>What This Site Covers</h2>
+      <p>The first phase focuses on the overview shell and generated component index. Detail pages, patterns, and AI/tooling sections land next.</p>
+    </div>
+  </div>
+
+  <div class="docs-feature-grid">
+    <div class="docs-feature-card">
+      <h3>Component Reference</h3>
+      <p>API facts, intents, examples, and accessibility obligations sourced from the generated schema.</p>
+    </div>
+    <div class="docs-feature-card">
+      <h3>Pattern Library</h3>
+      <p>Higher-level markup compositions such as auth flows, settings panels, tabbed settings, and toast stacks.</p>
+    </div>
+    <div class="docs-feature-card">
+      <h3>Design Foundations</h3>
+      <p>Intent-token vocabulary and the semantic bridge from raw values to component-facing roles.</p>
+    </div>
+    <div class="docs-feature-card">
+      <h3>AI Tooling</h3>
+      <p>Schema exports, linting, prompt fragments, and the local MCP server all documented in one place.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>Featured Components</h2>
+      <p>Phase 1 exposes the index first so the generated data model and docs shell are stable before per-component deep dives land.</p>
+    </div>
+    <a class="docs-inline-link" href="/components/">See the full component index</a>
+  </div>
+
+  <div class="docs-component-grid">
+    {% for component in docs.featuredComponents %}
+      {% include "partials/component-card.njk" %}
+    {% endfor %}
+  </div>
+</section>

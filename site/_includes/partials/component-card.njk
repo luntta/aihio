@@ -1,0 +1,37 @@
+<aihio-card class="docs-component-card">
+  <aihio-card-header>
+    <div class="docs-component-card__meta">
+      <aihio-badge variant="outline">{{ component.tag }}</aihio-badge>
+      <span class="docs-component-card__version">v{{ component.version }}</span>
+    </div>
+    <aihio-card-title>{{ component.name }}</aihio-card-title>
+    <aihio-card-description>{{ component.description }}</aihio-card-description>
+  </aihio-card-header>
+
+  <aihio-card-content>
+    <div class="docs-component-card__intents">
+      {% for intent in component.intentsDetailed %}
+        <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
+      {% endfor %}
+    </div>
+
+    <dl class="docs-component-card__facts">
+      <div>
+        <dt>Attributes</dt>
+        <dd>{{ component.attributeEntries.length }}</dd>
+      </div>
+      <div>
+        <dt>Slots</dt>
+        <dd>{{ component.slotEntries.length }}</dd>
+      </div>
+      <div>
+        <dt>Events</dt>
+        <dd>{{ component.eventEntries.length }}</dd>
+      </div>
+    </dl>
+  </aihio-card-content>
+
+  <aihio-card-footer>
+    <a class="docs-inline-link" href="{{ component.path }}">View reference</a>
+  </aihio-card-footer>
+</aihio-card>

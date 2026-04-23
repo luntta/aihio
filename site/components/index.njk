@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+title: Components
+description: Generated component reference index for the Aihio design system.
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>Component inventory</aihio-badge>
+    <aihio-badge variant="outline">{{ docs.componentCount }} components</aihio-badge>
+  </div>
+  <h1>Generated Component Index</h1>
+  <p>
+    Each card here is backed by the emitted schema in <code>dist/schema.json</code>. Phase 1 ships the overview and inventory;
+    detail pages land in the next commit.
+  </p>
+</section>
+
+<section>
+  <aihio-alert>
+    <div slot="title">Schema-backed reference</div>
+    <div slot="description">Counts, intents, and versions below are generated, not maintained by hand.</div>
+  </aihio-alert>
+</section>
+
+<section>
+  <div class="docs-component-grid">
+    {% for component in docs.components %}
+      {% include "partials/component-card.njk" %}
+    {% endfor %}
+  </div>
+</section>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} · {% endif %}Aihio</title>
+  <meta name="description" content="{{ description or 'Aihio is an AI-first design system built on native web components.' }}">
+  <link rel="stylesheet" href="/dist/aihio.css">
+  <link rel="stylesheet" href="/assets/docs.css">
+  <script type="module" src="/dist/aihio.js"></script>
+</head>
+<body>
+  <div class="docs-shell">
+    <header class="docs-header">
+      <div class="docs-header__brand">
+        <a class="docs-brand" href="/">
+          <span class="docs-brand__mark">A</span>
+          <span class="docs-brand__copy">
+            <strong>Aihio</strong>
+            <span>AI-first design system</span>
+          </span>
+        </a>
+        <aihio-badge variant="outline">v{{ docs.packageVersion }}</aihio-badge>
+      </div>
+
+      <nav class="docs-nav" aria-label="Primary">
+        {% for item in navigation %}
+          {% set isActive = page.url == item.url or (item.url != '/' and (page.url | startsWith(item.url))) %}
+          <a class="docs-nav__link{% if isActive %} is-active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
+        {% endfor %}
+      </nav>
+
+      <div class="docs-header__actions">
+        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme('light')">Light</aihio-button>
+        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme('dark')">Dark</aihio-button>
+        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme(null)">System</aihio-button>
+      </div>
+    </header>
+
+    <main class="docs-main">
+      {{ content | safe }}
+    </main>
+
+    <footer class="docs-footer">
+      <div>
+        <strong>Aihio</strong>
+        <span>Schema version {{ docs.schemaVersion }} · {{ docs.componentCount }} components · {{ docs.patternCount }} patterns</span>
+      </div>
+      <div class="docs-footer__links">
+        <a href="/components/">Browse components</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const themeKey = 'aihio-docs-theme';
+
+    function applyDocsTheme(theme) {
+      if (theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+
+    function setDocsTheme(theme) {
+      if (theme) {
+        localStorage.setItem(themeKey, theme);
+      } else {
+        localStorage.removeItem(themeKey);
+      }
+
+      applyDocsTheme(theme);
+    }
+
+    applyDocsTheme(localStorage.getItem(themeKey));
+    window.setDocsTheme = setDocsTheme;
+  </script>
+</body>
+</html>

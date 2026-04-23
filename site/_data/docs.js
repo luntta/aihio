@@ -1,0 +1,125 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const root = resolve(import.meta.dirname, '..', '..');
+const schemaPath = resolve(root, 'dist/schema.json');
+const packagePath = resolve(root, 'package.json');
+
+function readJson(path) {
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function toTitleCase(value) {
+  return String(value ?? '')
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function tagToSlug(tag) {
+  return String(tag ?? '').replace(/^aihio-/, '');
+}
+
+if (!existsSync(schemaPath)) {
+  throw new Error('Missing dist/schema.json. Run `npm run build` before building the docs site.');
+}
+
+const schema = readJson(schemaPath);
+const pkg = readJson(packagePath);
+
+const rawPatterns = schema.patterns.map((pattern) => ({
+  ...pattern,
+  path: `/patterns/${pattern.id}/`,
+}));
+
+const patternsByComponent = new Map();
+for (const pattern of rawPatterns) {
+  for (const componentTag of pattern.requiredComponents ?? []) {
+    const entries = patternsByComponent.get(componentTag) ?? [];
+    entries.push({
+      id: pattern.id,
+      name: pattern.name,
+      path: pattern.path,
+    });
+    patternsByComponent.set(componentTag, entries);
+  }
+}
+
+const components = schema.components
+  .map((component) => {
+    const tag = component.$component;
+    const slug = tagToSlug(tag);
+    const name = toTitleCase(slug);
+
+    return {
+      ...component,
+      tag,
+      slug,
+      name,
+      path: `/components/${slug}/`,
+      attributeEntries: Object.entries(component.attributes ?? {}).map(([attribute, definition]) => ({
+        name: attribute,
+        ...definition,
+      })),
+      slotEntries: Object.entries(component.slots ?? {}).map(([slot, definition]) => ({
+        name: slot,
+        ...definition,
+      })),
+      eventEntries: Object.entries(component.events ?? {}).map(([event, definition]) => ({
+        name: event,
+        ...definition,
+      })),
+      relatedEntries: (component.related ?? []).map((related) => ({
+        tag: related.$component,
+        slug: tagToSlug(related.$component),
+        name: toTitleCase(tagToSlug(related.$component)),
+        path: `/components/${tagToSlug(related.$component)}/`,
+      })),
+      intentsDetailed: (component.intents ?? []).map((intent) => ({
+        name: intent,
+        description: schema.intents[intent] ?? '',
+      })),
+      examplesDetailed: (component.examples ?? []).map((markup, index) => ({
+        id: `${slug}-example-${index + 1}`,
+        markup,
+      })),
+      counterExamplesDetailed: (component.counterExamples ?? []).map((example, index) => ({
+        id: `${slug}-counter-example-${index + 1}`,
+        ...example,
+      })),
+      handledA11y: component.a11yContract?.handled ?? [],
+      requiredA11y: component.a11yContract?.required ?? [],
+      patternsUsing: patternsByComponent.get(tag) ?? [],
+    };
+  })
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+const patterns = rawPatterns
+  .map((pattern) => ({
+    ...pattern,
+    componentEntries: (pattern.requiredComponents ?? []).map((tag) => ({
+      tag,
+      slug: tagToSlug(tag),
+      name: toTitleCase(tagToSlug(tag)),
+      path: `/components/${tagToSlug(tag)}/`,
+    })),
+  }))
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+export default {
+  packageName: pkg.name,
+  packageVersion: pkg.version,
+  schemaVersion: schema.version,
+  componentCount: components.length,
+  patternCount: patterns.length,
+  intentCount: Object.keys(schema.intents ?? {}).length,
+  components,
+  featuredComponents: components.slice(0, 6),
+  patterns,
+  featuredPatterns: patterns.slice(0, 4),
+  intents: Object.entries(schema.intents ?? {}).map(([name, description]) => ({
+    name,
+    description,
+  })),
+};

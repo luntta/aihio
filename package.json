@@ -38,6 +38,8 @@
     "schema": "node src/schema/build.js",
     "dev": "node dev.js",
     "build": "node build.js",
+    "docs:build": "npm run build && eleventy",
+    "docs:dev": "npm run build && eleventy --serve",
     "test": "npm run build && node --test",
     "check": "npm test",
     "prepare": "npm run build"
@@ -62,6 +64,7 @@
   },
   "homepage": "https://github.com/luntta/aihio#readme",
   "devDependencies": {
+    "@11ty/eleventy": "^3.1.5",
     "esbuild": "^0.25.0"
   }
 }
