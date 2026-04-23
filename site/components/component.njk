@@ -1,0 +1,314 @@
+---
+pagination:
+  data: docs.components
+  size: 1
+  alias: component
+permalink: "/components/{{ component.slug }}/index.html"
+layout: layouts/base.njk
+eleventyComputed:
+  title: "{{ component.name }}"
+  description: "{{ component.description }}"
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>{{ component.tag }}</aihio-badge>
+    <aihio-badge variant="outline">v{{ component.version }}</aihio-badge>
+    {% for intent in component.intentsDetailed %}
+      <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
+    {% endfor %}
+  </div>
+  <h1>{{ component.name }}</h1>
+  <p>{{ component.description }}</p>
+</section>
+
+<section class="docs-stat-grid">
+  <div class="docs-stat-card">
+    <strong>{{ component.attributeEntries.length }}</strong>
+    <span>Attributes declared in the schema contract.</span>
+  </div>
+  <div class="docs-stat-card">
+    <strong>{{ component.slotEntries.length }}</strong>
+    <span>Named slots available to authors in markup.</span>
+  </div>
+  <div class="docs-stat-card">
+    <strong>{{ component.eventEntries.length }}</strong>
+    <span>Custom events and emitted interaction hooks.</span>
+  </div>
+</section>
+
+{% if component.examplesDetailed.length %}
+  <section>
+    <div class="docs-section-heading">
+      <div>
+        <h2>Live Examples</h2>
+        <p>Rendered from the schema examples with matching source code shown underneath each preview.</p>
+      </div>
+    </div>
+
+    <div class="docs-example-grid">
+      {% for example in component.examplesDetailed %}
+        {% set label = "Example" %}
+        {% set title = example.title %}
+        {% set description = "Valid authored markup for " + component.tag + "." %}
+        {% set markup = example.previewMarkup %}
+        {% set source = example.markup %}
+        {% set tone = "default" %}
+        {% include "partials/example-frame.njk" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% if component.counterExamplesDetailed.length %}
+  <section>
+    <div class="docs-section-heading">
+      <div>
+        <h2>Counterexamples</h2>
+        <p>Known-bad patterns that the docs, runtime warnings, and linter all push authors away from.</p>
+      </div>
+    </div>
+
+    <div class="docs-example-grid">
+      {% for example in component.counterExamplesDetailed %}
+        {% set label = "Counterexample" %}
+        {% set title = example.title %}
+        {% set description = example.reason %}
+        {% set markup = example.previewMarkup %}
+        {% set source = example.markup %}
+        {% set tone = "warning" %}
+        {% include "partials/example-frame.njk" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+<section class="docs-detail-grid">
+  <div class="docs-detail-grid__main">
+    <aihio-card>
+      <aihio-card-header>
+        <aihio-card-title>Attributes</aihio-card-title>
+        <aihio-card-description>Author-configurable props exposed in the schema.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        {% if component.attributeEntries.length %}
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th>Type</th>
+                <th>Default</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for attribute in component.attributeEntries %}
+                <tr>
+                  <td><code>{{ attribute.name }}</code></td>
+                  <td>
+                    <strong>{{ attribute.type }}</strong>
+                    {% if attribute.values %}
+                      <div class="docs-table__detail">{{ attribute.values | join(', ') }}</div>
+                    {% endif %}
+                  </td>
+                  <td>{% if attribute.default !== undefined %}<code>{{ attribute.default }}</code>{% else %}<span class="docs-muted">None</span>{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="docs-muted">This component does not expose authored attributes.</p>
+        {% endif %}
+      </aihio-card-content>
+    </aihio-card>
+
+    <div class="docs-surface-grid">
+      <aihio-card>
+        <aihio-card-header>
+          <aihio-card-title>Slots</aihio-card-title>
+          <aihio-card-description>Named content regions and composition anchors.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          {% if component.slotEntries.length %}
+            <ul class="docs-list">
+              {% for slot in component.slotEntries %}
+                <li><code>{{ slot.name }}</code></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="docs-muted">No named slots.</p>
+          {% endif %}
+        </aihio-card-content>
+      </aihio-card>
+
+      <aihio-card>
+        <aihio-card-header>
+          <aihio-card-title>Events</aihio-card-title>
+          <aihio-card-description>Signals emitted by the component at runtime.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          {% if component.eventEntries.length %}
+            <ul class="docs-list">
+              {% for event in component.eventEntries %}
+                <li><code>{{ event.name }}</code></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="docs-muted">No custom events declared.</p>
+          {% endif %}
+        </aihio-card-content>
+      </aihio-card>
+    </div>
+  </div>
+
+  <aside class="docs-detail-grid__sidebar">
+    <aihio-card>
+      <aihio-card-header>
+        <aihio-card-title>Composition Rules</aihio-card-title>
+        <aihio-card-description>Schema-level constraints enforced by docs, linting, and runtime validation.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        {% if component.composition.requiredSlots or component.composition.requiredChildren or component.composition.allowedChildren or component.composition.forbiddenChildren or component.composition.allowedParents or component.composition.requiredAncestors %}
+          <dl class="docs-definition-list">
+            {% if component.composition.requiredSlots %}
+              <div>
+                <dt>Required slots</dt>
+                <dd>{{ component.composition.requiredSlots | join(', ') }}</dd>
+              </div>
+            {% endif %}
+            {% if component.composition.requiredChildren %}
+              <div>
+                <dt>Required children</dt>
+                <dd>{{ component.composition.requiredChildren | join(', ') }}</dd>
+              </div>
+            {% endif %}
+            {% if component.composition.allowedChildren %}
+              <div>
+                <dt>Allowed children</dt>
+                <dd>{{ component.composition.allowedChildren | join(', ') }}</dd>
+              </div>
+            {% endif %}
+            {% if component.composition.forbiddenChildren %}
+              <div>
+                <dt>Forbidden descendants</dt>
+                <dd>{{ component.composition.forbiddenChildren | join(', ') }}</dd>
+              </div>
+            {% endif %}
+            {% if component.composition.allowedParents %}
+              <div>
+                <dt>Allowed parents</dt>
+                <dd>{{ component.composition.allowedParents | join(', ') }}</dd>
+              </div>
+            {% endif %}
+            {% if component.composition.requiredAncestors %}
+              <div>
+                <dt>Required ancestors</dt>
+                <dd>{{ component.composition.requiredAncestors | join(', ') }}</dd>
+              </div>
+            {% endif %}
+          </dl>
+        {% else %}
+          <p class="docs-muted">No additional composition constraints beyond the examples and schema shape.</p>
+        {% endif %}
+      </aihio-card-content>
+    </aihio-card>
+
+    <aihio-card>
+      <aihio-card-header>
+        <aihio-card-title>Related Patterns</aihio-card-title>
+        <aihio-card-description>Seeded compositions that require this component.</aihio-card-description>
+      </aihio-card-header>
+      <aihio-card-content>
+        {% if component.patternsUsing.length %}
+          <ul class="docs-tag-list">
+            {% for pattern in component.patternsUsing %}
+              <li><aihio-badge variant="secondary">{{ pattern.name }}</aihio-badge></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="docs-muted">No seeded patterns reference this component yet.</p>
+        {% endif %}
+      </aihio-card-content>
+    </aihio-card>
+
+    {% if component.relatedEntries.length %}
+      <aihio-card>
+        <aihio-card-header>
+          <aihio-card-title>Related Components</aihio-card-title>
+          <aihio-card-description>Subcomponents or schema-linked neighbors.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          <ul class="docs-link-list">
+            {% for related in component.relatedEntries %}
+              <li><a class="docs-inline-link" href="{{ related.path }}">{{ related.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </aihio-card-content>
+      </aihio-card>
+    {% endif %}
+  </aside>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>Accessibility Contract</h2>
+      <p>The runtime already handles some semantics automatically; authors are still responsible for the rules listed here.</p>
+    </div>
+  </div>
+
+  <aihio-tabs value="handled">
+    <aihio-tab-list>
+      <aihio-tab value="handled">Handled for you</aihio-tab>
+      <aihio-tab value="required">Author obligations</aihio-tab>
+    </aihio-tab-list>
+
+    <aihio-tab-panel value="handled">
+      <div class="docs-surface-grid">
+        <aihio-card>
+          <aihio-card-header>
+            <aihio-card-title>Built-in behaviors</aihio-card-title>
+            <aihio-card-description>Semantics and keyboard behaviors the component applies for you.</aihio-card-description>
+          </aihio-card-header>
+          <aihio-card-content>
+            {% if component.handledA11y.length %}
+              <ul class="docs-list">
+                {% for item in component.handledA11y %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="docs-muted">No automatic a11y behaviors documented.</p>
+            {% endif %}
+          </aihio-card-content>
+        </aihio-card>
+      </div>
+    </aihio-tab-panel>
+
+    <aihio-tab-panel value="required">
+      <div class="docs-surface-grid">
+        <aihio-card>
+          <aihio-card-header>
+            <aihio-card-title>Required authoring rules</aihio-card-title>
+            <aihio-card-description>These are the conditions that warnings and lint rules surface back to authors.</aihio-card-description>
+          </aihio-card-header>
+          <aihio-card-content>
+            {% if component.requiredA11y.length %}
+              <ul class="docs-rule-list">
+                {% for rule in component.requiredA11y %}
+                  <li>
+                    <div class="docs-rule-list__meta">
+                      <aihio-badge variant="{% if rule.severity == 'error' %}destructive{% else %}outline{% endif %}">{{ rule.severity }}</aihio-badge>
+                      <code>{{ rule.when }}</code>
+                    </div>
+                    <p>{{ rule.requirement }}</p>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="docs-muted">No additional authoring rules documented.</p>
+            {% endif %}
+          </aihio-card-content>
+        </aihio-card>
+      </div>
+    </aihio-tab-panel>
+  </aihio-tabs>
+</section>

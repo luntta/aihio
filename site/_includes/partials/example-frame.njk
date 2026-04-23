@@ -1,0 +1,22 @@
+<aihio-card class="docs-example-card{% if tone == 'warning' %} docs-example-card--warning{% endif %}">
+  <aihio-card-header>
+    <div class="docs-component-card__meta">
+      <aihio-badge variant="{% if tone == 'warning' %}destructive{% else %}outline{% endif %}">{{ label }}</aihio-badge>
+      {% if meta %}
+        <span class="docs-component-card__version">{{ meta }}</span>
+      {% endif %}
+    </div>
+    <aihio-card-title>{{ title }}</aihio-card-title>
+    {% if description %}
+      <aihio-card-description>{{ description }}</aihio-card-description>
+    {% endif %}
+  </aihio-card-header>
+
+  <aihio-card-content>
+    <div class="docs-example-card__preview{% if tone == 'warning' %} is-warning{% endif %}">
+      {{ markup | safe }}
+    </div>
+
+    <pre class="docs-code"><code>{{ source | escape }}</code></pre>
+  </aihio-card-content>
+</aihio-card>

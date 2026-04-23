@@ -21,6 +21,19 @@ function tagToSlug(tag) {
   return String(tag ?? '').replace(/^aihio-/, '');
 }
 
+function toPreviewMarkup(tag, markup) {
+  const normalizedMarkup = String(markup ?? '');
+  if (tag === 'aihio-dialog' && normalizedMarkup.startsWith('<aihio-dialog') && !normalizedMarkup.includes('<aihio-dialog open')) {
+    return normalizedMarkup.replace('<aihio-dialog', '<aihio-dialog open');
+  }
+
+  if (tag === 'aihio-dropdown' && normalizedMarkup.startsWith('<aihio-dropdown') && !normalizedMarkup.includes('<aihio-dropdown open')) {
+    return normalizedMarkup.replace('<aihio-dropdown', '<aihio-dropdown open');
+  }
+
+  return normalizedMarkup;
+}
+
 if (!existsSync(schemaPath)) {
   throw new Error('Missing dist/schema.json. Run `npm run build` before building the docs site.');
 }
@@ -83,10 +96,14 @@ const components = schema.components
       examplesDetailed: (component.examples ?? []).map((markup, index) => ({
         id: `${slug}-example-${index + 1}`,
         markup,
+        previewMarkup: toPreviewMarkup(tag, markup),
+        title: `Example ${index + 1}`,
       })),
       counterExamplesDetailed: (component.counterExamples ?? []).map((example, index) => ({
         id: `${slug}-counter-example-${index + 1}`,
         ...example,
+        previewMarkup: toPreviewMarkup(tag, example.markup),
+        title: `Counterexample ${index + 1}`,
       })),
       handledA11y: component.a11yContract?.handled ?? [],
       requiredA11y: component.a11yContract?.required ?? [],
