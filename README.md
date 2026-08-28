@@ -104,8 +104,8 @@ For MCP clients that launch local stdio servers, the package also ships `aihio-m
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
 | `aihio-input` | Text input with size variants and error state |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
-| `aihio-badge` | Small status indicator with 4 variants |
-| `aihio-alert` | Callout for important messages with title/description slots |
+| `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
+| `aihio-alert` | Callout with title/description slots and 4 variants; only `destructive` announces assertively |
 | `aihio-avatar` | Image avatar with fallback initials |
 | `aihio-toggle` | Toggle button with pressed state |
 | `aihio-tabs` | Tabbed interface with keyboard navigation |
@@ -195,6 +195,35 @@ in the system shout. Field borders are covered, because on an empty input the
 border is the only thing marking the control.
 
 Add or change a pair in `CONTRAST_REQUIREMENTS` in `src/tokens/contrast.js`.
+It currently checks 15 pairs per theme, 30 in total.
+
+### State colours
+
+The palette carries four state intents — neutral, `success`, `warning`, and
+`destructive` — available on `aihio-alert` and `aihio-badge`. Warning pairs a
+light amber fill with a dark foreground in both themes, because an amber that
+passes 4.5:1 against white text is no longer amber.
+
+There is no separate `info` colour. Neutral is the informational state, which
+keeps the palette to what the system can actually keep accessible.
+
+### Motion
+
+Component transitions are timed from `--duration-intent-*`, and
+`@media (prefers-reduced-motion: reduce)` collapses those tokens to `1ms` — one
+place, no `!important`, and consumer animation is left alone. Looping and
+entrance keyframes are switched off at their own declaration instead, since a
+1ms infinite rotation is a strobe. A build test fails if a component gains an
+animation without a reduced-motion guard.
+
+### Forced colours
+
+Under `forced-colors: active` the OS replaces backgrounds and text colours, so
+anything whose state reads only as a fill disappears — a pressed toggle, a
+selected tab, a filled button. Every such state is restated with system colour
+keywords (`ButtonFace`/`ButtonText`, `Highlight`/`HighlightText`, `GrayText`,
+`FieldText`), and the input error state widens its border rather than relying
+on colour at all.
 
 ### Dark mode
 

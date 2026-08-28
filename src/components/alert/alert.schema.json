@@ -1,27 +1,47 @@
 {
   "$component": "aihio-alert",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A callout component for important messages.",
-  "intents": ["alert", "informational", "status"],
+  "intents": [
+    "alert",
+    "informational",
+    "status"
+  ],
   "attributes": {
     "variant": {
       "type": "enum",
-      "values": ["default", "destructive"],
+      "values": [
+        "default",
+        "success",
+        "warning",
+        "destructive"
+      ],
       "default": "default",
-      "description": "Visual style variant"
+      "description": "Visual and live-region emphasis. destructive announces assertively; success, warning, and default announce politely."
     }
   },
   "slots": {
-    "default": { "description": "Alert content" },
-    "title": { "description": "Alert title (use slot=\"title\")" },
-    "description": { "description": "Alert description (use slot=\"description\")" }
+    "default": {
+      "description": "Alert content"
+    },
+    "title": {
+      "description": "Alert title (use slot=\"title\")"
+    },
+    "description": {
+      "description": "Alert description (use slot=\"description\")"
+    }
   },
   "composition": {
-    "allowedSlots": ["default", "title", "description"]
+    "allowedSlots": [
+      "default",
+      "title",
+      "description"
+    ]
   },
   "a11yContract": {
     "handled": [
-      "role=\"alert\" is set automatically if none is provided"
+      "role=\"alert\" (assertive) is set for variant=\"destructive\"; other variants get role=\"status\" (polite) so a confirmation does not interrupt the screen reader",
+      "An author-provided role is always left alone"
     ],
     "required": [
       {
@@ -39,10 +59,16 @@
     {
       "markup": "<aihio-alert><aihio-button>OK</aihio-button></aihio-alert>",
       "reason": "Alerts are non-interactive surfaces. For acknowledgeable prompts use aihio-dialog."
+    },
+    {
+      "markup": "<aihio-alert variant=\"success\" role=\"alert\">Saved</aihio-alert>",
+      "reason": "role=\"alert\" interrupts the screen reader. A confirmation should announce politely \u2014 drop the role and let the success variant set role=\"status\"."
     }
   ],
   "examples": [
     "<aihio-alert>\n  <div slot=\"title\">Heads up!</div>\n  <div slot=\"description\">You can add components to your app.</div>\n</aihio-alert>",
-    "<aihio-alert variant=\"destructive\">\n  <div slot=\"title\">Error</div>\n  <div slot=\"description\">Something went wrong.</div>\n</aihio-alert>"
+    "<aihio-alert variant=\"destructive\">\n  <div slot=\"title\">Error</div>\n  <div slot=\"description\">Something went wrong.</div>\n</aihio-alert>",
+    "<aihio-alert variant=\"success\">\n  <div slot=\"title\">Changes saved</div>\n  <div slot=\"description\">Your profile is up to date.</div>\n</aihio-alert>",
+    "<aihio-alert variant=\"warning\">\n  <div slot=\"title\">Trial ends in 3 days</div>\n  <div slot=\"description\">Add a payment method to keep your workspace active.</div>\n</aihio-alert>"
   ]
 }

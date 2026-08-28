@@ -47,6 +47,18 @@ export class AihioDropdown extends AihioElement {
         transform: translateY(0);
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .content {
+        animation: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .content {
+        border-color: CanvasText;
+      }
+    }
   `;
 
   setup() {
@@ -239,6 +251,19 @@ export class AihioDropdownItem extends AihioElement {
     aihio-dropdown-item[disabled] {
       pointer-events: none;
       opacity: 0.5;
+    }
+
+    @media (forced-colors: active) {
+      aihio-dropdown-item:hover,
+      aihio-dropdown-item:focus {
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      aihio-dropdown-item[disabled] {
+        color: GrayText;
+        opacity: 1;
+      }
     }
   `;
 

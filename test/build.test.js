@@ -106,7 +106,7 @@ export declare class AihioButton extends HTMLElement {
   assert.match(declarations, /export type AihioIntent = "action" \| "primary-action"/);
   assert.match(
     declarations,
-    /export type AihioVariant = "default" \| "destructive" \| "secondary" \| "outline" \| "ghost" \| "link";/
+    /export type AihioVariant = "default" \| "success" \| "warning" \| "destructive" \| "secondary" \| "outline" \| "ghost" \| "link";/
   );
   assert.ok(declarations.includes(expectedButtonSnapshot), 'button declaration block matches the expected snapshot');
   assert.match(declarations, /interface AihioJSXIntrinsicElements/);
@@ -403,4 +403,71 @@ test('palette meets its contrast contract in both themes', async () => {
       assert.ok(result.pass, `${theme}/${result.id}: ${result.message} — ${result.note}`);
     }
   }
+});
+
+test('every keyframe animation is switched off under reduced motion', async () => {
+  const { readdirSync } = await import('node:fs');
+  const componentsDir = resolve(root, 'src/components');
+  const unguarded = [];
+
+  for (const dir of readdirSync(componentsDir, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+
+    const file = resolve(componentsDir, dir.name, `${dir.name}.js`);
+    let source;
+    try {
+      source = readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+
+    const animations = [...source.matchAll(/animation:\s*([\w-]+)\s/g)]
+      .map((match) => match[1])
+      .filter((name) => name !== 'none');
+
+    if (animations.length === 0) continue;
+
+    // Transition timings collapse via the duration tokens, but a keyframe
+    // animation has to be stopped where it is declared -- a looping one would
+    // otherwise become a strobe at 1ms.
+    if (!source.includes('prefers-reduced-motion')) {
+      unguarded.push(`${dir.name} (${animations.join(', ')})`);
+    }
+  }
+
+  assert.deepEqual(unguarded, [], 'components animate without a reduced-motion guard');
+});
+
+test('reduced motion collapses transition timings but not the spinner', () => {
+  const css = readFileSync(resolve(root, 'src/css/tokens.css'), 'utf8');
+  const block = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
+
+  assert.match(block, /--duration-intent-feedback:\s*1ms;/);
+  assert.match(block, /--duration-intent-overlay:\s*1ms;/);
+  assert.doesNotMatch(
+    block,
+    /--duration-intent-spinner:/,
+    'a 1ms infinite rotation is a strobe; the spinner is stopped at its declaration instead'
+  );
+});
+
+test('components that convey state through colour handle forced colours', () => {
+  const css = readFileSync(resolve(root, 'dist/aihio.css'), 'utf8');
+  const bundle = readFileSync(resolve(root, 'dist/aihio.js'), 'utf8');
+  const all = `${css}\n${bundle}`;
+
+  // Forced colours discard background-color, so anything whose state reads
+  // only as a fill needs an explicit system-colour treatment.
+  for (const keyword of ['ButtonText', 'ButtonBorder', 'CanvasText', 'FieldText', 'GrayText', 'Highlight']) {
+    assert.ok(all.includes(keyword), `${keyword} is used in a forced-colors block`);
+  }
+
+  assert.ok(
+    css.match(/forced-colors/g).length >= 8,
+    'light DOM components carry forced-colors handling'
+  );
+  assert.ok(
+    bundle.match(/forced-colors/g).length >= 2,
+    'shadow DOM components (dialog, dropdown) carry forced-colors handling'
+  );
 });

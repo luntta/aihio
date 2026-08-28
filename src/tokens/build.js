@@ -151,6 +151,12 @@ const darkEntries = flatten(semantic.dark, '', tokenRoot);
 // Build component tokens
 const componentEntries = flatten(component, '', tokenRoot);
 
+// Transition and entrance timings collapse under reduced motion. The spinner
+// duration is excluded — see the media block below.
+const reducedMotionEntries = flatten(intent.shared, '', tokenRoot)
+  .filter(([name]) => name.startsWith('duration-intent-') && name !== 'duration-intent-spinner')
+  .map(([name]) => [name, '1ms']);
+
 // Build intent tokens
 const sharedIntentEntries = flatten(intent.shared, '', tokenRoot);
 const lightIntentEntries = flatten(intent.light, '', tokenRoot);
@@ -192,6 +198,18 @@ ${toCSS(darkEntries, '    ')}
 
     /* Intent (dark) — auto */
 ${toCSS(darkIntentEntries, '    ')}
+  }
+}
+
+/* Every component transition and entrance animation is timed from these
+   tokens, so collapsing them here removes the motion system-wide without a
+   global !important override that would also flatten consumer animation.
+   --duration-intent-spinner is deliberately left alone: it drives a looping
+   animation, and a 1ms infinite rotation is a strobe. Looping animations are
+   switched off at their own declaration instead. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+${toCSS(reducedMotionEntries, '    ')}
   }
 }
 `;

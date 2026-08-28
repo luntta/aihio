@@ -52,6 +52,12 @@ export class AihioCard extends AihioElement {
       padding: var(--card-padding);
       padding-top: 0;
     }
+
+    @media (forced-colors: active) {
+      aihio-card {
+        border-color: CanvasText;
+      }
+    }
   `;
 }
 

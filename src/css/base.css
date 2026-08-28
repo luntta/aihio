@@ -15,3 +15,9 @@ body {
   outline: 2px solid oklch(var(--color-intent-focus-ring));
   outline-offset: 2px;
 }
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}

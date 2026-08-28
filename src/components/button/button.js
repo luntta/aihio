@@ -145,6 +145,40 @@ export class AihioButton extends AihioElement {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
     }
+
+    /* Forced colours override background and colour, so a custom element
+       styled only with a fill becomes invisible. System colour keywords are
+       honoured inside this query, and the disabled opacity is dropped because
+       GrayText is the signal HCM users actually read. */
+    @media (forced-colors: active) {
+      aihio-button {
+        background-color: ButtonFace;
+        color: ButtonText;
+        border-color: ButtonBorder;
+      }
+
+      aihio-button:hover {
+        background-color: ButtonFace;
+        color: ButtonText;
+      }
+
+      aihio-button[variant="link"] {
+        background-color: transparent;
+        color: LinkText;
+        border-color: transparent;
+      }
+
+      aihio-button[disabled],
+      aihio-button[loading] {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-button:focus-visible {
+        outline-color: Highlight;
+      }
+    }
   `;
 
   setup() {

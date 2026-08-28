@@ -1,22 +1,41 @@
 {
   "$component": "aihio-badge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A small status indicator label.",
-  "intents": ["status", "labeling", "metadata"],
+  "intents": [
+    "status",
+    "labeling",
+    "metadata"
+  ],
   "attributes": {
     "variant": {
       "type": "enum",
-      "values": ["default", "secondary", "outline", "destructive"],
+      "values": [
+        "default",
+        "secondary",
+        "outline",
+        "success",
+        "warning",
+        "destructive"
+      ],
       "default": "default",
       "description": "Visual style variant"
     }
   },
   "slots": {
-    "default": { "description": "Badge text content" }
+    "default": {
+      "description": "Badge text content"
+    }
   },
   "composition": {
-    "allowedChildren": ["#text"],
-    "forbiddenChildren": ["aihio-button", "aihio-input", "aihio-dialog"]
+    "allowedChildren": [
+      "#text"
+    ],
+    "forbiddenChildren": [
+      "aihio-button",
+      "aihio-input",
+      "aihio-dialog"
+    ]
   },
   "a11yContract": {
     "handled": [

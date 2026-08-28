@@ -39,5 +39,23 @@ export class AihioBadge extends AihioElement {
       background-color: oklch(var(--color-intent-state-destructive-bg));
       color: oklch(var(--color-intent-state-destructive-fg));
     }
+
+    aihio-badge[variant="success"] {
+      background-color: oklch(var(--color-intent-state-success-bg));
+      color: oklch(var(--color-intent-state-success-fg));
+    }
+
+    aihio-badge[variant="warning"] {
+      background-color: oklch(var(--color-intent-state-warning-bg));
+      color: oklch(var(--color-intent-state-warning-fg));
+    }
+
+    /* Every variant collapses to the same fill under forced colours, so give
+       the chip an outline to keep it readable as a distinct object. */
+    @media (forced-colors: active) {
+      aihio-badge {
+        border-color: CanvasText;
+      }
+    }
   `;
 }

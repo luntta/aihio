@@ -59,6 +59,33 @@ export class AihioToggle extends AihioElement {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
     }
+
+    @media (forced-colors: active) {
+      aihio-toggle {
+        background-color: ButtonFace;
+        color: ButtonText;
+        border: 1px solid ButtonBorder;
+      }
+
+      /* Pressed is a selected state, and Highlight/HighlightText is the system
+         pair for selection — without it the only cue is a background colour
+         that forced colours discards. */
+      aihio-toggle[pressed] {
+        background-color: Highlight;
+        color: HighlightText;
+        border-color: Highlight;
+      }
+
+      aihio-toggle[disabled] {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-toggle:focus-visible {
+        outline-color: Highlight;
+      }
+    }
   `;
 
   setup() {

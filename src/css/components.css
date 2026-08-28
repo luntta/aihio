@@ -26,6 +26,22 @@ aihio-alert {
       color: oklch(var(--color-intent-state-destructive-text));
     }
 
+    aihio-alert[variant="success"] {
+      border-color: oklch(var(--color-intent-state-success-bg) / 0.5);
+      color: oklch(var(--color-intent-state-success-text));
+    }
+    aihio-alert[variant="success"] [slot="title"] {
+      color: oklch(var(--color-intent-state-success-text));
+    }
+
+    aihio-alert[variant="warning"] {
+      border-color: oklch(var(--color-intent-state-warning-bg) / 0.5);
+      color: oklch(var(--color-intent-state-warning-text));
+    }
+    aihio-alert[variant="warning"] [slot="title"] {
+      color: oklch(var(--color-intent-state-warning-text));
+    }
+
     aihio-alert [slot="title"] {
       font-weight: var(--fontWeight-intent-control);
       line-height: var(--lineHeight-intent-compact);
@@ -36,6 +52,15 @@ aihio-alert {
     aihio-alert [slot="description"] {
       font-size: var(--fontSize-intent-body-sm);
       opacity: 0.9;
+    }
+
+    /* Variant colour is discarded under forced colours. The border keeps the
+       callout visible as a region; the a11yContract already requires title or
+       description text, which is what carries the meaning here. */
+    @media (forced-colors: active) {
+      aihio-alert {
+        border-color: CanvasText;
+      }
     }
 
 /* aihio-avatar */
@@ -106,6 +131,24 @@ aihio-badge {
     aihio-badge[variant="destructive"] {
       background-color: oklch(var(--color-intent-state-destructive-bg));
       color: oklch(var(--color-intent-state-destructive-fg));
+    }
+
+    aihio-badge[variant="success"] {
+      background-color: oklch(var(--color-intent-state-success-bg));
+      color: oklch(var(--color-intent-state-success-fg));
+    }
+
+    aihio-badge[variant="warning"] {
+      background-color: oklch(var(--color-intent-state-warning-bg));
+      color: oklch(var(--color-intent-state-warning-fg));
+    }
+
+    /* Every variant collapses to the same fill under forced colours, so give
+       the chip an outline to keep it readable as a distinct object. */
+    @media (forced-colors: active) {
+      aihio-badge {
+        border-color: CanvasText;
+      }
     }
 
 /* aihio-button */
@@ -247,6 +290,40 @@ aihio-button {
       outline-offset: 2px;
     }
 
+    /* Forced colours override background and colour, so a custom element
+       styled only with a fill becomes invisible. System colour keywords are
+       honoured inside this query, and the disabled opacity is dropped because
+       GrayText is the signal HCM users actually read. */
+    @media (forced-colors: active) {
+      aihio-button {
+        background-color: ButtonFace;
+        color: ButtonText;
+        border-color: ButtonBorder;
+      }
+
+      aihio-button:hover {
+        background-color: ButtonFace;
+        color: ButtonText;
+      }
+
+      aihio-button[variant="link"] {
+        background-color: transparent;
+        color: LinkText;
+        border-color: transparent;
+      }
+
+      aihio-button[disabled],
+      aihio-button[loading] {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-button:focus-visible {
+        outline-color: Highlight;
+      }
+    }
+
 /* aihio-card */
 aihio-card {
       display: flex;
@@ -295,6 +372,12 @@ aihio-card {
       gap: var(--spacing-intent-control-gap);
       padding: var(--card-padding);
       padding-top: 0;
+    }
+
+    @media (forced-colors: active) {
+      aihio-card {
+        border-color: CanvasText;
+      }
     }
 
 /* aihio-cluster */
@@ -385,6 +468,19 @@ aihio-dropdown-item {
     aihio-dropdown-item[disabled] {
       pointer-events: none;
       opacity: 0.5;
+    }
+
+    @media (forced-colors: active) {
+      aihio-dropdown-item:hover,
+      aihio-dropdown-item:focus {
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      aihio-dropdown-item[disabled] {
+        color: GrayText;
+        opacity: 1;
+      }
     }
 
 /* aihio-dropdown-separator */
@@ -485,6 +581,33 @@ aihio-input {
       box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
     }
 
+    @media (forced-colors: active) {
+      aihio-input input {
+        background-color: Field;
+        color: FieldText;
+        border-color: FieldText;
+      }
+
+      aihio-input input:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+        box-shadow: none;
+      }
+
+      aihio-input input:disabled {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      /* Colour cannot mark the error state here, so widen the border: a shape
+         signal survives forced colours. The message text carries the rest. */
+      aihio-input[error] input {
+        border-width: 2px;
+        border-color: FieldText;
+      }
+    }
+
 /* aihio-stack */
 aihio-stack {
       display: flex;
@@ -540,6 +663,29 @@ aihio-tab {
       outline-offset: 2px;
     }
 
+    /* The selected tab is marked by a fill and a shadow, both of which forced
+       colours discards, leaving no visible selection at all. Highlight is the
+       system pair for a selected item. */
+    @media (forced-colors: active) {
+      aihio-tab {
+        color: ButtonText;
+      }
+
+      aihio-tab[active] {
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      aihio-tab[disabled] {
+        color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-tab:focus-visible {
+        outline-color: Highlight;
+      }
+    }
+
 /* aihio-tab-list */
 aihio-tab-list {
       display: inline-flex;
@@ -548,6 +694,12 @@ aihio-tab-list {
       border-radius: var(--radius-intent-interactive);
       background-color: oklch(var(--color-intent-surface-muted-bg));
       padding: var(--spacing-intent-cluster-gap-tight);
+    }
+
+    @media (forced-colors: active) {
+      aihio-tab-list {
+        border: 1px solid CanvasText;
+      }
     }
 
 /* aihio-tab-panel */
@@ -614,4 +766,31 @@ aihio-toggle {
     aihio-toggle:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
+    }
+
+    @media (forced-colors: active) {
+      aihio-toggle {
+        background-color: ButtonFace;
+        color: ButtonText;
+        border: 1px solid ButtonBorder;
+      }
+
+      /* Pressed is a selected state, and Highlight/HighlightText is the system
+         pair for selection — without it the only cue is a background colour
+         that forced colours discards. */
+      aihio-toggle[pressed] {
+        background-color: Highlight;
+        color: HighlightText;
+        border-color: Highlight;
+      }
+
+      aihio-toggle[disabled] {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-toggle:focus-visible {
+        outline-color: Highlight;
+      }
     }

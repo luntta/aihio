@@ -317,6 +317,36 @@
           "$type": "color",
           "$description": "Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used."
         },
+        "state-success-bg": {
+          "$value": "{semantic.light.success}",
+          "$type": "color",
+          "$description": "Emphasis background for confirmed and healthy states."
+        },
+        "state-success-fg": {
+          "$value": "{semantic.light.success-foreground}",
+          "$type": "color",
+          "$description": "Foreground on success emphasis backgrounds."
+        },
+        "state-success-text": {
+          "$value": "{semantic.light.success-text}",
+          "$type": "color",
+          "$description": "Success text and iconography drawn directly on page or surface backgrounds."
+        },
+        "state-warning-bg": {
+          "$value": "{semantic.light.warning}",
+          "$type": "color",
+          "$description": "Emphasis background for states that need attention but are not failures."
+        },
+        "state-warning-fg": {
+          "$value": "{semantic.light.warning-foreground}",
+          "$type": "color",
+          "$description": "Foreground on warning emphasis backgrounds. Dark, because an accessible amber fill is light in both themes."
+        },
+        "state-warning-text": {
+          "$value": "{semantic.light.warning-text}",
+          "$type": "color",
+          "$description": "Warning text and iconography drawn directly on page or surface backgrounds."
+        },
         "border-subtle": {
           "$value": "{semantic.light.border}",
           "$type": "color",
@@ -422,6 +452,36 @@
           "$value": "{semantic.dark.destructive-text}",
           "$type": "color",
           "$description": "Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used."
+        },
+        "state-success-bg": {
+          "$value": "{semantic.dark.success}",
+          "$type": "color",
+          "$description": "Emphasis background for confirmed and healthy states."
+        },
+        "state-success-fg": {
+          "$value": "{semantic.dark.success-foreground}",
+          "$type": "color",
+          "$description": "Foreground on success emphasis backgrounds."
+        },
+        "state-success-text": {
+          "$value": "{semantic.dark.success-text}",
+          "$type": "color",
+          "$description": "Success text and iconography drawn directly on page or surface backgrounds."
+        },
+        "state-warning-bg": {
+          "$value": "{semantic.dark.warning}",
+          "$type": "color",
+          "$description": "Emphasis background for states that need attention but are not failures."
+        },
+        "state-warning-fg": {
+          "$value": "{semantic.dark.warning-foreground}",
+          "$type": "color",
+          "$description": "Foreground on warning emphasis backgrounds. Dark, because an accessible amber fill is light in both themes."
+        },
+        "state-warning-text": {
+          "$value": "{semantic.dark.warning-text}",
+          "$type": "color",
+          "$description": "Warning text and iconography drawn directly on page or surface backgrounds."
         },
         "border-subtle": {
           "$value": "{semantic.dark.border}",

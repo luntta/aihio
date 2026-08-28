@@ -109,6 +109,12 @@ export class AihioTabList extends AihioElement {
       background-color: oklch(var(--color-intent-surface-muted-bg));
       padding: var(--spacing-intent-cluster-gap-tight);
     }
+
+    @media (forced-colors: active) {
+      aihio-tab-list {
+        border: 1px solid CanvasText;
+      }
+    }
   `;
 
   setup() {
@@ -181,6 +187,29 @@ export class AihioTab extends AihioElement {
     aihio-tab:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
+    }
+
+    /* The selected tab is marked by a fill and a shadow, both of which forced
+       colours discards, leaving no visible selection at all. Highlight is the
+       system pair for a selected item. */
+    @media (forced-colors: active) {
+      aihio-tab {
+        color: ButtonText;
+      }
+
+      aihio-tab[active] {
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      aihio-tab[disabled] {
+        color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-tab:focus-visible {
+        outline-color: Highlight;
+      }
     }
   `;
 

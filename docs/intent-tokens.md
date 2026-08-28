@@ -31,6 +31,12 @@ Theme-aware color intents used by components and page-level chrome.
 | `color.intent.state-destructive-bg` | `--color-intent-state-destructive-bg` | `semantic.destructive` | Destructive emphasis background and error color. |
 | `color.intent.state-destructive-fg` | `--color-intent-state-destructive-fg` | `semantic.destructive-foreground` | Foreground on destructive emphasis backgrounds. |
 | `color.intent.state-destructive-text` | `--color-intent-state-destructive-text` | `semantic.destructive-text` | Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used. |
+| `color.intent.state-success-bg` | `--color-intent-state-success-bg` | `semantic.success` | Emphasis background for confirmed and healthy states. |
+| `color.intent.state-success-fg` | `--color-intent-state-success-fg` | `semantic.success-foreground` | Foreground on success emphasis backgrounds. |
+| `color.intent.state-success-text` | `--color-intent-state-success-text` | `semantic.success-text` | Success text and iconography drawn directly on page or surface backgrounds. |
+| `color.intent.state-warning-bg` | `--color-intent-state-warning-bg` | `semantic.warning` | Emphasis background for states that need attention but are not failures. |
+| `color.intent.state-warning-fg` | `--color-intent-state-warning-fg` | `semantic.warning-foreground` | Foreground on warning emphasis backgrounds. Dark, because an accessible amber fill is light in both themes. |
+| `color.intent.state-warning-text` | `--color-intent-state-warning-text` | `semantic.warning-text` | Warning text and iconography drawn directly on page or surface backgrounds. |
 | `color.intent.surface-bg` | `--color-intent-surface-bg` | `semantic.card` | Raised surface background for cards, alerts, and dialog panels. |
 | `color.intent.surface-fg` | `--color-intent-surface-fg` | `semantic.card-foreground` | Primary foreground on raised surfaces. |
 | `color.intent.surface-muted-bg` | `--color-intent-surface-muted-bg` | `semantic.muted` | Muted fill for grouped controls and subdued surfaces. |

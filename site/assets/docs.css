@@ -318,6 +318,10 @@ a {
 
 .docs-example-card__preview {
   display: grid;
+  /* Grid items stretch by default, which made every inline control in a
+     preview render full-bleed and disagree with the code sample beneath it.
+     Components that should fill the row set their own width. */
+  justify-items: start;
   gap: var(--spacing-4);
   padding: var(--spacing-5);
   border: 1px dashed oklch(var(--color-intent-border-subtle));

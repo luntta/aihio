@@ -66,6 +66,12 @@ export class AihioDialog extends AihioElement {
       }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .panel {
+        animation: none;
+      }
+    }
+
     ::slotted(aihio-dialog-header) {
       display: flex;
       flex-direction: column;
@@ -78,6 +84,12 @@ export class AihioDialog extends AihioElement {
       justify-content: flex-end;
       gap: var(--spacing-intent-control-gap);
       margin-top: var(--spacing-intent-stack-lg);
+    }
+
+    @media (forced-colors: active) {
+      .panel {
+        border-color: CanvasText;
+      }
     }
   `;
 

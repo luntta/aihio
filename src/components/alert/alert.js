@@ -29,6 +29,22 @@ export class AihioAlert extends AihioElement {
       color: oklch(var(--color-intent-state-destructive-text));
     }
 
+    aihio-alert[variant="success"] {
+      border-color: oklch(var(--color-intent-state-success-bg) / 0.5);
+      color: oklch(var(--color-intent-state-success-text));
+    }
+    aihio-alert[variant="success"] [slot="title"] {
+      color: oklch(var(--color-intent-state-success-text));
+    }
+
+    aihio-alert[variant="warning"] {
+      border-color: oklch(var(--color-intent-state-warning-bg) / 0.5);
+      color: oklch(var(--color-intent-state-warning-text));
+    }
+    aihio-alert[variant="warning"] [slot="title"] {
+      color: oklch(var(--color-intent-state-warning-text));
+    }
+
     aihio-alert [slot="title"] {
       font-weight: var(--fontWeight-intent-control);
       line-height: var(--lineHeight-intent-compact);
@@ -40,12 +56,28 @@ export class AihioAlert extends AihioElement {
       font-size: var(--fontSize-intent-body-sm);
       opacity: 0.9;
     }
+
+    /* Variant colour is discarded under forced colours. The border keeps the
+       callout visible as a region; the a11yContract already requires title or
+       description text, which is what carries the meaning here. */
+    @media (forced-colors: active) {
+      aihio-alert {
+        border-color: CanvasText;
+      }
+    }
   `;
 
-  constructor() {
-    super();
-    if (!this.getAttribute('role')) {
-      this.setAttribute('role', 'alert');
+  sync() {
+    if (this._authoredRole === undefined) {
+      this._authoredRole = this.getAttribute('role');
     }
+
+    if (this._authoredRole !== null) return;
+
+    // role="alert" is an assertive live region: it interrupts whatever the
+    // screen reader is saying. That is right for a failure and wrong for a
+    // confirmation, so only the destructive variant gets it.
+    const assertive = this.attr('variant', 'default') === 'destructive';
+    this.setAttribute('role', assertive ? 'alert' : 'status');
   }
 }

@@ -74,6 +74,33 @@ export class AihioInput extends AihioElement {
       border-color: oklch(var(--color-intent-state-destructive-bg));
       box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
     }
+
+    @media (forced-colors: active) {
+      aihio-input input {
+        background-color: Field;
+        color: FieldText;
+        border-color: FieldText;
+      }
+
+      aihio-input input:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+        box-shadow: none;
+      }
+
+      aihio-input input:disabled {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      /* Colour cannot mark the error state here, so widen the border: a shape
+         signal survives forced colours. The message text carries the rest. */
+      aihio-input[error] input {
+        border-width: 2px;
+        border-color: FieldText;
+      }
+    }
   `;
 
   setup() {
