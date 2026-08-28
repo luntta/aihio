@@ -1,23 +1,26 @@
-<section data-aihio-intent="form-field">
-  <label>
-    <span>Password</span>
-    <aihio-input
-      data-aihio-intent="form-field text-entry"
-      type="password"
-      value="correct horse battery staple"
-      aria-describedby="password-success"
-    ></aihio-input>
-  </label>
+<form data-aihio-intent="form-field">
+  <aihio-stack data-aihio-intent="layout">
+    <aihio-field data-aihio-intent="form-field">
+      <label slot="label">Password</label>
+      <aihio-input
+        data-aihio-intent="text-entry"
+        type="password"
+        name="password"
+        autocomplete="new-password"
+        value="correct horse battery staple"
+        required
+      ></aihio-input>
+      <span slot="description">Password strength looks good.</span>
+    </aihio-field>
 
-  <p id="password-success">Password strength looks good.</p>
+    <aihio-alert data-aihio-intent="informational status">
+      <div slot="title">Ready to save</div>
+      <div slot="description">You can submit the form without additional changes.</div>
+    </aihio-alert>
 
-  <aihio-alert data-aihio-intent="informational status">
-    <div slot="title">Ready to save</div>
-    <div slot="description">You can submit the form without additional changes.</div>
-  </aihio-alert>
-
-  <div>
-    <aihio-button data-aihio-intent="secondary-action" variant="outline">Cancel</aihio-button>
-    <aihio-button data-aihio-intent="primary-action">Save password</aihio-button>
-  </div>
-</section>
+    <aihio-cluster data-aihio-intent="layout" grow justify="end">
+      <aihio-button data-aihio-intent="secondary-action" variant="outline" type="reset">Cancel</aihio-button>
+      <aihio-button data-aihio-intent="primary-action" type="submit">Save password</aihio-button>
+    </aihio-cluster>
+  </aihio-stack>
+</form>

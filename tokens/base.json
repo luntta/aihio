@@ -6,7 +6,9 @@
       "200": { "$value": "0.92 0.004 264", "$type": "color" },
       "300": { "$value": "0.87 0.008 258", "$type": "color" },
       "400": { "$value": "0.71 0.015 261", "$type": "color" },
+      "450": { "$value": "0.65 0.014 260", "$type": "color" },
       "500": { "$value": "0.55 0.014 259", "$type": "color" },
+      "550": { "$value": "0.52 0.014 259", "$type": "color" },
       "600": { "$value": "0.45 0.013 256", "$type": "color" },
       "700": { "$value": "0.39 0.013 258", "$type": "color" },
       "800": { "$value": "0.31 0.012 256", "$type": "color" },
@@ -86,6 +88,7 @@
   "duration": {
     "fast":   { "$value": "100ms", "$type": "duration" },
     "normal": { "$value": "150ms", "$type": "duration" },
-    "slow":   { "$value": "200ms", "$type": "duration" }
+    "slow":   { "$value": "200ms", "$type": "duration" },
+    "spin":   { "$value": "700ms", "$type": "duration" }
   }
 }

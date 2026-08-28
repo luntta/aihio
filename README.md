@@ -25,7 +25,17 @@ Or import as a module:
 import 'aihio';
 ```
 
-That entrypoint auto-registers all custom elements. If you only want the classes without side effects:
+That entrypoint auto-registers all custom elements.
+
+During development, import the dev bundle instead to get schema-backed console
+warnings for invalid attributes and accessibility-contract violations:
+
+```js
+import 'aihio/dev';   // same components, warnings installed
+```
+
+The warnings are a separate module that the production bundle never imports, so
+`dist/aihio.js` carries none of that code. If you only want the classes without side effects:
 
 ```js
 import { AihioButton, AihioDialog } from 'aihio/components';
@@ -88,6 +98,9 @@ For MCP clients that launch local stdio servers, the package also ships `aihio-m
 
 | Component | Description |
 |-----------|-------------|
+| `aihio-stack` | Vertical layout primitive applying the system spacing scale |
+| `aihio-cluster` | Horizontal layout primitive for button rows, badge lists, and toolbars |
+| `aihio-field` | Form field wrapper that lays out label, control, description, and error, and wires the ARIA between them |
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
 | `aihio-input` | Text input with size variants and error state |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
@@ -114,7 +127,50 @@ The seeded patterns cover higher-level compositions such as auth forms, settings
 
 The component schemas also include author-facing `a11yContract` requirements and multiple `counterExamples` per component, so prompts, docs, and dev warnings can all point back to the same source-of-truth rules.
 
-In dev builds, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes and machine-checkable `a11yContract` violations including unnamed icon buttons and toggles, unnamed dialogs, unlabeled inputs, icon-only dropdown triggers without labels, destructive alerts without announced content, and mismatched tab/panel values.
+When you import `aihio/dev`, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes and machine-checkable `a11yContract` violations including unnamed icon buttons and toggles, unnamed dialogs, unlabeled inputs, icon-only dropdown triggers without labels, destructive alerts without announced content, and mismatched tab/panel values.
+
+## Forms
+
+`aihio-button` is form-associated and `aihio-input` wraps a real light-DOM
+`<input>`, so a form built from Aihio components submits like any other:
+
+```html
+<form>
+  <aihio-field>
+    <label slot="label">Email</label>
+    <aihio-input type="email" name="email" autocomplete="email" required></aihio-input>
+    <span slot="description">Use your work address.</span>
+  </aihio-field>
+
+  <aihio-cluster grow justify="end">
+    <aihio-button variant="outline" type="reset">Clear</aihio-button>
+    <aihio-button type="submit">Sign in</aihio-button>
+  </aihio-cluster>
+</form>
+```
+
+- `type="submit"` calls `requestSubmit()` on the owning form, so native
+  constraint validation runs first; `type="reset"` resets it.
+- The button is a member of `form.elements` and honours `<fieldset disabled>`.
+- `name` on `aihio-input` is what puts the value in `FormData`. Without it the
+  field submits nothing, and both the linter and the dev build say so.
+- `aihio-field` generates the ids and wires `aria-labelledby` and
+  `aria-describedby`, pointing the description at the error message while the
+  field is erroring.
+
+## Layout
+
+Three primitives keep page composition inside the token system instead of in
+hand-written CSS:
+
+```html
+<aihio-stack gap="lg">          <!-- vertical rhythm -->
+<aihio-cluster justify="end">   <!-- horizontal groups, wraps -->
+<aihio-field>                   <!-- label + control + message -->
+```
+
+`aihio-cluster` is sized to its content, so add `grow` when you need `justify`
+to distribute across a row inside a flex parent such as a card footer.
 
 ## Tokens
 
@@ -127,6 +183,18 @@ Four tiers:
 - **Component** (`tokens/component.json`) — component-level tokens (button height, input height, etc.)
 
 Intent tokens compile to CSS custom properties without collapsing the alias chain, so overriding a lower tier still flows upward.
+
+### Contrast
+
+`src/tokens/build.js` checks the palette against a contract of foreground and
+background pairs — 4.5:1 for body-size text, 3:1 for the boundary of an
+interactive control — and fails the build if any pair regresses. Card and alert
+borders are deliberately excluded: they are decorative framing, not the kind of
+boundary WCAG 1.4.11 covers, and holding them to 3:1 would make every surface
+in the system shout. Field borders are covered, because on an empty input the
+border is the only thing marking the control.
+
+Add or change a pair in `CONTRAST_REQUIREMENTS` in `src/tokens/contrast.js`.
 
 ### Dark mode
 
@@ -170,13 +238,13 @@ The site uses Aihio components in the docs UI itself and currently includes:
 ```bash
 npm install
 npm run dev       # Dev server at localhost:3000/
-npm run build     # Build dist/
+npm run build     # Build dist/ (production + dev bundles)
 npm run docs:build  # Build the Eleventy docs site into _site/
 npm run docs:test   # Validate generated docs HTML assumptions
 npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Run tests, build docs, and validate the docs output
 npm exec aihio-mcp  # Start the local MCP server over stdio
-npm run tokens    # Rebuild tokens only
+npm run tokens    # Rebuild tokens only (also enforces the contrast contract)
 npm run styles    # Rebuild generated component CSS
 npm run schema    # Rebuild schema only
 ```

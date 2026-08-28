@@ -10,7 +10,8 @@
   <pre id="results"></pre>
 
   <script type="module">
-    globalThis.__AIHIO_DEV__ = true;
+    import '../../dist/aihio.dev.js';  // installs the warnings itself
+
     globalThis.requestAnimationFrame = (callback) => setTimeout(() => callback(performance.now()), 0);
     globalThis.cancelAnimationFrame = (handle) => clearTimeout(handle);
 
@@ -52,8 +53,6 @@
     }
 
     try {
-      await import('../../src/define.js');
-
       await runTest('dev warnings report schema and a11y violations', async () => {
         sandbox.innerHTML = `
           <aihio-button id="bad-button" variant="primary" size="icon">&#x2715;</aihio-button>
@@ -161,7 +160,7 @@
         const dialog = document.querySelector('#good-dialog');
         const panel = dialog.shadowRoot.querySelector('.panel');
 
-        assert(globalThis.Aihio.describe('aihio-input')?.version === '1.0.0', 'Aihio.describe should expose the input schema');
+        assert(globalThis.Aihio.describe('aihio-input')?.version === '1.1.0', 'Aihio.describe should expose the input schema');
         assert(innerInput.getAttribute('aria-label') === 'Email', 'input host aria-label should sync to the inner input');
         assert(innerInput.getAttribute('aria-describedby') === 'good-help', 'input host aria-describedby should sync to the inner input');
         assert(panel.getAttribute('aria-label') === 'Confirm archive', 'dialog host aria-label should sync to the panel');

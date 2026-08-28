@@ -1,4 +1,4 @@
-import { AIHIO_DEV, collectDevWarnings, formatDevWarning } from '../schema/runtime.js';
+import { runDevHook } from './dev-hook.js';
 
 const AihioHTMLElement = globalThis.HTMLElement ?? class {};
 const shadowStyleSheets = new WeakMap();
@@ -15,8 +15,6 @@ export class AihioElement extends AihioHTMLElement {
       this._initShadow();
     }
     this._didSetup = false;
-    this._activeDevWarnings = new Set();
-    this._devObserver = null;
   }
 
   _initShadow() {
@@ -105,19 +103,18 @@ export class AihioElement extends AihioHTMLElement {
 
   connectedCallback() {
     this._ensureSetup();
-    this._startDevObserver();
+    runDevHook(this, 'connect');
     this.refresh();
   }
 
   disconnectedCallback() {
-    this._stopDevObserver();
-    this._activeDevWarnings.clear();
+    runDevHook(this, 'disconnect');
     this.teardown?.();
   }
 
   refresh() {
     this.sync?.();
-    this._runDevWarnings();
+    runDevHook(this, 'refresh');
   }
 
   /** Override in subclasses for one-time DOM setup */
@@ -125,41 +122,4 @@ export class AihioElement extends AihioHTMLElement {
 
   /** Override in subclasses for repeated state syncing */
   sync() {}
-
-  _runDevWarnings() {
-    if (!AIHIO_DEV) return;
-
-    const warnings = collectDevWarnings(this);
-    const nextKeys = new Set(warnings.map((warning) => warning.key));
-
-    for (const warning of warnings) {
-      if (this._activeDevWarnings.has(warning.key)) continue;
-      console.warn(formatDevWarning(this, warning));
-    }
-
-    this._activeDevWarnings = nextKeys;
-  }
-
-  _startDevObserver() {
-    if (!AIHIO_DEV || this._devObserver || typeof MutationObserver === 'undefined') {
-      return;
-    }
-
-    this._devObserver = new MutationObserver(() => {
-      this._runDevWarnings();
-    });
-
-    this._devObserver.observe(this, {
-      attributes: true,
-      attributeFilter: ['aria-label', 'aria-labelledby', 'aria-describedby', 'id'],
-      childList: true,
-      characterData: true,
-      subtree: true,
-    });
-  }
-
-  _stopDevObserver() {
-    this._devObserver?.disconnect();
-    this._devObserver = null;
-  }
 }

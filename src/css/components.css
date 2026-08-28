@@ -20,10 +20,10 @@ aihio-alert {
 
     aihio-alert[variant="destructive"] {
       border-color: oklch(var(--color-intent-state-destructive-bg) / 0.5);
-      color: oklch(var(--color-intent-state-destructive-bg));
+      color: oklch(var(--color-intent-state-destructive-text));
     }
     aihio-alert[variant="destructive"] [slot="title"] {
-      color: oklch(var(--color-intent-state-destructive-bg));
+      color: oklch(var(--color-intent-state-destructive-text));
     }
 
     aihio-alert [slot="title"] {
@@ -217,6 +217,31 @@ aihio-button {
       pointer-events: none;
     }
 
+    /* A loading button has to look different, not just behave differently.
+       aria-busy covers assistive tech; this covers everyone else. */
+    aihio-button[loading]::before {
+      content: "";
+      width: 1em;
+      height: 1em;
+      flex: none;
+      border-radius: var(--radius-intent-pill);
+      border: 2px solid currentColor;
+      border-block-start-color: transparent;
+      animation: aihio-button-spin var(--duration-intent-spinner) linear infinite;
+    }
+
+    @keyframes aihio-button-spin {
+      to { transform: rotate(1turn); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      aihio-button[loading]::before {
+        animation: none;
+        border-block-start-color: currentColor;
+        opacity: 0.5;
+      }
+    }
+
     aihio-button:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
@@ -270,6 +295,38 @@ aihio-card {
       gap: var(--spacing-intent-control-gap);
       padding: var(--card-padding);
       padding-top: 0;
+    }
+
+/* aihio-cluster */
+aihio-cluster {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--spacing-intent-control-gap);
+    }
+
+    aihio-cluster[gap="tight"] { gap: var(--spacing-intent-cluster-gap-tight); }
+    aihio-cluster[gap="sm"]    { gap: var(--spacing-intent-control-gap); }
+    aihio-cluster[gap="md"]    { gap: var(--spacing-intent-stack-sm); }
+    aihio-cluster[gap="lg"]    { gap: var(--spacing-intent-stack-md); }
+
+    aihio-cluster[align="start"]    { align-items: flex-start; }
+    aihio-cluster[align="center"]   { align-items: center; }
+    aihio-cluster[align="end"]      { align-items: flex-end; }
+    aihio-cluster[align="baseline"] { align-items: baseline; }
+
+    aihio-cluster[justify="start"]   { justify-content: flex-start; }
+    aihio-cluster[justify="center"]  { justify-content: center; }
+    aihio-cluster[justify="end"]     { justify-content: flex-end; }
+    aihio-cluster[justify="between"] { justify-content: space-between; }
+
+    /* justify only has something to distribute once the cluster occupies its
+       row. Inside a flex parent (a card or dialog footer) it is otherwise
+       sized to its content and every justify value looks the same. */
+    aihio-cluster[grow] {
+      flex: 1 1 auto;
+      width: 100%;
     }
 
 /* aihio-dialog-description */
@@ -338,6 +395,38 @@ aihio-dropdown-separator {
       margin: var(--spacing-intent-cluster-gap-tight) calc(var(--spacing-intent-cluster-gap-tight) * -1);
     }
 
+/* aihio-field */
+aihio-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-intent-form-field-gap);
+    }
+
+    aihio-field [slot="label"] {
+      font-size: var(--fontSize-intent-control-sm);
+      font-weight: var(--fontWeight-intent-control);
+      line-height: var(--lineHeight-intent-compact);
+      color: oklch(var(--color-intent-page-fg));
+    }
+
+    aihio-field [slot="description"] {
+      font-size: var(--fontSize-intent-body-sm);
+      line-height: var(--lineHeight-intent-body);
+      color: oklch(var(--color-intent-surface-muted-fg));
+    }
+
+    aihio-field [slot="error"] {
+      font-size: var(--fontSize-intent-body-sm);
+      line-height: var(--lineHeight-intent-body);
+      color: oklch(var(--color-intent-state-destructive-text));
+    }
+
+    /* The description is redundant once an error is showing: the error message
+       supersedes it, and stacking both buries the thing the user must act on. */
+    aihio-field[error] [slot="description"] {
+      display: none;
+    }
+
 /* aihio-input */
 aihio-input {
       display: inline-flex;
@@ -395,6 +484,23 @@ aihio-input {
       border-color: oklch(var(--color-intent-state-destructive-bg));
       box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
     }
+
+/* aihio-stack */
+aihio-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-intent-stack-md);
+    }
+
+    aihio-stack[gap="tight"] { gap: var(--spacing-intent-stack-tight); }
+    aihio-stack[gap="sm"]    { gap: var(--spacing-intent-stack-sm); }
+    aihio-stack[gap="md"]    { gap: var(--spacing-intent-stack-md); }
+    aihio-stack[gap="lg"]    { gap: var(--spacing-intent-stack-lg); }
+
+    aihio-stack[align="start"]   { align-items: flex-start; }
+    aihio-stack[align="center"]  { align-items: center; }
+    aihio-stack[align="end"]     { align-items: flex-end; }
+    aihio-stack[align="stretch"] { align-items: stretch; }
 
 /* aihio-tab */
 aihio-tab {

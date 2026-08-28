@@ -1,9 +1,22 @@
 {
   "id": "auth-form",
   "name": "Auth Form",
-  "intents": ["surface", "form-field", "text-entry", "primary-action", "secondary-action"],
-  "description": "Card-based authentication form with labeled fields and a dominant submit action.",
-  "requiredComponents": ["aihio-card", "aihio-input", "aihio-button"],
+  "intents": [
+    "surface",
+    "layout",
+    "form-field",
+    "text-entry",
+    "primary-action",
+    "secondary-action"
+  ],
+  "description": "Card-based authentication form with labelled fields and a dominant submit action inside the form element.",
+  "requiredComponents": [
+    "aihio-card",
+    "aihio-field",
+    "aihio-input",
+    "aihio-cluster",
+    "aihio-button"
+  ],
   "variations": [
     {
       "id": "passwordless",

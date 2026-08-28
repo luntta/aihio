@@ -14,9 +14,17 @@
       "types": "./dist/aihio.d.ts",
       "default": "./dist/aihio.js"
     },
+    "./dev": {
+      "types": "./dist/aihio.d.ts",
+      "default": "./dist/aihio.dev.js"
+    },
     "./components": {
       "types": "./dist/components.d.ts",
       "default": "./dist/components.js"
+    },
+    "./components/dev": {
+      "types": "./dist/components.d.ts",
+      "default": "./dist/components.dev.js"
     },
     "./prompt": {
       "types": "./dist/prompt.d.ts",

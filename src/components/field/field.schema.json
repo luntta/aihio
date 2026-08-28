@@ -1,0 +1,96 @@
+{
+  "$component": "aihio-field",
+  "version": "1.0.0",
+  "description": "Form field wrapper that lays out a label, control, description, and error message, and wires the accessibility relationships between them.",
+  "intents": [
+    "form-field",
+    "layout",
+    "labeling"
+  ],
+  "attributes": {
+    "error": {
+      "type": "boolean",
+      "default": false,
+      "description": "Reflected automatically when slot=\"error\" has content. Authors write the message; the field sets the state."
+    }
+  },
+  "slots": {
+    "label": {
+      "description": "The field label. Use a <label> element to also get click-to-focus.",
+      "accepts": [
+        "label",
+        "span",
+        "#text"
+      ]
+    },
+    "default": {
+      "description": "The control itself, normally aihio-input.",
+      "accepts": [
+        "aihio-input",
+        "input",
+        "select",
+        "textarea"
+      ]
+    },
+    "description": {
+      "description": "Supporting hint shown under the control, hidden while an error is showing.",
+      "accepts": [
+        "#flow"
+      ]
+    },
+    "error": {
+      "description": "Validation message. Its presence puts the field into its error state.",
+      "accepts": [
+        "#flow"
+      ]
+    }
+  },
+  "composition": {
+    "allowedSlots": [
+      "label",
+      "default",
+      "description",
+      "error"
+    ],
+    "allowedChildren": [
+      "aihio-input",
+      "label",
+      "span",
+      "p",
+      "#flow"
+    ],
+    "forbiddenChildren": [
+      "aihio-card",
+      "aihio-dialog"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "Generates ids for the label, description, and error, and wires aria-labelledby and aria-describedby on the control",
+      "Sets for on the label when it is a <label> element, so clicking it focuses the control",
+      "Reflects the error state onto the control, which sets aria-invalid",
+      "Points aria-describedby at the error message while erroring, and at the description otherwise, so only the relevant text is announced"
+    ],
+    "required": [
+      {
+        "when": "the field has no slot=\"label\" content",
+        "requirement": "Provide slot=\"label\" content, or an aria-label on the control. aihio-field wires a label but cannot invent one.",
+        "severity": "error"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-field>\n  <aihio-input name=\"email\"></aihio-input>\n</aihio-field>",
+      "reason": "No slot=\"label\", so the control is still unnamed. aihio-field wires a label, it does not invent one."
+    },
+    {
+      "markup": "<aihio-field error>\n  <span slot=\"label\">Email</span>\n  <aihio-input name=\"email\"></aihio-input>\n</aihio-field>",
+      "reason": "The error attribute is set by the component from slot=\"error\" content. Writing it by hand with no message leaves nothing to announce."
+    }
+  ],
+  "examples": [
+    "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  <span slot=\"description\">Use your work address.</span>\n</aihio-field>",
+    "<aihio-field>\n  <label slot=\"label\">Password</label>\n  <aihio-input type=\"password\" name=\"password\"></aihio-input>\n  <span slot=\"error\">Password must include at least 12 characters and one symbol.</span>\n</aihio-field>"
+  ]
+}

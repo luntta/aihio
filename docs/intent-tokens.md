@@ -30,6 +30,7 @@ Theme-aware color intents used by components and page-level chrome.
 | `color.intent.page-fg` | `--color-intent-page-fg` | `semantic.foreground` | Primary foreground on the page canvas. |
 | `color.intent.state-destructive-bg` | `--color-intent-state-destructive-bg` | `semantic.destructive` | Destructive emphasis background and error color. |
 | `color.intent.state-destructive-fg` | `--color-intent-state-destructive-fg` | `semantic.destructive-foreground` | Foreground on destructive emphasis backgrounds. |
+| `color.intent.state-destructive-text` | `--color-intent-state-destructive-text` | `semantic.destructive-text` | Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used. |
 | `color.intent.surface-bg` | `--color-intent-surface-bg` | `semantic.card` | Raised surface background for cards, alerts, and dialog panels. |
 | `color.intent.surface-fg` | `--color-intent-surface-fg` | `semantic.card-foreground` | Primary foreground on raised surfaces. |
 | `color.intent.surface-muted-bg` | `--color-intent-surface-muted-bg` | `semantic.muted` | Muted fill for grouped controls and subdued surfaces. |
@@ -120,3 +121,4 @@ Motion timing intents for feedback and overlay entrance.
 | `duration.intent.feedback` | `--duration-intent-feedback` | `duration.normal` | Default control feedback transition duration. |
 | `duration.intent.feedback-fast` | `--duration-intent-feedback-fast` | `duration.fast` | Fast hover and menu-item feedback transitions. |
 | `duration.intent.overlay` | `--duration-intent-overlay` | `duration.slow` | Entrance timing for larger blocking overlays. |
+| `duration.intent.spinner` | `--duration-intent-spinner` | `duration.spin` | One full rotation of an indeterminate busy indicator. |

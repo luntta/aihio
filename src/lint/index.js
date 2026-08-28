@@ -28,6 +28,15 @@ const VOID_ELEMENTS = new Set([
   'wbr',
 ]);
 
+const BUTTON_SUBMITS_FORM = 'the button submits a form';
+const INPUT_NEEDS_NAME =
+  'the field is inside a <form> and its value should be submitted';
+
+function isFormActionButton(node) {
+  const type = getAttribute(node, 'type');
+  return type === 'submit' || type === 'reset';
+}
+
 const a11yRequirementCheckers = {
   'aihio-alert': {
     'variant="destructive"': (node) =>
@@ -45,6 +54,7 @@ const a11yRequirementCheckers = {
   'aihio-button': {
     'size="icon" or the button has no visible text': (node, context) =>
       requiresExplicitAccessibleName(node) && !hasAccessibleName(node, context),
+    [BUTTON_SUBMITS_FORM]: (node) => isFormActionButton(node) && !hasAncestor(node, 'form'),
   },
   'aihio-dialog': {
     'dialog has no aihio-dialog-title': (node) =>
@@ -57,10 +67,19 @@ const a11yRequirementCheckers = {
       return Boolean(trigger && requiresExplicitAccessibleName(trigger) && !hasAccessibleName(trigger, context));
     },
   },
+  'aihio-field': {
+    'the field has no slot="label" content': (node, context) => {
+      if (fieldHasLabel(node)) return false;
+      const control = findDescendants(node, (child) => child.tagName === 'aihio-input')[0];
+      return !control || !hasNonEmptyAttribute(control, 'aria-label');
+    },
+  },
   'aihio-input': {
     'input has no visible <label> associated by for/id': (node, context) => !hasAssociatedLabel(node, context),
     'error=true': (node, context) =>
       hasAttribute(node, 'error') && !referencesExistingIds(node, 'aria-describedby', context),
+    [INPUT_NEEDS_NAME]: (node) =>
+      hasAncestor(node, 'form') && !hasNonEmptyAttribute(node, 'name'),
   },
   'aihio-tabs': {
     'every aihio-tab and aihio-tab-panel': (node) => !hasExactTabValuePairs(node),
@@ -511,14 +530,33 @@ function getNodePath(node) {
 }
 
 function hasAncestor(node, tagName) {
+  return getAncestor(node, tagName) !== null;
+}
+
+function getAncestor(node, tagName) {
   let current = node.parent;
 
   while (current?.type === 'element') {
-    if (current.tagName === tagName) return true;
+    if (current.tagName === tagName) return current;
     current = current.parent;
   }
 
-  return false;
+  return null;
+}
+
+/**
+ * aihio-field wires aria-labelledby onto its control at runtime, which static
+ * markup cannot show. Recognise the authored shape instead, so a correctly
+ * built field does not report the control as unlabelled.
+ */
+function fieldProvidesLabel(node) {
+  const field = getAncestor(node, 'aihio-field');
+  if (!field) return false;
+
+  return findDescendants(
+    field,
+    (child) => getAttribute(child, 'slot') === 'label'
+  ).some((label) => normalizeText(getTextContent(label)).length > 0);
 }
 
 function getAttribute(node, name) {
@@ -559,7 +597,16 @@ function referencesExistingIds(node, attrName, context) {
     .every((id) => context.ids.has(id));
 }
 
+function fieldHasLabel(node) {
+  return findDescendants(
+    node,
+    (child) => getAttribute(child, 'slot') === 'label'
+  ).some((label) => normalizeText(getTextContent(label)).length > 0);
+}
+
 function hasAssociatedLabel(node, context) {
+  if (hasAncestor(node, 'aihio-field')) return true;
+
   if (hasNonEmptyAttribute(node, 'aria-label')) return true;
   if (referencesExistingIds(node, 'aria-labelledby', context)) return true;
   if (hasAncestor(node, 'label')) return true;
@@ -570,16 +617,24 @@ function hasAssociatedLabel(node, context) {
   return (context.labelsByFor.get(id) ?? []).length > 0;
 }
 
+function isIconSized(node) {
+  return getAttribute(node, 'size') === 'icon';
+}
+
 function hasAccessibleName(node, context) {
-  return (
-    hasNonEmptyAttribute(node, 'aria-label') ||
-    referencesExistingIds(node, 'aria-labelledby', context) ||
-    normalizeText(getTextContent(node)).length > 0
-  );
+  if (hasNonEmptyAttribute(node, 'aria-label')) return true;
+  if (referencesExistingIds(node, 'aria-labelledby', context)) return true;
+
+  // On an icon-sized control the text content is a glyph ("\u2715", "\u22ef"), which
+  // names the shape and not the action. Only an explicit label counts there —
+  // otherwise every icon button would look named and the rule would never fire.
+  if (isIconSized(node)) return false;
+
+  return normalizeText(getTextContent(node)).length > 0;
 }
 
 function requiresExplicitAccessibleName(node) {
-  return getAttribute(node, 'size') === 'icon' || normalizeText(getTextContent(node)).length === 0;
+  return isIconSized(node) || normalizeText(getTextContent(node)).length === 0;
 }
 
 function hasNamedSlotContent(node, slotName) {

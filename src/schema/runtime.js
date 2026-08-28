@@ -1,9 +1,5 @@
 import runtimeSchemaDocument from './runtime-schema.js';
 
-const buildTimeDev = typeof __AIHIO_DEV__ !== 'undefined' ? __AIHIO_DEV__ : undefined;
-
-export const AIHIO_DEV = buildTimeDev ?? globalThis.__AIHIO_DEV__ ?? false;
-
 export const runtimeSchema = deepFreeze(runtimeSchemaDocument);
 
 const componentSchemaByTag = new Map(
@@ -37,6 +33,15 @@ export function formatDevWarning(element, warning) {
   return `[aihio] ${tag}: ${severity}${warning.message}`;
 }
 
+const BUTTON_SUBMITS_FORM = 'the button submits a form';
+const INPUT_NEEDS_NAME =
+  'the field is inside a <form> and its value should be submitted';
+
+function isFormActionButton(element) {
+  const type = element?.getAttribute?.('type');
+  return type === 'submit' || type === 'reset';
+}
+
 const a11yRequirementCheckers = {
   'aihio-alert': {
     'variant="destructive"': (element) =>
@@ -55,6 +60,8 @@ const a11yRequirementCheckers = {
   'aihio-button': {
     'size="icon" or the button has no visible text': (element) =>
       requiresExplicitAccessibleName(element) && !hasAccessibleName(element),
+    [BUTTON_SUBMITS_FORM]: (element) =>
+      isFormActionButton(element) && !element.closest?.('form'),
   },
   'aihio-dialog': {
     'dialog has no aihio-dialog-title': (element) =>
@@ -71,6 +78,8 @@ const a11yRequirementCheckers = {
     'input has no visible <label> associated by for/id': (element) => !hasAssociatedLabel(element),
     'error=true': (element) =>
       element.hasAttribute?.('error') && !referencesExistingIds(element, 'aria-describedby'),
+    [INPUT_NEEDS_NAME]: (element) =>
+      Boolean(element.closest?.('form')) && !hasNonEmptyAttribute(element, 'name'),
   },
   'aihio-tabs': {
     'every aihio-tab and aihio-tab-panel': (element) => !hasExactTabValuePairs(element),
@@ -124,6 +133,9 @@ function collectA11yWarnings(element, schema) {
 }
 
 function hasAssociatedLabel(element) {
+  // aihio-field owns labelling for the control it wraps and wires
+  // aria-labelledby itself, so the control does not report it separately.
+  if (element.closest?.('aihio-field')) return true;
   if (hasNonEmptyAttribute(element, 'aria-label')) return true;
   if (referencesExistingIds(element, 'aria-labelledby')) return true;
   if (element.closest?.('label')) return true;
@@ -139,19 +151,24 @@ function hasAssociatedLabel(element) {
   );
 }
 
+function isIconSized(element) {
+  return element?.getAttribute?.('size') === 'icon';
+}
+
 function hasAccessibleName(element) {
-  return (
-    hasNonEmptyAttribute(element, 'aria-label') ||
-    referencesExistingIds(element, 'aria-labelledby') ||
-    normalizeText(element.textContent).length > 0
-  );
+  if (hasNonEmptyAttribute(element, 'aria-label')) return true;
+  if (referencesExistingIds(element, 'aria-labelledby')) return true;
+
+  // On an icon-sized control the text content is a glyph ("\u2715", "\u22ef"), which
+  // names the shape and not the action. Only an explicit label counts there —
+  // otherwise every icon button would look named and the rule would never fire.
+  if (isIconSized(element)) return false;
+
+  return normalizeText(element.textContent).length > 0;
 }
 
 function requiresExplicitAccessibleName(element) {
-  return (
-    element?.getAttribute?.('size') === 'icon' ||
-    normalizeText(element?.textContent).length === 0
-  );
+  return isIconSized(element) || normalizeText(element?.textContent).length === 0;
 }
 
 function hasNamedSlotContent(element, slotName) {

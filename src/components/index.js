@@ -4,6 +4,7 @@ import { AihioAlert } from './alert/alert.js';
 import { AihioAvatar } from './avatar/avatar.js';
 import { AihioBadge } from './badge/badge.js';
 import { AihioButton } from './button/button.js';
+import { AihioCluster } from './cluster/cluster.js';
 import {
   AihioCard,
   AihioCardContent,
@@ -24,7 +25,9 @@ import {
   AihioDropdownItem,
   AihioDropdownSeparator,
 } from './dropdown/dropdown.js';
+import { AihioField } from './field/field.js';
 import { AihioInput } from './input/input.js';
+import { AihioStack } from './stack/stack.js';
 import {
   AihioTab,
   AihioTabList,
@@ -39,9 +42,12 @@ import { AihioToggle } from './toggle/toggle.js';
   AihioBadge,
   AihioButton,
   AihioCard,
+  AihioCluster,
   AihioDialog,
   AihioDropdown,
+  AihioField,
   AihioInput,
+  AihioStack,
   AihioTabs,
   AihioToggle,
 ].forEach((component) => {
@@ -75,7 +81,10 @@ export {
   AihioDropdownItem,
   AihioDropdownSeparator,
 };
+export { AihioCluster };
+export { AihioField };
 export { AihioInput };
+export { AihioStack };
 export {
   AihioTab,
   AihioTabList,

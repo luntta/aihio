@@ -1,18 +1,35 @@
 {
   "$component": "aihio-button",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A button component with multiple visual variants and sizes.",
-  "intents": ["action", "primary-action", "secondary-action", "destructive-action"],
+  "intents": [
+    "action",
+    "primary-action",
+    "secondary-action",
+    "destructive-action"
+  ],
   "attributes": {
     "variant": {
       "type": "enum",
-      "values": ["default", "secondary", "outline", "ghost", "link", "destructive"],
+      "values": [
+        "default",
+        "secondary",
+        "outline",
+        "ghost",
+        "link",
+        "destructive"
+      ],
       "default": "default",
       "description": "Visual style variant"
     },
     "size": {
       "type": "enum",
-      "values": ["sm", "md", "lg", "icon"],
+      "values": [
+        "sm",
+        "md",
+        "lg",
+        "icon"
+      ],
       "default": "md",
       "description": "Button size"
     },
@@ -25,25 +42,46 @@
       "type": "boolean",
       "default": false,
       "description": "Shows loading state and disables interaction"
+    },
+    "type": {
+      "type": "enum",
+      "values": [
+        "button",
+        "submit",
+        "reset"
+      ],
+      "default": "button",
+      "description": "Form behaviour. submit calls requestSubmit() on the owning form (running native validation first); reset resets it. Defaults to button, which does neither."
     }
   },
   "slots": {
-    "default": { "description": "Button label content" }
+    "default": {
+      "description": "Button label content"
+    }
   },
   "events": {
-    "click": { "description": "Fired when the button is clicked" }
+    "click": {
+      "description": "Fired when the button is clicked"
+    }
   },
   "composition": {
-    "forbiddenChildren": ["aihio-button", "aihio-input", "aihio-dialog", "aihio-dropdown"]
+    "forbiddenChildren": [
+      "aihio-button",
+      "aihio-input",
+      "aihio-dialog",
+      "aihio-dropdown"
+    ]
   },
   "a11yContract": {
     "handled": [
       "role=\"button\" is set",
-      "tabindex is managed — removed from tab order when disabled or loading",
+      "tabindex is managed \u2014 removed from tab order when disabled or loading",
       "aria-disabled reflects disabled state",
       "aria-busy reflects loading state",
       "Enter and Space activate the button",
-      "Click events are suppressed while disabled or loading"
+      "Click events are suppressed while disabled or loading",
+      "Form association: the button is a member of its owning form and honours <fieldset disabled>",
+      "type=\"submit\" submits the owning form via requestSubmit(), so native constraint validation runs first"
     ],
     "required": [
       {
@@ -53,7 +91,7 @@
       },
       {
         "when": "the button submits a form",
-        "requirement": "Place the button inside a <form> and set type=\"submit\"; aihio-button does not set submit semantics automatically.",
+        "requirement": "Set type=\"submit\" and place the button inside the <form> it submits. A submit button outside its form does nothing.",
         "severity": "warn"
       }
     ]
@@ -70,12 +108,17 @@
     {
       "markup": "<aihio-button size=\"icon\">&#x2715;</aihio-button>",
       "reason": "Icon-only button is missing an accessible name. Add aria-label=\"Close\" (or similar)."
+    },
+    {
+      "markup": "<form>\n  <aihio-input name=\"email\" aria-label=\"Email\"></aihio-input>\n</form>\n<aihio-button type=\"submit\">Sign in</aihio-button>",
+      "reason": "A submit button outside the <form> never submits it. Move the button inside the form element."
     }
   ],
   "examples": [
     "<aihio-button>Click me</aihio-button>",
     "<aihio-button variant=\"outline\" size=\"sm\">Cancel</aihio-button>",
     "<aihio-button variant=\"destructive\">Delete</aihio-button>",
-    "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>"
+    "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>",
+    "<form>\n  <label>\n    Email\n    <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  </label>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>"
   ]
 }

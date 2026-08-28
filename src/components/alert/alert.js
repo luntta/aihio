@@ -23,10 +23,10 @@ export class AihioAlert extends AihioElement {
 
     aihio-alert[variant="destructive"] {
       border-color: oklch(var(--color-intent-state-destructive-bg) / 0.5);
-      color: oklch(var(--color-intent-state-destructive-bg));
+      color: oklch(var(--color-intent-state-destructive-text));
     }
     aihio-alert[variant="destructive"] [slot="title"] {
-      color: oklch(var(--color-intent-state-destructive-bg));
+      color: oklch(var(--color-intent-state-destructive-text));
     }
 
     aihio-alert [slot="title"] {

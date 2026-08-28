@@ -1,9 +1,23 @@
 {
   "id": "inline-form-validation",
   "name": "Inline Form With Validation",
-  "intents": ["form-field", "text-entry", "alert", "primary-action", "secondary-action"],
-  "description": "A compact form that keeps the invalid field, visible message, and corrective action in one place.",
-  "requiredComponents": ["aihio-input", "aihio-alert", "aihio-button"],
+  "intents": [
+    "layout",
+    "form-field",
+    "text-entry",
+    "alert",
+    "primary-action",
+    "secondary-action"
+  ],
+  "description": "A compact form that keeps the invalid field, its message, and the corrective action in one place.",
+  "requiredComponents": [
+    "aihio-stack",
+    "aihio-field",
+    "aihio-input",
+    "aihio-alert",
+    "aihio-cluster",
+    "aihio-button"
+  ],
   "variations": [
     {
       "id": "success",

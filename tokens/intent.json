@@ -220,6 +220,11 @@
           "$value": "{duration.slow}",
           "$type": "duration",
           "$description": "Entrance timing for larger blocking overlays."
+        },
+        "spinner": {
+          "$value": "{duration.spin}",
+          "$type": "duration",
+          "$description": "One full rotation of an indeterminate busy indicator."
         }
       }
     }
@@ -306,6 +311,11 @@
           "$value": "{semantic.light.destructive-foreground}",
           "$type": "color",
           "$description": "Foreground on destructive emphasis backgrounds."
+        },
+        "state-destructive-text": {
+          "$value": "{semantic.light.destructive-text}",
+          "$type": "color",
+          "$description": "Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used."
         },
         "border-subtle": {
           "$value": "{semantic.light.border}",
@@ -407,6 +417,11 @@
           "$value": "{semantic.dark.destructive-foreground}",
           "$type": "color",
           "$description": "Foreground on destructive emphasis backgrounds."
+        },
+        "state-destructive-text": {
+          "$value": "{semantic.dark.destructive-text}",
+          "$type": "color",
+          "$description": "Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used."
         },
         "border-subtle": {
           "$value": "{semantic.dark.border}",

@@ -44,9 +44,15 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 10);
+  assert.equal(components.length, 13);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
+
+  // The layout tier: without these, composing a page means hand-rolled CSS
+  // outside the system.
+  for (const layout of ['aihio-stack', 'aihio-cluster', 'aihio-field']) {
+    assert.ok(components.includes(layout), `${layout} is part of the system`);
+  }
 });
 
 test('schema output includes the seeded patterns library with inlined markup', () => {
@@ -88,6 +94,7 @@ test('generated TypeScript declarations snapshot the button API and JSX surface'
   size?: AihioButtonSize;
   disabled?: boolean;
   loading?: boolean;
+  type?: AihioButtonType;
 }
 export type AihioButtonProps = AihioIntrinsicElementProps & AihioButtonAttributes;
 
@@ -188,11 +195,11 @@ test('runtime bundle exposes Aihio.describe and schema-backed component versions
 
     assert.equal(globalThis.Aihio, Aihio, 'runtime bundle publishes Aihio globally');
     assert.equal(Aihio.describe, describe, 'named describe export matches the Aihio namespace');
-    assert.equal(Aihio.describe('aihio-button')?.version, '1.0.0', 'button schema is introspectable by tag');
+    assert.equal(Aihio.describe('aihio-button')?.version, '1.1.0', 'button schema is introspectable by tag');
     assert.equal(Aihio.describe({ tagName: 'AIHIO-DIALOG' })?.$component, 'aihio-dialog', 'describe accepts live-element-like objects');
-    assert.equal(AihioButton.schemaVersion, '1.0.0', 'button class carries schemaVersion');
+    assert.equal(AihioButton.schemaVersion, '1.1.0', 'button class carries schemaVersion');
     assert.equal(AihioDialog.schemaVersion, '1.0.0', 'dialog class carries schemaVersion');
-    assert.equal(AihioInput.schemaVersion, '1.0.0', 'input class carries schemaVersion');
+    assert.equal(AihioInput.schemaVersion, '1.1.0', 'input class carries schemaVersion');
   } finally {
     globalThis.Aihio = previousAihio;
   }
@@ -251,7 +258,7 @@ test('schema content pass keeps a11y guidance and counterexamples populated for 
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 10);
+  assert.equal(minified.components.length, 13);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
   assert.equal(minified.patterns.length, 8);
 
@@ -326,5 +333,74 @@ test('register skips already-defined tags safely', async () => {
     assert.equal(defined.get('aihio-new-button'), NewButton);
   } finally {
     globalThis.customElements = originalCustomElements;
+  }
+});
+
+test('production bundle drops dev warnings and the dev bundle keeps them', () => {
+  const prod = readFileSync(resolve(root, 'dist/aihio.js'), 'utf8');
+  const dev = readFileSync(resolve(root, 'dist/aihio.dev.js'), 'utf8');
+
+  // The whole reason two bundles exist: warnings must be eliminated from the
+  // shipped default entry, not merely switched off behind a flag consumers
+  // cannot reach.
+  assert.doesNotMatch(prod, /requiresExplicitAccessibleName|hasAssociatedLabel/);
+  assert.doesNotMatch(prod, /\[aihio\] /);
+
+  assert.match(dev, /requiresExplicitAccessibleName/);
+  assert.match(dev, /hasAssociatedLabel/);
+  assert.match(dev, /\[aihio\] /);
+});
+
+test('dev warnings install through a hook rather than a compile-time flag', async () => {
+  const hook = await import(
+    pathToFileURL(resolve(root, 'src/components/dev-hook.js')).href
+  );
+  const devWarnings = await import(
+    pathToFileURL(resolve(root, 'src/schema/dev-warnings.js')).href
+  );
+
+  // Nothing is installed by importing components — the production entry gets
+  // an inert hook, and enabling warnings is an explicit act.
+  assert.equal(hook.hasDevHook(), false);
+
+  devWarnings.installDevWarnings();
+  assert.equal(hook.hasDevHook(), true);
+
+  devWarnings.installDevWarnings();
+  assert.equal(hook.hasDevHook(), true, 'install should be idempotent');
+
+  devWarnings.uninstallDevWarnings();
+  assert.equal(hook.hasDevHook(), false);
+});
+
+test('package exposes the dev bundle as its own entrypoint', () => {
+  const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
+
+  assert.equal(pkg.exports['./dev'].default, './dist/aihio.dev.js');
+  assert.equal(pkg.exports['./components/dev'].default, './dist/components.dev.js');
+});
+
+test('palette meets its contrast contract in both themes', async () => {
+  const { checkTheme } = await import(
+    pathToFileURL(resolve(root, 'src/tokens/contrast.js')).href
+  );
+  const base = JSON.parse(readFileSync(resolve(root, 'tokens/base.json'), 'utf8'));
+  const semantic = JSON.parse(readFileSync(resolve(root, 'tokens/semantic.json'), 'utf8'));
+
+  const resolveValue = (value) => {
+    const match = String(value).match(/^\{color\.([a-z]+)\.([0-9]+)\}$/);
+    return match ? base.color[match[1]][match[2]].$value : value;
+  };
+
+  for (const theme of ['light', 'dark']) {
+    const colors = Object.fromEntries(
+      Object.entries(semantic[theme])
+        .filter(([, token]) => token?.$type === 'color')
+        .map(([name, token]) => [name, resolveValue(token.$value)])
+    );
+
+    for (const result of checkTheme(theme, colors)) {
+      assert.ok(result.pass, `${theme}/${result.id}: ${result.message} — ${result.note}`);
+    }
   }
 });

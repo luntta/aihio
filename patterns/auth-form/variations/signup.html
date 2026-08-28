@@ -1,46 +1,63 @@
 <aihio-card data-aihio-intent="surface">
-  <aihio-card-header>
-    <aihio-card-title>Create your account</aihio-card-title>
-    <aihio-card-description>Set up a new workspace login for your team.</aihio-card-description>
-  </aihio-card-header>
-  <aihio-card-content>
-    <form novalidate>
-      <label>
-        <span>Full name</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          placeholder="Jane Doe"
-        ></aihio-input>
-      </label>
+  <form>
+    <aihio-card-header>
+      <aihio-card-title>Create your account</aihio-card-title>
+      <aihio-card-description>Set up a new workspace login for your team.</aihio-card-description>
+    </aihio-card-header>
+    <aihio-card-content>
+      <aihio-stack data-aihio-intent="layout">
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Full name</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            name="name"
+            autocomplete="name"
+            placeholder="Jane Doe"
+            required
+          ></aihio-input>
+        </aihio-field>
 
-      <label>
-        <span>Email</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          type="email"
-          placeholder="jane@company.com"
-        ></aihio-input>
-      </label>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Email</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="jane@company.com"
+            required
+          ></aihio-input>
+        </aihio-field>
 
-      <label>
-        <span>Password</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          type="password"
-        ></aihio-input>
-      </label>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Password</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            required
+          ></aihio-input>
+          <span slot="description">At least 12 characters, including one symbol.</span>
+        </aihio-field>
 
-      <label>
-        <span>Confirm password</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          type="password"
-        ></aihio-input>
-      </label>
-    </form>
-  </aihio-card-content>
-  <aihio-card-footer>
-    <aihio-button data-aihio-intent="secondary-action" variant="outline">Already have an account?</aihio-button>
-    <aihio-button data-aihio-intent="primary-action">Create account</aihio-button>
-  </aihio-card-footer>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Confirm password</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            type="password"
+            name="password_confirmation"
+            autocomplete="new-password"
+            required
+          ></aihio-input>
+        </aihio-field>
+      </aihio-stack>
+    </aihio-card-content>
+    <aihio-card-footer>
+      <aihio-cluster data-aihio-intent="layout" grow justify="end">
+        <aihio-button data-aihio-intent="secondary-action" variant="outline">Already have an account?</aihio-button>
+        <aihio-button data-aihio-intent="primary-action" type="submit">Create account</aihio-button>
+      </aihio-cluster>
+    </aihio-card-footer>
+  </form>
 </aihio-card>

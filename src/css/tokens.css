@@ -9,7 +9,9 @@
   --color-zinc-200: 0.92 0.004 264;
   --color-zinc-300: 0.87 0.008 258;
   --color-zinc-400: 0.71 0.015 261;
+  --color-zinc-450: 0.65 0.014 260;
   --color-zinc-500: 0.55 0.014 259;
+  --color-zinc-550: 0.52 0.014 259;
   --color-zinc-600: 0.45 0.013 256;
   --color-zinc-700: 0.39 0.013 258;
   --color-zinc-800: 0.31 0.012 256;
@@ -73,6 +75,7 @@
   --duration-fast: 100ms;
   --duration-normal: 150ms;
   --duration-slow: 200ms;
+  --duration-spin: 700ms;
 
   /* Component tokens */
   --button-height-sm: 2.25rem;
@@ -111,13 +114,14 @@
   --secondary: var(--color-zinc-100);
   --secondary-foreground: var(--color-zinc-900);
   --muted: var(--color-zinc-100);
-  --muted-foreground: var(--color-zinc-500);
+  --muted-foreground: var(--color-zinc-550);
   --accent: var(--color-zinc-100);
   --accent-foreground: var(--color-zinc-900);
-  --destructive: var(--color-red-500);
+  --destructive: var(--color-red-600);
   --destructive-foreground: var(--color-zinc-50);
-  --border: var(--color-zinc-200);
-  --input: var(--color-zinc-200);
+  --destructive-text: var(--color-red-600);
+  --border: var(--color-zinc-300);
+  --input: var(--color-zinc-450);
   --ring: var(--color-zinc-950);
 
   /* Intent (shared) */
@@ -159,6 +163,7 @@
   --duration-intent-feedback-fast: var(--duration-fast);
   --duration-intent-feedback: var(--duration-normal);
   --duration-intent-overlay: var(--duration-slow);
+  --duration-intent-spinner: var(--duration-spin);
 
   /* Intent (light) */
   --color-intent-page-bg: var(--background);
@@ -177,6 +182,7 @@
   --color-intent-action-accent-fg: var(--accent-foreground);
   --color-intent-state-destructive-bg: var(--destructive);
   --color-intent-state-destructive-fg: var(--destructive-foreground);
+  --color-intent-state-destructive-text: var(--destructive-text);
   --color-intent-border-subtle: var(--border);
   --color-intent-field-border: var(--input);
   --color-intent-focus-ring: var(--ring);
@@ -200,8 +206,9 @@
   --accent-foreground: var(--color-zinc-50);
   --destructive: var(--color-red-600);
   --destructive-foreground: var(--color-zinc-50);
-  --border: var(--color-zinc-800);
-  --input: var(--color-zinc-800);
+  --destructive-text: var(--color-red-400);
+  --border: var(--color-zinc-700);
+  --input: var(--color-zinc-550);
   --ring: var(--color-zinc-300);
 
   /* Intent (dark) */
@@ -221,6 +228,7 @@
   --color-intent-action-accent-fg: var(--accent-foreground);
   --color-intent-state-destructive-bg: var(--destructive);
   --color-intent-state-destructive-fg: var(--destructive-foreground);
+  --color-intent-state-destructive-text: var(--destructive-text);
   --color-intent-border-subtle: var(--border);
   --color-intent-field-border: var(--input);
   --color-intent-focus-ring: var(--ring);
@@ -245,8 +253,9 @@
     --accent-foreground: var(--color-zinc-50);
     --destructive: var(--color-red-600);
     --destructive-foreground: var(--color-zinc-50);
-    --border: var(--color-zinc-800);
-    --input: var(--color-zinc-800);
+    --destructive-text: var(--color-red-400);
+    --border: var(--color-zinc-700);
+    --input: var(--color-zinc-550);
     --ring: var(--color-zinc-300);
 
     /* Intent (dark) — auto */
@@ -266,6 +275,7 @@
     --color-intent-action-accent-fg: var(--accent-foreground);
     --color-intent-state-destructive-bg: var(--destructive);
     --color-intent-state-destructive-fg: var(--destructive-foreground);
+    --color-intent-state-destructive-text: var(--destructive-text);
     --color-intent-border-subtle: var(--border);
     --color-intent-field-border: var(--input);
     --color-intent-focus-ring: var(--ring);

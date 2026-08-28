@@ -11,13 +11,14 @@
     "secondary":            { "$value": "{color.zinc.100}", "$type": "color" },
     "secondary-foreground": { "$value": "{color.zinc.900}", "$type": "color" },
     "muted":                { "$value": "{color.zinc.100}", "$type": "color" },
-    "muted-foreground":     { "$value": "{color.zinc.500}", "$type": "color" },
+    "muted-foreground":     { "$value": "{color.zinc.550}", "$type": "color" },
     "accent":               { "$value": "{color.zinc.100}", "$type": "color" },
     "accent-foreground":    { "$value": "{color.zinc.900}", "$type": "color" },
-    "destructive":          { "$value": "{color.red.500}", "$type": "color" },
+    "destructive":          { "$value": "{color.red.600}", "$type": "color" },
     "destructive-foreground": { "$value": "{color.zinc.50}", "$type": "color" },
-    "border":               { "$value": "{color.zinc.200}", "$type": "color" },
-    "input":                { "$value": "{color.zinc.200}", "$type": "color" },
+    "destructive-text":     { "$value": "{color.red.600}", "$type": "color" },
+    "border":               { "$value": "{color.zinc.300}", "$type": "color" },
+    "input":                { "$value": "{color.zinc.450}", "$type": "color" },
     "ring":                 { "$value": "{color.zinc.950}", "$type": "color" }
   },
   "dark": {
@@ -37,8 +38,9 @@
     "accent-foreground":    { "$value": "{color.zinc.50}", "$type": "color" },
     "destructive":          { "$value": "{color.red.600}", "$type": "color" },
     "destructive-foreground": { "$value": "{color.zinc.50}", "$type": "color" },
-    "border":               { "$value": "{color.zinc.800}", "$type": "color" },
-    "input":                { "$value": "{color.zinc.800}", "$type": "color" },
+    "destructive-text":     { "$value": "{color.red.400}", "$type": "color" },
+    "border":               { "$value": "{color.zinc.700}", "$type": "color" },
+    "input":                { "$value": "{color.zinc.550}", "$type": "color" },
     "ring":                 { "$value": "{color.zinc.300}", "$type": "color" }
   }
 }

@@ -1,0 +1,91 @@
+{
+  "$component": "aihio-cluster",
+  "version": "1.0.0",
+  "description": "Horizontal layout primitive for grouped inline items such as button rows, badge lists, and toolbars. Wraps when space runs out.",
+  "intents": [
+    "layout",
+    "container"
+  ],
+  "attributes": {
+    "gap": {
+      "type": "enum",
+      "values": [
+        "tight",
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "sm",
+      "description": "Spacing between items, from the intent spacing scale."
+    },
+    "align": {
+      "type": "enum",
+      "values": [
+        "start",
+        "center",
+        "end",
+        "baseline"
+      ],
+      "default": "center",
+      "description": "Cross-axis alignment of items."
+    },
+    "justify": {
+      "type": "enum",
+      "values": [
+        "start",
+        "center",
+        "end",
+        "between"
+      ],
+      "default": "start",
+      "description": "Main-axis distribution of items."
+    },
+    "grow": {
+      "type": "boolean",
+      "default": false,
+      "description": "Makes the cluster fill its row. Needed for justify to have any effect inside a flex parent such as a card or dialog footer, where the cluster is otherwise sized to its content."
+    }
+  },
+  "slots": {
+    "default": {
+      "description": "Inline items to group, typically buttons, badges, or avatars."
+    }
+  },
+  "composition": {
+    "allowedChildren": [
+      "*"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "Purely presentational: adds no role and no tab stop, so grouped controls keep their own semantics and focus order.",
+      "Items wrap rather than overflow, so grouped actions stay reachable at narrow widths."
+    ],
+    "required": [
+      {
+        "when": "the cluster is a toolbar of related controls",
+        "requirement": "Add role=\"toolbar\" and an aria-label on the cluster; it is presentational by default.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-cluster justify=\"space-between\"><aihio-button>Save</aihio-button></aihio-cluster>",
+      "reason": "justify=\"space-between\" is not valid. Use justify=\"between\"."
+    },
+    {
+      "markup": "<aihio-stack><aihio-button>Cancel</aihio-button><aihio-button>Save</aihio-button></aihio-stack>",
+      "reason": "A row of actions belongs in aihio-cluster. aihio-stack stacks them vertically and stretches them to full width."
+    },
+    {
+      "markup": "<aihio-card-footer>\n  <aihio-cluster justify=\"end\">\n    <aihio-button type=\"submit\">Save</aihio-button>\n  </aihio-cluster>\n</aihio-card-footer>",
+      "reason": "justify=\"end\" does nothing here: the cluster is a content-sized flex item inside the footer. Add grow so it fills the row."
+    }
+  ],
+  "examples": [
+    "<aihio-cluster justify=\"end\">\n  <aihio-button variant=\"outline\">Cancel</aihio-button>\n  <aihio-button type=\"submit\">Save</aihio-button>\n</aihio-cluster>",
+    "<aihio-cluster gap=\"tight\">\n  <aihio-badge>Draft</aihio-badge>\n  <aihio-badge variant=\"secondary\">Internal</aihio-badge>\n</aihio-cluster>",
+    "<aihio-card-footer>\n  <aihio-cluster grow justify=\"end\">\n    <aihio-button variant=\"outline\">Cancel</aihio-button>\n    <aihio-button type=\"submit\">Save</aihio-button>\n  </aihio-cluster>\n</aihio-card-footer>"
+  ]
+}

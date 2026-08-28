@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkTheme } from './contrast.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '../..');
@@ -300,9 +301,54 @@ function buildIntentDocs() {
   return `${lines.join('\n').trim()}\n`;
 }
 
+/**
+ * Follow a semantic token through its alias chain down to a literal "L C H"
+ * triple, so the contrast checker compares rendered colours rather than
+ * references.
+ */
+function resolveColorValue(value, seen = new Set()) {
+  if (typeof value !== 'string') return null;
+
+  const match = value.match(/^\{([^}]+)\}$/);
+  if (!match) return value;
+
+  const path = match[1];
+  if (seen.has(path)) {
+    throw new Error(`Circular colour reference: ${[...seen, path].join(' -> ')}`);
+  }
+
+  return resolveColorValue(lookup(path, tokenRoot)?.$value, new Set([...seen, path]));
+}
+
+function resolveTheme(themeTokens) {
+  const resolved = {};
+
+  for (const [name, token] of Object.entries(themeTokens)) {
+    if (name.startsWith('$') || token?.$type !== 'color') continue;
+    resolved[name] = resolveColorValue(token.$value);
+  }
+
+  return resolved;
+}
+
+const contrastResults = [
+  ...checkTheme('light', resolveTheme(semantic.light)),
+  ...checkTheme('dark', resolveTheme(semantic.dark)),
+];
+const contrastFailures = contrastResults.filter((result) => !result.pass);
+
+if (contrastFailures.length > 0) {
+  console.error('token build failed — palette does not meet its contrast contract:');
+  for (const failure of contrastFailures) {
+    console.error(`  ${failure.theme}/${failure.id}: ${failure.message} — ${failure.note}`);
+  }
+  process.exit(1);
+}
+
 const outPath = resolve(__dirname, '../css/tokens.css');
 writeFileSync(outPath, css, 'utf8');
 const docsPath = resolve(root, 'docs/intent-tokens.md');
 writeFileSync(docsPath, buildIntentDocs(), 'utf8');
 console.log(`tokens → ${outPath}`);
 console.log(`intent docs → ${docsPath}`);
+console.log(`contrast → ${contrastResults.length} pairs pass (light + dark)`);

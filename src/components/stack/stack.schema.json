@@ -1,0 +1,69 @@
+{
+  "$component": "aihio-stack",
+  "version": "1.0.0",
+  "description": "Vertical layout primitive that applies the system's spacing rhythm between its children.",
+  "intents": [
+    "layout",
+    "container"
+  ],
+  "attributes": {
+    "gap": {
+      "type": "enum",
+      "values": [
+        "tight",
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Vertical spacing between children, from the intent spacing scale."
+    },
+    "align": {
+      "type": "enum",
+      "values": [
+        "start",
+        "center",
+        "end",
+        "stretch"
+      ],
+      "default": "stretch",
+      "description": "Cross-axis alignment of children."
+    }
+  },
+  "slots": {
+    "default": {
+      "description": "Any flow content to stack vertically."
+    }
+  },
+  "composition": {
+    "allowedChildren": [
+      "*"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "Purely presentational: adds no role, no landmark, and no tab stop, so the semantics of its children are untouched."
+    ],
+    "required": [
+      {
+        "when": "the stack groups a titled region of the page",
+        "requirement": "Use a semantic sectioning element (<section>, <nav>, <main>) around or inside the stack. aihio-stack does not create a landmark.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-stack gap=\"medium\"><p>One</p></aihio-stack>",
+      "reason": "gap=\"medium\" is not valid. The scale is tight, sm, md, lg."
+    },
+    {
+      "markup": "<div style=\"display:flex;flex-direction:column;gap:16px\"><p>One</p></div>",
+      "reason": "Hand-rolled spacing drifts from the token scale. Use aihio-stack so the rhythm stays system-owned."
+    }
+  ],
+  "examples": [
+    "<aihio-stack>\n  <h2>Notifications</h2>\n  <p>Choose how you want to hear from us.</p>\n</aihio-stack>",
+    "<aihio-stack gap=\"lg\" align=\"center\">\n  <aihio-avatar alt=\"Jane Doe\"></aihio-avatar>\n  <aihio-button>Follow</aihio-button>\n</aihio-stack>"
+  ]
+}

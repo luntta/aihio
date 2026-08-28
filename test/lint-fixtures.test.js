@@ -21,6 +21,40 @@ const fixtures = [
     ],
   },
   {
+    // The glyph case: an icon button with visible content but no label. This is
+    // the counterExample the button schema actually ships, and it went
+    // unflagged while any text content counted as an accessible name.
+    file: 'button-icon-glyph-missing-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-button' },
+    ],
+  },
+  {
+    // The defect the seeded auth-form pattern itself shipped with.
+    file: 'submit-button-outside-form.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-button' },
+    ],
+  },
+  {
+    file: 'form-field-without-name.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-input' },
+    ],
+  },
+  {
+    file: 'field-without-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-field' },
+    ],
+  },
+  {
+    file: 'field-control-without-name.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-input' },
+    ],
+  },
+  {
     file: 'dropdown-missing-trigger.html',
     expectedIssues: [
       { ruleId: 'missing-required-slot', component: 'aihio-dropdown' },

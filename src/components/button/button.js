@@ -2,7 +2,11 @@ import { AihioElement } from '../base.js';
 
 export class AihioButton extends AihioElement {
   static tag = 'aihio-button';
-  static observedAttributes = ['variant', 'size', 'disabled', 'loading'];
+  // Form association is what makes type="submit" mean anything. Without it a
+  // custom element inside a <form> is inert markup: no submit, no reset, no
+  // membership in form.elements.
+  static formAssociated = true;
+  static observedAttributes = ['variant', 'size', 'disabled', 'loading', 'type'];
   static styles = `
     aihio-button {
       display: inline-flex;
@@ -112,6 +116,31 @@ export class AihioButton extends AihioElement {
       pointer-events: none;
     }
 
+    /* A loading button has to look different, not just behave differently.
+       aria-busy covers assistive tech; this covers everyone else. */
+    aihio-button[loading]::before {
+      content: "";
+      width: 1em;
+      height: 1em;
+      flex: none;
+      border-radius: var(--radius-intent-pill);
+      border: 2px solid currentColor;
+      border-block-start-color: transparent;
+      animation: aihio-button-spin var(--duration-intent-spinner) linear infinite;
+    }
+
+    @keyframes aihio-button-spin {
+      to { transform: rotate(1turn); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      aihio-button[loading]::before {
+        animation: none;
+        border-block-start-color: currentColor;
+        opacity: 0.5;
+      }
+    }
+
     aihio-button:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
@@ -120,6 +149,7 @@ export class AihioButton extends AihioElement {
 
   setup() {
     this._defaultTabIndex = this.getAttribute('tabindex') ?? '0';
+    this._internals = this.attachInternals?.() ?? null;
 
     this._onClickCapture = (e) => {
       if (!this._isDisabledLike()) return;
@@ -135,12 +165,19 @@ export class AihioButton extends AihioElement {
       }
     };
 
+    this._onClick = () => {
+      if (this._isDisabledLike()) return;
+      this._submitOrReset();
+    };
+
     this.addEventListener('click', this._onClickCapture, { capture: true });
+    this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
   }
 
   teardown() {
     this.removeEventListener('click', this._onClickCapture, { capture: true });
+    this.removeEventListener('click', this._onClick);
     this.removeEventListener('keydown', this._onKeyDown);
   }
 
@@ -159,5 +196,41 @@ export class AihioButton extends AihioElement {
 
   _isDisabledLike() {
     return this.boolAttr('disabled') || this.boolAttr('loading');
+  }
+
+  /** The form this button belongs to, or null when it is outside one. */
+  get form() {
+    return this._internals?.form ?? null;
+  }
+
+  get type() {
+    const type = this.attr('type', 'button');
+    return type === 'submit' || type === 'reset' ? type : 'button';
+  }
+
+  set type(value) {
+    this.setAttribute('type', String(value));
+  }
+
+  _submitOrReset() {
+    const type = this.type;
+    if (type === 'button') return;
+
+    const form = this.form;
+    if (!form) return;
+
+    // requestSubmit() runs constraint validation and fires submit, unlike
+    // submit(). It is called without a submitter because a form-associated
+    // custom element is not a valid submitter argument.
+    if (type === 'submit') form.requestSubmit();
+    else form.reset();
+  }
+
+  /**
+   * Fires when the element is disabled by an ancestor <fieldset disabled>,
+   * which form association gives us for free.
+   */
+  formDisabledCallback(disabled) {
+    this.setBoolAttr('disabled', disabled);
   }
 }

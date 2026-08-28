@@ -1,30 +1,40 @@
 <aihio-card data-aihio-intent="surface">
-  <aihio-card-header>
-    <aihio-card-title>Sign in</aihio-card-title>
-    <aihio-card-description>Use your work email and password to continue.</aihio-card-description>
-  </aihio-card-header>
-  <aihio-card-content>
-    <form novalidate>
-      <label>
-        <span>Email</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          type="email"
-          placeholder="you@example.com"
-        ></aihio-input>
-      </label>
+  <form>
+    <aihio-card-header>
+      <aihio-card-title>Sign in</aihio-card-title>
+      <aihio-card-description>Use your work email and password to continue.</aihio-card-description>
+    </aihio-card-header>
+    <aihio-card-content>
+      <aihio-stack data-aihio-intent="layout">
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Email</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          ></aihio-input>
+        </aihio-field>
 
-      <label>
-        <span>Password</span>
-        <aihio-input
-          data-aihio-intent="form-field text-entry"
-          type="password"
-        ></aihio-input>
-      </label>
-    </form>
-  </aihio-card-content>
-  <aihio-card-footer>
-    <aihio-button data-aihio-intent="secondary-action" variant="outline">Forgot password</aihio-button>
-    <aihio-button data-aihio-intent="primary-action">Sign in</aihio-button>
-  </aihio-card-footer>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Password</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          ></aihio-input>
+        </aihio-field>
+      </aihio-stack>
+    </aihio-card-content>
+    <aihio-card-footer>
+      <aihio-cluster data-aihio-intent="layout" grow justify="end">
+        <aihio-button data-aihio-intent="secondary-action" variant="outline">Forgot password</aihio-button>
+        <aihio-button data-aihio-intent="primary-action" type="submit">Sign in</aihio-button>
+      </aihio-cluster>
+    </aihio-card-footer>
+  </form>
 </aihio-card>

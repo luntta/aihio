@@ -9,6 +9,10 @@ export class AihioInput extends AihioElement {
     'disabled',
     'error',
     'value',
+    'name',
+    'required',
+    'readonly',
+    'autocomplete',
     'aria-label',
     'aria-labelledby',
     'aria-describedby',
@@ -74,6 +78,22 @@ export class AihioInput extends AihioElement {
 
   setup() {
     this._input = this.querySelector('input') ?? document.createElement('input');
+    this._form = null;
+
+    // The host `value` attribute tracks the live value (it is mirrored back on
+    // every keystroke), so it cannot also serve as the reset target. Capture
+    // the authored value once and hand it to the inner input as its
+    // defaultValue, which is what form.reset() restores to.
+    this._input.defaultValue = this.getAttribute('value') ?? '';
+
+    this._onReset = () => {
+      // The reset event fires before the controls are reset, so read back on
+      // the next microtask and mirror the restored value onto the host.
+      queueMicrotask(() => {
+        if (!this._input) return;
+        this.setAttribute('value', this._input.value);
+      });
+    };
 
     this._onInput = () => {
       if (this.getAttribute('value') !== this._input.value) {
@@ -97,6 +117,21 @@ export class AihioInput extends AihioElement {
   teardown() {
     this._input?.removeEventListener('input', this._onInput);
     this._input?.removeEventListener('change', this._onChange);
+    this._detachForm();
+  }
+
+  _syncFormListener() {
+    const form = this._input?.form ?? null;
+    if (form === this._form) return;
+
+    this._detachForm();
+    this._form = form;
+    this._form?.addEventListener('reset', this._onReset);
+  }
+
+  _detachForm() {
+    this._form?.removeEventListener('reset', this._onReset);
+    this._form = null;
   }
 
   sync() {
@@ -107,17 +142,29 @@ export class AihioInput extends AihioElement {
     const value = this.attr('value', '');
     const disabled = this.boolAttr('disabled');
     const error = this.boolAttr('error');
+    const required = this.boolAttr('required');
+    const readOnly = this.boolAttr('readonly');
 
     if (this._input.type !== type) this._input.type = type;
     if (this._input.placeholder !== placeholder) this._input.placeholder = placeholder;
     if (this._input.value !== value) this._input.value = value;
     if (this._input.disabled !== disabled) this._input.disabled = disabled;
+    if (this._input.required !== required) this._input.required = required;
+    if (this._input.readOnly !== readOnly) this._input.readOnly = readOnly;
+
+    // The inner <input> is real light DOM inside the author's <form>, so
+    // forwarding name/autocomplete is all that form submission needs — no
+    // ElementInternals, no value shadowing.
+    syncAttribute(this, this._input, 'name');
+    syncAttribute(this, this._input, 'autocomplete');
 
     this._input.setAttribute('aria-invalid', String(error));
 
-    syncAria(this, this._input, 'aria-label');
-    syncAria(this, this._input, 'aria-labelledby');
-    syncAria(this, this._input, 'aria-describedby');
+    syncAttribute(this, this._input, 'aria-label');
+    syncAttribute(this, this._input, 'aria-labelledby');
+    syncAttribute(this, this._input, 'aria-describedby');
+
+    this._syncFormListener();
   }
 
   get value() {
@@ -131,9 +178,27 @@ export class AihioInput extends AihioElement {
   focus() {
     this._input?.focus();
   }
+
+  /** The form this field submits to, or null when it is outside one. */
+  get form() {
+    return this._input?.form ?? null;
+  }
+
+  /** Native constraint validation state of the inner input. */
+  get validity() {
+    return this._input?.validity ?? null;
+  }
+
+  checkValidity() {
+    return this._input?.checkValidity() ?? true;
+  }
+
+  reportValidity() {
+    return this._input?.reportValidity() ?? true;
+  }
 }
 
-function syncAria(host, input, name) {
+function syncAttribute(host, input, name) {
   const value = host.getAttribute(name);
   if (value === null) {
     input.removeAttribute(name);

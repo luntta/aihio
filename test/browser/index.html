@@ -231,6 +231,103 @@
       assert(document.activeElement === opener, 'closing the dialog should restore focus to the opener');
     });
 
+    await runTest('buttons submit and reset their owning form', async () => {
+      sandbox.innerHTML = `
+        <form id="signin">
+          <label>Email
+            <aihio-input name="email" type="email" value="a@b.co" aria-label="Email"></aihio-input>
+          </label>
+          <aihio-button type="reset">Clear</aihio-button>
+          <aihio-button type="submit">Sign in</aihio-button>
+          <aihio-button>Plain</aihio-button>
+        </form>
+      `;
+      await nextFrame(2);
+
+      const form = sandbox.querySelector('#signin');
+      const [reset, submit, plain] = [...sandbox.querySelectorAll('aihio-button')];
+
+      assert(submit.form === form, 'a form-associated button should resolve its owning form');
+      assert([...form.elements].includes(submit), 'the button should be a member of form.elements');
+      assert(form.elements.email?.value === 'a@b.co', 'the named field should be submittable');
+
+      let submits = 0;
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        submits += 1;
+      });
+
+      plain.click();
+      await nextFrame();
+      assert(submits === 0, 'a default button must not submit');
+
+      submit.click();
+      await nextFrame();
+      assert(submits === 1, 'type="submit" should submit the owning form');
+
+      const field = sandbox.querySelector('aihio-input');
+      field.value = 'changed@b.co';
+      await nextFrame();
+      reset.click();
+      await nextFrame();
+      assert(
+        form.elements.email.value === 'a@b.co',
+        `type="reset" should reset the form, got ${form.elements.email.value}`
+      );
+    });
+
+    await runTest('field wires labelling, description, and error state', async () => {
+      sandbox.innerHTML = `
+        <aihio-field id="plain">
+          <label slot="label">Email</label>
+          <aihio-input type="email" name="email"></aihio-input>
+          <span slot="description">Use your work address.</span>
+        </aihio-field>
+        <aihio-field id="invalid">
+          <label slot="label">Password</label>
+          <aihio-input type="password" name="password"></aihio-input>
+          <span slot="description">At least 12 characters.</span>
+          <span slot="error">Password is too short.</span>
+        </aihio-field>
+      `;
+      await nextFrame(2);
+
+      const plain = sandbox.querySelector('#plain');
+      const plainControl = plain.querySelector('aihio-input');
+      const plainLabel = plain.querySelector('[slot="label"]');
+
+      assert(plainControl.id.length > 0, 'the control should be given an id');
+      assert(
+        plainLabel.getAttribute('for') === plainControl.id,
+        'a <label> in the label slot should point at the control'
+      );
+      assert(
+        plainControl.getAttribute('aria-labelledby') === plainLabel.id,
+        'the control should be labelled by the label slot'
+      );
+      assert(
+        plainControl.getAttribute('aria-describedby') ===
+          plain.querySelector('[slot="description"]').id,
+        'the control should be described by the description slot'
+      );
+      assert(!plain.hasAttribute('error'), 'a field with no error slot is not in error state');
+
+      const invalid = sandbox.querySelector('#invalid');
+      const invalidControl = invalid.querySelector('aihio-input');
+
+      assert(invalid.hasAttribute('error'), 'error slot content should set the error state');
+      assert(invalidControl.hasAttribute('error'), 'the error state should reach the control');
+      assert(
+        invalidControl.getAttribute('aria-describedby') ===
+          invalid.querySelector('[slot="error"]').id,
+        'while erroring, aria-describedby should point at the error, not the description'
+      );
+      assert(
+        invalidControl.querySelector('input').getAttribute('aria-invalid') === 'true',
+        'the inner input should be marked invalid'
+      );
+    });
+
     const failed = results.some((result) => !result.pass);
     document.body.dataset.status = failed ? 'fail' : 'pass';
     resultsNode.textContent = JSON.stringify(results, null, 2);
