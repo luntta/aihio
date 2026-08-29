@@ -22,17 +22,64 @@ function tagToSlug(tag) {
   return String(tag ?? '').replace(/^aihio-/, '');
 }
 
+/**
+ * A dialog example carries no trigger, so the preview would render an empty
+ * box unless it is opened for display. A dropdown example does carry its own
+ * trigger button, so it is left closed and the reader opens it — the live
+ * component demonstrates itself better than a frozen open state.
+ */
 function toPreviewMarkup(tag, markup) {
   const normalizedMarkup = String(markup ?? '');
   if (tag === 'aihio-dialog' && normalizedMarkup.startsWith('<aihio-dialog') && !normalizedMarkup.includes('<aihio-dialog open')) {
     return normalizedMarkup.replace('<aihio-dialog', '<aihio-dialog open');
   }
 
-  if (tag === 'aihio-dropdown' && normalizedMarkup.startsWith('<aihio-dropdown') && !normalizedMarkup.includes('<aihio-dropdown open')) {
-    return normalizedMarkup.replace('<aihio-dropdown', '<aihio-dropdown open');
+  return normalizedMarkup;
+}
+
+/**
+ * The generated intent-token reference is a markdown document of pipe tables.
+ * Rendering it as preformatted text put a four-column table inside a <pre>,
+ * which is the single least responsive thing a page can contain. Parsing it
+ * back into rows lets the page render real tables that reflow and scroll.
+ */
+function parseIntentTokenGroups(markdown) {
+  const groups = [];
+  let group = null;
+
+  for (const line of markdown.split('\n')) {
+    const heading = line.match(/^##\s+(.+)$/);
+    if (heading) {
+      group = { name: heading[1].trim(), intro: '', tokens: [] };
+      groups.push(group);
+      continue;
+    }
+
+    if (!group) continue;
+
+    const cells = line.trim().startsWith('|')
+      ? line.trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim())
+      : null;
+
+    if (!cells) {
+      const text = line.trim();
+      if (text && !group.intro) group.intro = text;
+      continue;
+    }
+
+    // Skip the header row and the |---|---| separator beneath it.
+    if (cells[0] === 'Token' || cells.every((cell) => /^-+$/.test(cell))) continue;
+
+    const [token, variable, source, description] = cells;
+    group.tokens.push({
+      token: token.replace(/`/g, ''),
+      variable: variable.replace(/`/g, ''),
+      source: source.replace(/`/g, ''),
+      description,
+    });
   }
 
-  return normalizedMarkup;
+  return groups.filter((entry) => entry.tokens.length > 0);
 }
 
 if (!existsSync(schemaPath)) {
@@ -153,4 +200,5 @@ export default {
     description,
   })),
   intentTokensMarkdown,
+  intentTokenGroups: parseIntentTokenGroups(intentTokensMarkdown),
 };

@@ -184,6 +184,37 @@ Four tiers:
 
 Intent tokens compile to CSS custom properties without collapsing the alias chain, so overriding a lower tier still flows upward.
 
+### Palette
+
+The neutral ramp is monochrome — hue 286 at near-zero chroma — and runs to true
+white (`zinc.0`) and true black (`zinc.1000`), so a page canvas is untinted in
+both themes rather than a very light or very dark grey.
+
+Light and dark are built as mirror images rather than as two separate palettes:
+a pure canvas, an elevated surface one step off it, and a hairline that only
+just separates the two.
+
+| Role | Light | Dark |
+| --- | --- | --- |
+| `page-bg` | `zinc.0` (`#ffffff`) | `zinc.1000` (`#000000`) |
+| `surface-bg` | `zinc.50` (`#f5f5f7`) | `zinc.950` (`#161617`) |
+| `border-subtle` | `zinc.200` | `zinc.850` |
+
+Because the elevated surface differs from the canvas in both themes, cards,
+alerts, and dialogs read as raised without needing a shadow to prove it.
+
+### Typography
+
+The type stack (`fontFamily.sans`) leads with the platform UI face, so text
+renders in the grey the OS already optimises for and no webfont ships — the
+package stays zero-dependency.
+
+`letterSpacing.*` tightens as type grows (`display` -0.025em, `heading`
+-0.018em, `body` -0.011em), because the same em value reads looser at larger
+sizes. `letterSpacing.wide` is the one positive value, reserved for small
+capitalised labels. Components read these through `--letterSpacing-intent-*`
+rather than hardcoding a tracking value.
+
 ### Contrast
 
 `src/tokens/build.js` checks the palette against a contract of foreground and

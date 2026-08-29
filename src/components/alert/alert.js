@@ -6,7 +6,11 @@ export class AihioAlert extends AihioElement {
   static styles = `
     aihio-alert {
       display: flex;
-      gap: var(--spacing-intent-stack-sm);
+      /* Title and description are stacked blocks, not columns. Without an
+         explicit direction the default "row" set them side by side and
+         squeezed both into half the callout. */
+      flex-direction: column;
+      gap: var(--spacing-intent-cluster-gap-tight);
       width: 100%;
       border-radius: var(--radius-intent-surface);
       border: 1px solid oklch(var(--color-intent-border-subtle));
@@ -48,8 +52,7 @@ export class AihioAlert extends AihioElement {
     aihio-alert [slot="title"] {
       font-weight: var(--fontWeight-intent-control);
       line-height: var(--lineHeight-intent-compact);
-      letter-spacing: -0.01em;
-      margin-bottom: var(--spacing-intent-cluster-gap-tight);
+      letter-spacing: var(--letterSpacing-intent-heading);
     }
 
     aihio-alert [slot="description"] {

@@ -1,360 +1,653 @@
+/* ==========================================================================
+   Aihio docs — application shell
+   Monochrome. The page canvas is the token canvas (true white / true black),
+   surfaces are one step off it, and everything is separated by hairlines
+   rather than by shadow. Colour appears only where it carries state.
+   ========================================================================== */
+
 :root {
-  color-scheme: light dark;
+  --docs-topbar-height: 3.5rem;
+  --docs-sidebar-width: 17rem;
+  --docs-gutter: clamp(1.25rem, 0.9rem + 1.6vw, 2.5rem);
+  --docs-column: 62rem;
+  --docs-measure: 40rem;
+
+  /* Exponential ease-out: fast departure, long settle. The one motion curve
+     in the site, so drawer and hover feedback feel like the same hand. */
+  --docs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --docs-hairline: oklch(var(--color-intent-border-subtle));
+  --docs-chrome: oklch(var(--color-intent-page-bg) / 0.72);
 }
 
-* {
-  box-sizing: border-box;
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+  /* Anchored headings must clear the sticky chrome. */
+  scroll-padding-top: calc(var(--docs-topbar-height) + 1.5rem);
 }
 
-html,
 body {
-  min-height: 100%;
-}
-
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at top left, oklch(var(--color-intent-action-accent-bg) / 0.65), transparent 28rem),
-    linear-gradient(180deg, oklch(var(--color-intent-page-bg)), oklch(var(--color-intent-surface-muted-bg)));
-  background-attachment: fixed;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(oklch(var(--color-intent-border-subtle) / 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(var(--color-intent-border-subtle) / 0.18) 1px, transparent 1px);
-  background-size: 2.5rem 2.5rem;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 80%);
+  min-height: 100dvh;
 }
 
 a {
   color: inherit;
 }
 
-.docs-shell {
-  position: relative;
-  width: min(100%, 88rem);
-  margin: 0 auto;
-  padding: var(--spacing-6);
+::selection {
+  background: oklch(var(--color-intent-page-fg));
+  color: oklch(var(--color-intent-page-bg));
 }
 
-.docs-header {
+.docs-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.docs-skip {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-intent-interactive);
+  background: oklch(var(--color-intent-action-primary-bg));
+  color: oklch(var(--color-intent-action-primary-fg));
+  font-size: var(--fontSize-sm);
+  font-weight: var(--fontWeight-intent-control);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.docs-skip:focus-visible {
+  transform: none;
+}
+
+/* ==========================================================================
+   Top bar
+   ========================================================================== */
+
+.docs-topbar {
   position: sticky;
-  top: var(--spacing-4);
-  z-index: 20;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-4);
+  top: 0;
+  z-index: 50;
+  display: flex;
   align-items: center;
-  margin-bottom: var(--spacing-10);
-  padding: var(--spacing-3) var(--spacing-4);
-  border: 1px solid oklch(var(--color-intent-border-subtle) / 0.8);
-  border-radius: calc(var(--radius-intent-surface) + 0.35rem);
-  background: oklch(var(--color-intent-surface-bg) / 0.88);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-intent-overlay);
+  gap: var(--spacing-4);
+  height: var(--docs-topbar-height);
+  padding-inline: var(--docs-gutter);
+  border-bottom: 1px solid var(--docs-hairline);
+  /* Content scrolls beneath the chrome; the blur is what keeps the bar
+     readable over it, not an ornament. */
+  background: var(--docs-chrome);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
-.docs-header__brand {
+.docs-topbar__lead {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.docs-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.docs-topbar__link {
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  font-weight: var(--fontWeight-intent-control);
+  text-decoration: none;
+  transition: color var(--duration-intent-feedback) ease;
+}
+
+.docs-topbar__link:hover {
+  color: oklch(var(--color-intent-page-fg));
 }
 
 .docs-brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2.5);
+  min-width: 0;
   text-decoration: none;
 }
 
 .docs-brand__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, oklch(var(--color-intent-action-primary-bg)), oklch(var(--color-intent-action-accent-bg)));
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-intent-interactive-compact);
+  background: oklch(var(--color-intent-action-primary-bg));
   color: oklch(var(--color-intent-action-primary-fg));
-  font-size: var(--fontSize-intent-heading-sm);
-  font-weight: var(--fontWeight-intent-heading);
+  font-size: 0.8125rem;
+  font-weight: var(--fontWeight-bold);
+  line-height: 1;
+}
+
+.docs-brand__name {
+  font-size: var(--fontSize-base);
+  font-weight: var(--fontWeight-semibold);
+  letter-spacing: var(--letterSpacing-intent-heading);
+}
+
+.docs-brand__version {
+  padding: 0.125rem 0.4375rem;
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-pill);
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+/* Segmented theme control ------------------------------------------------ */
+
+.docs-theme {
+  display: flex;
+  gap: 0.125rem;
+  padding: 0.1875rem;
+  border-radius: var(--radius-intent-pill);
+  background: oklch(var(--color-intent-surface-muted-bg));
+  border: 1px solid var(--docs-hairline);
+}
+
+.docs-theme__option {
+  padding: 0.25rem 0.6875rem;
+  border: 0;
+  border-radius: var(--radius-intent-pill);
+  background: transparent;
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
+  font-weight: var(--fontWeight-intent-control);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-intent-feedback) ease,
+    color var(--duration-intent-feedback) ease;
+}
+
+.docs-theme__option:hover {
+  color: oklch(var(--color-intent-page-fg));
+}
+
+.docs-theme__option[aria-pressed='true'] {
+  background: oklch(var(--color-intent-page-bg));
+  color: oklch(var(--color-intent-page-fg));
   box-shadow: var(--shadow-intent-surface);
 }
 
-.docs-brand__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+/* Drawer toggle ---------------------------------------------------------- */
+
+.docs-navtoggle {
+  display: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: -0.375rem;
+  border: 0;
+  border-radius: var(--radius-intent-interactive-compact);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 
-.docs-brand__copy strong {
-  font-size: var(--fontSize-intent-control);
-  letter-spacing: -0.02em;
-}
-
-.docs-brand__copy span {
-  color: oklch(var(--color-intent-surface-muted-fg));
-  font-size: var(--fontSize-intent-control-sm);
-}
-
-.docs-nav {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-2);
-  flex-wrap: wrap;
-}
-
-.docs-nav__link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.5rem;
-  padding: 0 var(--spacing-4);
-  border-radius: var(--radius-intent-pill);
-  text-decoration: none;
-  color: oklch(var(--color-intent-surface-muted-fg));
-  transition:
-    background-color var(--duration-intent-feedback) ease,
-    color var(--duration-intent-feedback) ease,
-    transform var(--duration-intent-feedback) ease;
-}
-
-.docs-nav__link:hover,
-.docs-nav__link.is-active {
+.docs-navtoggle:hover {
   background: oklch(var(--color-intent-action-accent-bg));
-  color: oklch(var(--color-intent-action-accent-fg));
 }
 
-.docs-header__actions {
-  display: flex;
-  gap: var(--spacing-2);
+.docs-navtoggle__glyph,
+.docs-navtoggle__glyph::before,
+.docs-navtoggle__glyph::after {
+  display: block;
+  width: 1rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform var(--duration-intent-feedback) var(--docs-ease);
+}
+
+.docs-navtoggle__glyph {
+  position: relative;
+}
+
+.docs-navtoggle__glyph::before,
+.docs-navtoggle__glyph::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.docs-navtoggle__glyph::before { transform: translateY(-5px); }
+.docs-navtoggle__glyph::after  { transform: translateY(5px); }
+
+[data-nav-open] .docs-navtoggle__glyph { background: transparent; }
+[data-nav-open] .docs-navtoggle__glyph::before { transform: rotate(45deg); }
+[data-nav-open] .docs-navtoggle__glyph::after  { transform: rotate(-45deg); }
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr);
+  align-items: start;
+}
+
+.docs-scrim {
+  display: none;
+}
+
+.docs-sidebar {
+  position: sticky;
+  top: var(--docs-topbar-height);
+  height: calc(100dvh - var(--docs-topbar-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--spacing-6) var(--spacing-4) var(--spacing-10);
+  border-right: 1px solid var(--docs-hairline);
 }
 
 .docs-main {
+  min-width: 0;
+  padding-inline: var(--docs-gutter);
+  /* The detail layout below reflows on the width of this column, not the
+     viewport — the sidebar takes 17rem out of the viewport and a media query
+     cannot see that. */
+  container-type: inline-size;
+  container-name: docs-main;
+}
+
+.docs-content {
+  width: min(100%, var(--docs-column));
+  margin-inline: auto;
+  padding-block: clamp(2rem, 1.4rem + 2vw, 3.5rem) var(--spacing-16);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-8);
+  gap: clamp(2.5rem, 2rem + 2vw, 4rem);
 }
 
-.docs-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.9fr);
-  gap: var(--spacing-6);
-  align-items: stretch;
-}
-
-.docs-hero__copy,
-.docs-hero__preview {
+/* Section is the page's own rhythm unit; nothing inside it may push the
+   column wider than the column. */
+.docs-content > section {
   min-width: 0;
 }
 
-.docs-eyebrow {
-  display: inline-flex;
-  gap: var(--spacing-2);
-  flex-wrap: wrap;
-  margin-bottom: var(--spacing-4);
+/* ==========================================================================
+   Sidebar navigation
+   ========================================================================== */
+
+.docs-sidenav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
 }
 
-.docs-title {
+.docs-sidenav__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  margin: 0 0 var(--spacing-2);
+  padding-inline: var(--spacing-3);
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: 0.6875rem;
+  font-weight: var(--fontWeight-semibold);
+  letter-spacing: var(--letterSpacing-intent-label);
+  text-transform: uppercase;
+}
+
+.docs-sidenav__heading a {
+  text-decoration: none;
+}
+
+.docs-sidenav__heading a:hover {
+  color: oklch(var(--color-intent-page-fg));
+}
+
+.docs-sidenav__count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.docs-sidenav__list {
   margin: 0;
-  max-width: 14ch;
-  font-size: clamp(2.8rem, 7vw, 5.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.055em;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-sidenav__link {
+  display: block;
+  padding: 0.375rem var(--spacing-3);
+  border-radius: var(--radius-intent-interactive);
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-intent-feedback) ease,
+    color var(--duration-intent-feedback) ease;
+}
+
+.docs-sidenav__link:hover {
+  background: oklch(var(--color-intent-action-accent-bg));
+  color: oklch(var(--color-intent-page-fg));
+}
+
+.docs-sidenav__link[aria-current='page'] {
+  background: oklch(var(--color-intent-action-accent-bg));
+  color: oklch(var(--color-intent-page-fg));
+  font-weight: var(--fontWeight-intent-control);
+}
+
+/* ==========================================================================
+   Page typography
+   ========================================================================== */
+
+.docs-page-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.docs-page-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  font-weight: var(--fontWeight-semibold);
+  line-height: 1.08;
+  letter-spacing: var(--letterSpacing-intent-display);
   text-wrap: balance;
 }
 
-.docs-lede {
-  max-width: 42rem;
-  margin: var(--spacing-4) 0 0;
-  font-size: var(--fontSize-lg);
+.docs-lede,
+.docs-page-intro > p {
+  max-width: var(--docs-measure);
+  margin: 0;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
   line-height: var(--lineHeight-relaxed);
   color: oklch(var(--color-intent-surface-muted-fg));
+  text-wrap: pretty;
 }
 
-.docs-callouts {
-  display: grid;
-  gap: var(--spacing-4);
-  margin-top: var(--spacing-6);
-}
-
-.docs-hero-card {
-  min-height: 100%;
-}
-
-.docs-hero-card form {
-  display: grid;
-  gap: var(--spacing-4);
-}
-
-.docs-field {
-  display: grid;
-  gap: var(--spacing-2);
-}
-
-.docs-field span {
-  font-size: var(--fontSize-intent-control-sm);
-  font-weight: var(--fontWeight-intent-control);
-  color: oklch(var(--color-intent-surface-muted-fg));
-}
-
-.docs-chip-row {
+.docs-eyebrow {
   display: flex;
-  gap: var(--spacing-2);
   flex-wrap: wrap;
-}
-
-.docs-stat-grid,
-.docs-feature-grid,
-.docs-component-grid {
-  display: grid;
-  gap: var(--spacing-4);
-}
-
-.docs-stat-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.docs-stat-card {
-  padding: var(--spacing-5);
-  border-radius: calc(var(--radius-intent-surface) + 0.2rem);
-  background: oklch(var(--color-intent-surface-bg) / 0.92);
-  border: 1px solid oklch(var(--color-intent-border-subtle));
-  box-shadow: var(--shadow-intent-surface);
-}
-
-.docs-stat-card strong {
-  display: block;
-  margin-bottom: var(--spacing-2);
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-}
-
-.docs-stat-card span {
-  color: oklch(var(--color-intent-surface-muted-fg));
+  gap: var(--spacing-2);
 }
 
 .docs-section-heading {
   display: flex;
-  align-items: end;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--spacing-4);
-  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-5);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--docs-hairline);
 }
 
-.docs-section-heading h2,
-.docs-section-heading h1 {
-  margin: 0;
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  letter-spacing: -0.04em;
+.docs-section-heading > div {
+  min-width: 0;
+}
+
+.docs-section-heading h1,
+.docs-section-heading h2 {
+  margin: 0 0 var(--spacing-2);
+  font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.625rem);
+  font-weight: var(--fontWeight-semibold);
+  line-height: 1.2;
+  letter-spacing: var(--letterSpacing-intent-heading);
 }
 
 .docs-section-heading p {
+  max-width: var(--docs-measure);
   margin: 0;
-  max-width: 42rem;
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
+  text-wrap: pretty;
+}
+
+.docs-muted {
   color: oklch(var(--color-intent-surface-muted-fg));
 }
 
+.docs-inline-link {
+  color: oklch(var(--color-intent-page-fg));
+  font-size: var(--fontSize-sm);
+  font-weight: var(--fontWeight-intent-control);
+  text-decoration: underline;
+  text-decoration-color: var(--docs-hairline);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--duration-intent-feedback) ease;
+}
+
+.docs-inline-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ==========================================================================
+   Grids
+   ========================================================================== */
+
+.docs-feature-grid,
+.docs-component-grid,
+.docs-example-grid,
+.docs-stat-grid,
+.docs-surface-grid {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+/* Fluid rather than stepped: cards reflow at whatever width they stop
+   fitting, so there is no range where the layout is merely tolerable. */
+.docs-component-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
 .docs-feature-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+
+.docs-example-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+
+.docs-example-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.docs-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+/* Grid and flex children default to min-width:auto, which lets a long code
+   sample or table set the column width and push the page sideways. */
+.docs-feature-grid > *,
+.docs-component-grid > *,
+.docs-example-grid > *,
+.docs-stat-grid > *,
+.docs-surface-grid > *,
+.docs-detail-grid > *,
+.docs-detail-grid__main > *,
+.docs-detail-grid__sidebar > * {
+  min-width: 0;
+}
+
+/* ==========================================================================
+   Surfaces
+   ========================================================================== */
+
+.docs-stat-card {
+  padding: var(--spacing-5);
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-surface);
+  background: oklch(var(--color-intent-surface-bg));
+}
+
+.docs-stat-card strong {
+  display: block;
+  margin-bottom: var(--spacing-1);
+  font-size: 2rem;
+  font-weight: var(--fontWeight-semibold);
+  line-height: 1.05;
+  letter-spacing: var(--letterSpacing-intent-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-stat-card span {
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
 }
 
 .docs-feature-card {
   display: block;
   padding: var(--spacing-5);
-  border-radius: calc(var(--radius-intent-surface) + 0.2rem);
-  border: 1px solid oklch(var(--color-intent-border-subtle));
-  background: linear-gradient(180deg, oklch(var(--color-intent-surface-bg)), oklch(var(--color-intent-surface-muted-bg)));
-  box-shadow: var(--shadow-intent-surface);
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-surface);
+  background: oklch(var(--color-intent-surface-bg));
   text-decoration: none;
 }
 
 .docs-feature-card h3 {
   margin: 0 0 var(--spacing-2);
-  font-size: var(--fontSize-intent-heading-sm);
+  font-size: var(--fontSize-base);
+  font-weight: var(--fontWeight-semibold);
+  letter-spacing: var(--letterSpacing-intent-heading);
 }
 
 .docs-feature-card p {
   margin: 0;
   color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
 }
 
 .docs-feature-card--link {
+  position: relative;
   transition:
-    transform var(--duration-intent-feedback) ease,
-    box-shadow var(--duration-intent-feedback) ease,
+    background-color var(--duration-intent-feedback) ease,
     border-color var(--duration-intent-feedback) ease;
 }
 
 .docs-feature-card--link:hover {
-  transform: translateY(-2px);
-  border-color: oklch(var(--color-intent-action-primary-bg) / 0.25);
-  box-shadow: var(--shadow-intent-overlay);
+  background: oklch(var(--color-intent-action-accent-bg));
+  border-color: oklch(var(--color-intent-field-border) / 0.4);
 }
 
-.docs-component-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.docs-feature-card--link h3::after {
+  content: ' →';
+  color: oklch(var(--color-intent-surface-muted-fg));
 }
 
-.docs-example-grid {
+/* Quick start ------------------------------------------------------------ */
+
+/* Numbered because the order is load-bearing: the stylesheet has to be there
+   before the elements upgrade. */
+.docs-steps {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--spacing-4);
+  gap: var(--spacing-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: docs-step;
 }
 
-.docs-example-grid--single {
-  grid-template-columns: 1fr;
+.docs-step {
+  position: relative;
+  min-width: 0;
+  padding-left: 2.25rem;
+  counter-increment: docs-step;
 }
 
-.docs-example-card--warning {
-  border-color: oklch(var(--color-intent-state-destructive-bg) / 0.25);
-}
-
-.docs-example-card__preview {
+.docs-step::before {
+  content: counter(docs-step);
+  position: absolute;
+  top: 0;
+  left: 0;
   display: grid;
-  /* Grid items stretch by default, which made every inline control in a
-     preview render full-bleed and disagree with the code sample beneath it.
-     Components that should fill the row set their own width. */
-  justify-items: start;
-  gap: var(--spacing-4);
-  padding: var(--spacing-5);
-  border: 1px dashed oklch(var(--color-intent-border-subtle));
-  border-radius: var(--radius-intent-surface);
-  background:
-    linear-gradient(180deg, oklch(var(--color-intent-page-bg)), oklch(var(--color-intent-surface-muted-bg)));
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-pill);
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
-.docs-example-card__preview.is-warning {
-  background:
-    linear-gradient(180deg, oklch(var(--color-intent-state-destructive-bg) / 0.05), oklch(var(--color-intent-page-bg)));
+.docs-step__label {
+  margin: 0.1875rem 0 var(--spacing-3);
+  font-size: var(--fontSize-sm);
+  font-weight: var(--fontWeight-intent-control);
 }
 
-.docs-code {
-  margin: var(--spacing-4) 0 0;
+.docs-step .docs-code {
+  margin-top: 0;
+}
+
+.docs-step__preview {
+  margin-top: var(--spacing-3);
   padding: var(--spacing-4);
-  overflow-x: auto;
+  border: 1px solid var(--docs-hairline);
   border-radius: var(--radius-intent-surface);
-  background: oklch(var(--color-zinc-950));
-  color: oklch(var(--color-zinc-50));
-  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.08);
+  background: oklch(var(--color-intent-surface-bg));
 }
 
-.docs-code code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  white-space: pre;
+.docs-step__aside {
+  max-width: var(--docs-measure);
+  margin: var(--spacing-6) 0 0;
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
 }
 
-.docs-component-card {
+/* ==========================================================================
+   Detail layout
+   ========================================================================== */
+
+.docs-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.75fr);
+  gap: var(--spacing-4);
+  align-items: start;
+}
+
+.docs-detail-grid__main,
+.docs-detail-grid__sidebar,
+.docs-surface-grid {
+  display: grid;
+  gap: var(--spacing-4);
   min-width: 0;
 }
+
+@container docs-main (max-width: 51.999rem) {
+  .docs-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   Component / pattern cards
+   ========================================================================== */
 
 .docs-component-card__meta {
   display: flex;
@@ -366,7 +659,8 @@ a {
 
 .docs-component-card__version {
   color: oklch(var(--color-intent-surface-muted-fg));
-  font-size: var(--fontSize-intent-control-sm);
+  font-size: var(--fontSize-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 .docs-component-card__intents {
@@ -380,67 +674,207 @@ a {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--spacing-3);
   margin: var(--spacing-4) 0 0;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--docs-hairline);
 }
 
 .docs-component-card__facts dt {
-  margin: 0 0 0.35rem;
-  font-size: var(--fontSize-intent-control-sm);
+  margin: 0 0 0.125rem;
   color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
 }
 
 .docs-component-card__facts dd {
   margin: 0;
-  font-size: var(--fontSize-intent-heading-sm);
-  letter-spacing: -0.03em;
+  font-size: var(--fontSize-lg);
+  font-weight: var(--fontWeight-semibold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--letterSpacing-intent-heading);
 }
 
-.docs-inline-link {
-  color: oklch(var(--color-intent-action-primary-bg));
+/* ==========================================================================
+   Example frames
+   ========================================================================== */
+
+.docs-example {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  min-width: 0;
+  margin: 0;
+  padding: var(--spacing-4);
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-surface);
+  background: oklch(var(--color-intent-surface-bg));
+}
+
+.docs-example--warning {
+  border-color: oklch(var(--color-intent-state-destructive-bg) / 0.35);
+}
+
+.docs-example__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.docs-example__label,
+.docs-example__meta {
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
   font-weight: var(--fontWeight-intent-control);
-  text-decoration: none;
+  letter-spacing: var(--letterSpacing-intent-label);
+  text-transform: uppercase;
 }
 
-.docs-inline-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
+.docs-example__reason {
+  flex-basis: 100%;
+  margin: 0;
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
+  text-wrap: pretty;
 }
 
-.docs-detail-grid {
+.docs-example__preview {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.85fr);
+  /* Grid items stretch by default, which made every inline control in a
+     preview render full-bleed and disagree with the code sample beneath it.
+     Components that should fill the row set their own width. */
+  justify-items: start;
   gap: var(--spacing-4);
-  align-items: start;
+  padding: var(--spacing-5);
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-surface);
+  background: oklch(var(--color-intent-page-bg));
+  /* `clip` rather than `auto`: an `auto` on one axis blockifies the other, and
+     that was cutting the tops off dropdown menus that are supposed to escape
+     the frame. `clip` leaves the block axis genuinely visible. */
+  overflow-x: clip;
+  overflow-y: visible;
+  /* Overlays that escape the frame have to land on top of the code sample
+     below, which is a later sibling and would otherwise paint over them. */
+  position: relative;
+  z-index: 1;
 }
 
-.docs-detail-grid__main,
-.docs-detail-grid__sidebar,
-.docs-surface-grid {
-  display: grid;
-  gap: var(--spacing-4);
+.docs-example__preview.is-warning {
+  border-color: oklch(var(--color-intent-state-destructive-bg) / 0.35);
+}
+
+/* A modal is position:fixed by design, so a force-opened dialog preview threw
+   its scrim over the whole page and blacked out the docs. `contain: paint`
+   makes the preview the containing block for fixed descendants, so the modal
+   stages itself inside its own frame. Scoped with :has() so dropdown menus,
+   which legitimately overflow their preview, are not clipped too. */
+.docs-example__preview:has(aihio-dialog[open]) {
+  contain: paint;
+  align-content: center;
+  justify-items: stretch;
+  min-height: 20rem;
+  padding: 0;
+}
+
+.docs-code {
+  margin: var(--spacing-3) 0 0;
+  padding: var(--spacing-4);
+  overflow-x: auto;
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--radius-intent-surface);
+  background: oklch(var(--color-intent-surface-muted-bg));
+  color: oklch(var(--color-intent-page-fg));
+}
+
+.docs-example .docs-code {
+  margin-top: 0;
+}
+
+.docs-code code {
+  font-family: var(--fontFamily-intent-code);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  /* Wrapped, not clipped. These samples are short markup lines, and a
+     horizontal scrollbar inside a card in a grid is a worse trade than a
+     wrapped line — indentation and line breaks both survive pre-wrap. */
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Inline code inside prose reads as a token, not as a block. */
+.docs-content :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: oklch(var(--color-intent-surface-muted-bg));
+  font-family: var(--fontFamily-intent-code);
+  font-size: 0.875em;
+}
+
+/* ==========================================================================
+   Tables and lists
+   ========================================================================== */
+
+/* Token swatches carry the value itself, so the reference shows the colour
+   rather than describing it. The ring keeps a swatch that matches the page
+   canvas — and the semi-transparent scrim — visible. */
+.docs-swatch {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px oklch(var(--color-intent-page-fg) / 0.16);
+}
+
+.docs-table__swatch-cell {
+  width: 1px;
+  padding-right: 0;
+}
+
+/* A CSS variable name broken across two lines is unreadable and unsearchable,
+   so the token tables keep their columns and let the wrapper scroll. */
+.docs-table--tokens {
+  min-width: 44rem;
+}
+
+.docs-table--tokens code {
+  white-space: nowrap;
+}
+
+.docs-tablewrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .docs-table {
   width: 100%;
+  min-width: 22rem;
   border-collapse: collapse;
-  font-size: var(--fontSize-intent-body-sm);
+  font-size: var(--fontSize-sm);
 }
 
 .docs-table th,
 .docs-table td {
   padding: var(--spacing-3);
-  border-bottom: 1px solid oklch(var(--color-intent-border-subtle));
+  border-bottom: 1px solid var(--docs-hairline);
   text-align: left;
   vertical-align: top;
 }
 
+.docs-table tr:last-child td {
+  border-bottom: 0;
+}
+
 .docs-table th {
   color: oklch(var(--color-intent-surface-muted-fg));
-  font-size: var(--fontSize-intent-control-sm);
+  font-size: var(--fontSize-xs);
   font-weight: var(--fontWeight-intent-control);
+  letter-spacing: var(--letterSpacing-intent-label);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .docs-table__detail {
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   color: oklch(var(--color-intent-surface-muted-fg));
 }
 
@@ -451,23 +885,29 @@ a {
   margin: 0;
   padding-left: 1.1rem;
   display: grid;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2);
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
 }
 
-.docs-link-list {
-  padding-left: 1rem;
+.docs-list li::marker,
+.docs-link-list li::marker,
+.docs-rule-list li::marker {
+  color: oklch(var(--color-intent-surface-muted-fg));
 }
 
 .docs-link-list--compact {
-  gap: var(--spacing-2);
-  margin-top: var(--spacing-4);
+  margin-top: var(--spacing-3);
 }
 
 .docs-tag-list {
   padding-left: 0;
   list-style: none;
   grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
-  gap: var(--spacing-2);
+}
+
+.docs-rule-list {
+  gap: var(--spacing-4);
 }
 
 .docs-rule-list li p {
@@ -486,108 +926,214 @@ a {
   display: grid;
   gap: var(--spacing-4);
   margin: 0;
+  font-size: var(--fontSize-sm);
 }
 
 .docs-definition-list dt {
-  margin: 0 0 0.35rem;
-  font-size: var(--fontSize-intent-control-sm);
+  margin: 0 0 0.25rem;
   color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-xs);
+  letter-spacing: var(--letterSpacing-intent-label);
+  text-transform: uppercase;
 }
 
 .docs-definition-list dd {
   margin: 0;
   line-height: var(--lineHeight-relaxed);
+  overflow-wrap: anywhere;
 }
 
-.docs-muted {
-  color: oklch(var(--color-intent-surface-muted-fg));
-}
-
-.docs-page-intro {
+.docs-field {
   display: grid;
-  gap: var(--spacing-3);
+  gap: var(--spacing-2);
 }
 
-.docs-page-intro h1 {
-  margin: 0;
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 0.94;
-  letter-spacing: -0.05em;
-}
-
-.docs-page-intro p {
-  margin: 0;
-  max-width: 42rem;
-  font-size: var(--fontSize-lg);
+.docs-field span {
+  font-size: var(--fontSize-sm);
+  font-weight: var(--fontWeight-intent-control);
   color: oklch(var(--color-intent-surface-muted-fg));
 }
+
+.docs-chip-row {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+/* Vocabulary ------------------------------------------------------------- */
+
+/* A glossary, not a card wall: 26 same-size cards made the reader scroll past
+   decoration to reach 26 short definitions. */
+.docs-vocab {
+  margin: 0;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-vocab__row {
+  display: grid;
+  grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+  gap: var(--spacing-4);
+  padding-block: var(--spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+}
+
+.docs-vocab dt {
+  margin: 0;
+  min-width: 0;
+}
+
+.docs-vocab dt code {
+  font-size: var(--fontSize-sm);
+}
+
+.docs-vocab dd {
+  margin: 0;
+  min-width: 0;
+  color: oklch(var(--color-intent-surface-muted-fg));
+  font-size: var(--fontSize-sm);
+  line-height: var(--lineHeight-relaxed);
+}
+
+@container docs-main (max-width: 34rem) {
+  .docs-vocab__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-1);
+  }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 
 .docs-footer {
   display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-4);
-  margin-top: var(--spacing-12);
-  padding: var(--spacing-4) 0 var(--spacing-8);
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding-block: var(--spacing-6) var(--spacing-10);
+  border-top: 1px solid var(--docs-hairline);
   color: oklch(var(--color-intent-surface-muted-fg));
-  font-size: var(--fontSize-intent-control-sm);
+  font-size: var(--fontSize-sm);
 }
 
-.docs-footer strong,
-.docs-footer a {
+.docs-footer p {
+  margin: 0;
+}
+
+.docs-footer strong {
   color: oklch(var(--color-intent-page-fg));
 }
 
-.docs-footer > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+.docs-footer__note {
+  max-width: var(--docs-measure);
 }
 
-.docs-footer__links {
-  align-items: flex-end;
+/* ==========================================================================
+   Drawer (below the sidebar breakpoint)
+   ========================================================================== */
+
+@media (max-width: 63.999rem) {
+  .docs-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-navtoggle {
+    display: grid;
+  }
+
+  .docs-sidebar {
+    position: fixed;
+    top: var(--docs-topbar-height);
+    left: 0;
+    bottom: 0;
+    z-index: 45;
+    width: min(19rem, 82vw);
+    height: auto;
+    padding-block: var(--spacing-5) var(--spacing-10);
+    background: oklch(var(--color-intent-page-bg));
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition:
+      transform 0.32s var(--docs-ease),
+      visibility 0.32s;
+  }
+
+  [data-nav-open] .docs-sidebar {
+    visibility: visible;
+    transform: none;
+  }
+
+  .docs-scrim {
+    display: block;
+    position: fixed;
+    inset: var(--docs-topbar-height) 0 0;
+    z-index: 40;
+    background: oklch(var(--color-intent-overlay-scrim) / 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  .docs-scrim[hidden] {
+    display: none;
+  }
+
+  /* The drawer owns the viewport while it is open. */
+  [data-nav-open] {
+    overflow: hidden;
+  }
 }
 
-@media (max-width: 70rem) {
-  .docs-header {
-    grid-template-columns: 1fr;
-    justify-items: start;
+@media (max-width: 30rem) {
+  .docs-topbar__link {
+    display: none;
   }
 
-  .docs-nav {
-    justify-content: start;
+  .docs-brand__version {
+    display: none;
   }
 
-  .docs-hero,
-  .docs-detail-grid,
-  .docs-example-grid,
-  .docs-feature-grid,
-  .docs-component-grid,
-  .docs-stat-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 44rem) {
-  .docs-shell {
-    padding: var(--spacing-4);
-  }
-
-  .docs-header {
-    top: var(--spacing-2);
-    padding: var(--spacing-3);
-  }
-
-  .docs-header__actions {
-    flex-wrap: wrap;
-  }
-
-  .docs-section-heading,
-  .docs-footer {
-    flex-direction: column;
-    align-items: start;
+  .docs-theme__option {
+    padding-inline: 0.5rem;
   }
 
   .docs-component-card__facts {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, auto));
+    justify-content: start;
+    gap: var(--spacing-5);
+  }
+}
+
+/* ==========================================================================
+   Motion and forced colours
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .docs-sidebar,
+  .docs-navtoggle__glyph,
+  .docs-navtoggle__glyph::before,
+  .docs-navtoggle__glyph::after {
+    transition-duration: 1ms;
+  }
+}
+
+@media (forced-colors: active) {
+  .docs-topbar,
+  .docs-sidebar,
+  .docs-stat-card,
+  .docs-feature-card,
+  .docs-code,
+  .docs-theme,
+  .docs-example-card__preview {
+    border-color: CanvasText;
+  }
+
+  .docs-sidenav__link[aria-current='page'],
+  .docs-theme__option[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
   }
 }

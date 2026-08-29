@@ -6,12 +6,12 @@ description: Generated multi-component patterns for the Aihio design system.
 <section class="docs-page-intro">
   <div class="docs-eyebrow">
     <aihio-badge>Pattern library</aihio-badge>
-    <aihio-badge variant="outline">{{ docs.patternCount }} seeded patterns</aihio-badge>
+    <aihio-badge variant="outline">{{ docs.patternCount }} patterns</aihio-badge>
   </div>
-  <h1>Reusable Markup Patterns</h1>
+  <h1>Patterns</h1>
   <p>
-    These patterns are generated from the same schema bundle that powers linting, prompt output, and runtime introspection.
-    Each one documents a higher-level UI composition rather than a single component.
+    Patterns document a composition rather than a single component: which components take part, how they nest, and what
+    the authored markup looks like. They come from the same schema bundle that powers linting and prompt output.
   </p>
 </section>
 
@@ -22,6 +22,7 @@ description: Generated multi-component patterns for the Aihio design system.
         <aihio-card-header>
           <div class="docs-component-card__meta">
             <aihio-badge variant="outline">{{ pattern.id }}</aihio-badge>
+            <span class="docs-component-card__version">{{ pattern.componentEntries.length }} components</span>
           </div>
           <aihio-card-title>{{ pattern.name }}</aihio-card-title>
           <aihio-card-description>{{ pattern.description }}</aihio-card-description>
@@ -33,12 +34,6 @@ description: Generated multi-component patterns for the Aihio design system.
               <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
             {% endfor %}
           </div>
-
-          <ul class="docs-link-list docs-link-list--compact">
-            {% for component in pattern.componentEntries %}
-              <li><a class="docs-inline-link" href="{{ component.path | docsUrl(page.url) }}">{{ component.name }}</a></li>
-            {% endfor %}
-          </ul>
         </aihio-card-content>
 
         <aihio-card-footer>

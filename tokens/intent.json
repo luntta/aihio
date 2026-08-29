@@ -103,6 +103,44 @@
         }
       }
     },
+    "fontFamily": {
+      "intent": {
+        "body": {
+          "$value": "{fontFamily.sans}",
+          "$type": "fontFamily",
+          "$description": "Interface and body typeface for every component and page surface."
+        },
+        "code": {
+          "$value": "{fontFamily.mono}",
+          "$type": "fontFamily",
+          "$description": "Typeface for code samples, markup, token names, and other fixed-width data."
+        }
+      }
+    },
+    "letterSpacing": {
+      "intent": {
+        "body": {
+          "$value": "{letterSpacing.normal}",
+          "$type": "dimension",
+          "$description": "Default body and control tracking. Slightly negative, because the system stack sets a touch wide at UI sizes."
+        },
+        "heading": {
+          "$value": "{letterSpacing.heading}",
+          "$type": "dimension",
+          "$description": "Tracking for surface titles and section headings."
+        },
+        "display": {
+          "$value": "{letterSpacing.display}",
+          "$type": "dimension",
+          "$description": "Tracking for large display type, where glyph gaps open up as size grows."
+        },
+        "label": {
+          "$value": "{letterSpacing.wide}",
+          "$type": "dimension",
+          "$description": "Positive tracking for the one place it earns its keep: small capitalised labels."
+        }
+      }
+    },
     "fontSize": {
       "intent": {
         "body": {
@@ -136,9 +174,9 @@
           "$description": "Dense label size for badges and tiny metadata chips."
         },
         "heading": {
-          "$value": "{fontSize.2xl}",
+          "$value": "{fontSize.xl}",
           "$type": "dimension",
-          "$description": "Large surface title size."
+          "$description": "Large surface title size. Sized to lead a card, not to headline a page — a title much larger than this stops reading as part of the surface it sits on."
         },
         "heading-sm": {
           "$value": "{fontSize.lg}",

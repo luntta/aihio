@@ -6,42 +6,79 @@ description: Intent tokens and schema-linked design foundations in Aihio.
 <section class="docs-page-intro">
   <div class="docs-eyebrow">
     <aihio-badge>Foundations</aihio-badge>
-    <aihio-badge variant="outline">Intent tokens</aihio-badge>
+    <aihio-badge variant="outline">{{ docs.intentCount }} intents</aihio-badge>
   </div>
-  <h1>Intent Tokens</h1>
+  <h1>Intent tokens</h1>
   <p>
-    Aihio’s token model is layered so primitive values flow into semantic roles, then into intent-facing variables,
-    and finally into component-level decisions. The docs site reads the generated token vocabulary directly.
+    Primitive values flow into semantic roles, semantic roles into intent-facing variables, and only then into
+    component decisions. Components ask for meaning — <code>surface-bg</code>, <code>stack-md</code> — never for a
+    position on a scale. Everything below is generated from <code>tokens/intent.json</code>.
   </p>
-</section>
-
-<section>
-  <div class="docs-feature-grid">
-    {% for intent in docs.intents %}
-      <div class="docs-feature-card">
-        <h3>{{ intent.name }}</h3>
-        <p>{{ intent.description }}</p>
-      </div>
-    {% endfor %}
-  </div>
 </section>
 
 <section>
   <div class="docs-section-heading">
     <div>
-      <h2>Generated Reference</h2>
-      <p>The full generated markdown reference is emitted during the build and linked directly below.</p>
+      <h2>The intent vocabulary</h2>
+      <p>The {{ docs.intentCount }} named intents that the schema, the linter, and the prompt fragment all share.</p>
     </div>
-    <a class="docs-inline-link" href="{{ '/dist/intent-tokens.md' | docsUrl(page.url) }}">Open generated markdown</a>
   </div>
 
-  <aihio-card>
-    <aihio-card-header>
-      <aihio-card-title><code>dist/intent-tokens.md</code></aihio-card-title>
-      <aihio-card-description>The same markdown artifact shipped with the package.</aihio-card-description>
-    </aihio-card-header>
-    <aihio-card-content>
-      <pre class="docs-code"><code>{{ docs.intentTokensMarkdown | escape }}</code></pre>
-    </aihio-card-content>
-  </aihio-card>
+  <dl class="docs-vocab">
+    {% for intent in docs.intents %}
+      <div class="docs-vocab__row">
+        <dt><code>{{ intent.name }}</code></dt>
+        <dd>{{ intent.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+</section>
+
+{% for group in docs.intentTokenGroups %}
+  <section>
+    <div class="docs-section-heading">
+      <div>
+        <h2>{{ group.name }}</h2>
+        <p>{{ group.intro }}</p>
+      </div>
+      <span class="docs-muted">{{ group.tokens.length }} tokens</span>
+    </div>
+
+    <div class="docs-tablewrap">
+      <table class="docs-table docs-table--tokens">
+        <thead>
+          <tr>
+            {% if group.name == 'color' %}<th><span class="docs-visually-hidden">Swatch</span></th>{% endif %}
+            <th>CSS variable</th>
+            <th>Source</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for token in group.tokens %}
+            <tr>
+              {% if group.name == 'color' %}
+                <td class="docs-table__swatch-cell">
+                  <span class="docs-swatch" style="background: oklch(var({{ token.variable }}))"></span>
+                </td>
+              {% endif %}
+              <td><code>{{ token.variable }}</code></td>
+              <td><code class="docs-muted">{{ token.source }}</code></td>
+              <td>{{ token.description }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endfor %}
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>Generated artifact</h2>
+      <p>The same markdown reference ships inside the package, so agents read the vocabulary without scraping this site.</p>
+    </div>
+    <a class="docs-inline-link" href="{{ '/dist/intent-tokens.md' | docsUrl(page.url) }}">Open intent-tokens.md</a>
+  </div>
 </section>

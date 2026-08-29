@@ -194,7 +194,11 @@ export class AihioDialog extends AihioElement {
 
     requestAnimationFrame(() => {
       const focusable = this._getFocusableElements();
-      (focusable[0] ?? this._panel)?.focus();
+      // The panel is fixed-position and therefore already in view, so the
+      // browser's scroll-into-view would only move the document behind the
+      // backdrop — visibly, if the dialog opened while the page was scrolled
+      // elsewhere.
+      (focusable[0] ?? this._panel)?.focus({ preventScroll: true });
     });
   }
 
@@ -266,7 +270,7 @@ export class AihioDialogTitle extends AihioElement {
       font-size: var(--fontSize-intent-heading-sm);
       font-weight: var(--fontWeight-intent-heading);
       line-height: var(--lineHeight-intent-compact);
-      letter-spacing: -0.01em;
+      letter-spacing: var(--letterSpacing-intent-heading);
     }
   `;
 }

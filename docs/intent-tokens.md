@@ -73,6 +73,15 @@ Corner-radius choices for surfaced and interactive affordances.
 | `radius.intent.pill` | `--radius-intent-pill` | `radius.full` | Fully rounded presentation for badges, avatars, and pill-shaped affordances. |
 | `radius.intent.surface` | `--radius-intent-surface` | `radius.lg` | Corner radius for cards, alerts, and other framed surfaces. |
 
+## fontFamily
+
+Typeface intents for interface copy and fixed-width data.
+
+| Token | CSS Variable | Source | Description |
+| --- | --- | --- | --- |
+| `fontFamily.intent.body` | `--fontFamily-intent-body` | `fontFamily.sans` | Interface and body typeface for every component and page surface. |
+| `fontFamily.intent.code` | `--fontFamily-intent-code` | `fontFamily.mono` | Typeface for code samples, markup, token names, and other fixed-width data. |
+
 ## fontSize
 
 Text-size intents for body copy, controls, and surfaced headings.
@@ -85,7 +94,7 @@ Text-size intents for body copy, controls, and surfaced headings.
 | `fontSize.intent.control` | `--fontSize-intent-control` | `fontSize.sm` | Default text size for controls. |
 | `fontSize.intent.control-lg` | `--fontSize-intent-control-lg` | `fontSize.base` | Larger text size for prominent controls. |
 | `fontSize.intent.control-sm` | `--fontSize-intent-control-sm` | `fontSize.xs` | Compact text size for small controls. |
-| `fontSize.intent.heading` | `--fontSize-intent-heading` | `fontSize.2xl` | Large surface title size. |
+| `fontSize.intent.heading` | `--fontSize-intent-heading` | `fontSize.xl` | Large surface title size. Sized to lead a card, not to headline a page — a title much larger than this stops reading as part of the surface it sits on. |
 | `fontSize.intent.heading-sm` | `--fontSize-intent-heading-sm` | `fontSize.lg` | Compact surface title size for dialogs and smaller panels. |
 
 ## fontWeight
@@ -98,6 +107,17 @@ Weight intents for body text, controls, and headings.
 | `fontWeight.intent.body` | `--fontWeight-intent-body` | `fontWeight.normal` | Default document body weight. |
 | `fontWeight.intent.control` | `--fontWeight-intent-control` | `fontWeight.medium` | Emphasized but compact weight for controls and inline titles. |
 | `fontWeight.intent.heading` | `--fontWeight-intent-heading` | `fontWeight.semibold` | Strong surface-heading weight. |
+
+## letterSpacing
+
+Optical tracking intents, tightening as type grows.
+
+| Token | CSS Variable | Source | Description |
+| --- | --- | --- | --- |
+| `letterSpacing.intent.body` | `--letterSpacing-intent-body` | `letterSpacing.normal` | Default body and control tracking. Slightly negative, because the system stack sets a touch wide at UI sizes. |
+| `letterSpacing.intent.display` | `--letterSpacing-intent-display` | `letterSpacing.display` | Tracking for large display type, where glyph gaps open up as size grows. |
+| `letterSpacing.intent.heading` | `--letterSpacing-intent-heading` | `letterSpacing.heading` | Tracking for surface titles and section headings. |
+| `letterSpacing.intent.label` | `--letterSpacing-intent-label` | `letterSpacing.wide` | Positive tracking for the one place it earns its keep: small capitalised labels. |
 
 ## lineHeight
 

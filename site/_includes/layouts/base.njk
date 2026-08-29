@@ -5,76 +5,194 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if title %}{{ title }} · {% endif %}Aihio</title>
   <meta name="description" content="{{ description or 'Aihio is an AI-first design system built on native web components.' }}">
+  <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="{{ '/dist/aihio.css' | docsUrl(page.url) }}">
   <link rel="stylesheet" href="{{ '/assets/docs.css' | docsUrl(page.url) }}">
+  <script>
+    /* Runs before first paint: a theme applied after the stylesheet lands
+       would flash the wrong canvas on every navigation. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('aihio-docs-theme');
+        if (stored === 'light' || stored === 'dark') {
+          document.documentElement.setAttribute('data-theme', stored);
+        }
+      } catch (error) {
+        /* Private mode and blocked storage both throw; the system theme is a
+           correct answer, so there is nothing to recover from. */
+      }
+    })();
+  </script>
   <script type="module" src="{{ '/dist/aihio.js' | docsUrl(page.url) }}"></script>
 </head>
 <body>
-  <div class="docs-shell">
-    <header class="docs-header">
-      <div class="docs-header__brand">
-        <a class="docs-brand" href="{{ '/' | docsUrl(page.url) }}">
-          <span class="docs-brand__mark">A</span>
-          <span class="docs-brand__copy">
-            <strong>Aihio</strong>
-            <span>AI-first design system</span>
-          </span>
-        </a>
-        <aihio-badge variant="outline">v{{ docs.packageVersion }}</aihio-badge>
+  <a class="docs-skip" href="#docs-content">Skip to content</a>
+
+  <header class="docs-topbar">
+    <div class="docs-topbar__lead">
+      <button
+        class="docs-navtoggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="docs-sidebar"
+        data-nav-toggle
+      >
+        <span class="docs-navtoggle__glyph" aria-hidden="true"></span>
+        <span class="docs-visually-hidden">Navigation</span>
+      </button>
+
+      <a class="docs-brand" href="{{ '/' | docsUrl(page.url) }}">
+        <span class="docs-brand__mark" aria-hidden="true">A</span>
+        <span class="docs-brand__name">Aihio</span>
+      </a>
+      <span class="docs-brand__version">v{{ docs.packageVersion }}</span>
+    </div>
+
+    <div class="docs-topbar__actions">
+      <div class="docs-theme" role="group" aria-label="Colour theme">
+        <button class="docs-theme__option" type="button" data-theme-option="light" aria-pressed="false">Light</button>
+        <button class="docs-theme__option" type="button" data-theme-option="dark" aria-pressed="false">Dark</button>
+        <button class="docs-theme__option" type="button" data-theme-option="system" aria-pressed="false">Auto</button>
       </div>
 
-      <nav class="docs-nav" aria-label="Primary">
-        {% for item in navigation %}
-          {% set isActive = page.url == item.url or (item.url != '/' and (page.url | startsWith(item.url))) %}
-          <a class="docs-nav__link{% if isActive %} is-active{% endif %}" href="{{ item.url | docsUrl(page.url) }}">{{ item.title }}</a>
+      <a class="docs-topbar__link" href="https://github.com/luntta/aihio">GitHub</a>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <div class="docs-scrim" data-nav-scrim hidden></div>
+
+    <aside class="docs-sidebar" id="docs-sidebar">
+      <nav class="docs-sidenav" aria-label="Documentation">
+        {% for section in navigation.sections %}
+          <div class="docs-sidenav__group">
+            <p class="docs-sidenav__heading">
+              {% if section.url %}
+                <a href="{{ section.url | docsUrl(page.url) }}">{{ section.title }}</a>
+                <span class="docs-sidenav__count">{{ section.count }}</span>
+              {% else %}
+                {{ section.title }}
+              {% endif %}
+            </p>
+            <ul class="docs-sidenav__list">
+              {% for item in section.items %}
+                <li>
+                  <a
+                    class="docs-sidenav__link"
+                    href="{{ item.url | docsUrl(page.url) }}"
+                    {% if page.url == item.url %}aria-current="page"{% endif %}
+                  >{{ item.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         {% endfor %}
       </nav>
+    </aside>
 
-      <div class="docs-header__actions">
-        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme('light')">Light</aihio-button>
-        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme('dark')">Dark</aihio-button>
-        <aihio-button variant="ghost" size="sm" onclick="setDocsTheme(null)">System</aihio-button>
+    <main class="docs-main" id="docs-content">
+      <div class="docs-content">
+        {{ content | safe }}
       </div>
-    </header>
 
-    <main class="docs-main">
-      {{ content | safe }}
+      <footer class="docs-footer">
+        <p>
+          <strong>Aihio</strong> · schema v{{ docs.schemaVersion }} ·
+          {{ docs.componentCount }} components · {{ docs.patternCount }} patterns
+        </p>
+        <p class="docs-footer__note">
+          Every page on this site is generated from <code>dist/schema.json</code> and built with the components it documents.
+        </p>
+      </footer>
     </main>
-
-    <footer class="docs-footer">
-      <div>
-        <strong>Aihio</strong>
-        <span>Schema version {{ docs.schemaVersion }} · {{ docs.componentCount }} components · {{ docs.patternCount }} patterns</span>
-      </div>
-      <div class="docs-footer__links">
-        <a href="{{ '/components/' | docsUrl(page.url) }}">Browse components</a>
-      </div>
-    </footer>
   </div>
 
   <script>
-    const themeKey = 'aihio-docs-theme';
+    (function () {
+      var root = document.documentElement;
+      var themeKey = 'aihio-docs-theme';
 
-    function applyDocsTheme(theme) {
-      if (theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-    }
-
-    function setDocsTheme(theme) {
-      if (theme) {
-        localStorage.setItem(themeKey, theme);
-      } else {
-        localStorage.removeItem(themeKey);
+      function readTheme() {
+        try {
+          var stored = localStorage.getItem(themeKey);
+          return stored === 'light' || stored === 'dark' ? stored : 'system';
+        } catch (error) {
+          return 'system';
+        }
       }
 
-      applyDocsTheme(theme);
-    }
+      function paintThemeControl(theme) {
+        for (var button of document.querySelectorAll('[data-theme-option]')) {
+          button.setAttribute('aria-pressed', String(button.dataset.themeOption === theme));
+        }
+      }
 
-    applyDocsTheme(localStorage.getItem(themeKey));
-    window.setDocsTheme = setDocsTheme;
+      function setTheme(theme) {
+        if (theme === 'system') {
+          root.removeAttribute('data-theme');
+        } else {
+          root.setAttribute('data-theme', theme);
+        }
+
+        try {
+          if (theme === 'system') {
+            localStorage.removeItem(themeKey);
+          } else {
+            localStorage.setItem(themeKey, theme);
+          }
+        } catch (error) {
+          /* The theme still applies for this page; it just will not persist. */
+        }
+
+        paintThemeControl(theme);
+      }
+
+      for (var button of document.querySelectorAll('[data-theme-option]')) {
+        button.addEventListener('click', function (event) {
+          setTheme(event.currentTarget.dataset.themeOption);
+        });
+      }
+
+      paintThemeControl(readTheme());
+
+      /* Mobile navigation drawer. */
+      var toggle = document.querySelector('[data-nav-toggle]');
+      var scrim = document.querySelector('[data-nav-scrim]');
+      var sidebar = document.getElementById('docs-sidebar');
+
+      function setNav(open) {
+        root.toggleAttribute('data-nav-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        scrim.hidden = !open;
+
+        if (open) {
+          sidebar.querySelector('a').focus();
+        } else {
+          toggle.focus();
+        }
+      }
+
+      toggle.addEventListener('click', function () {
+        setNav(toggle.getAttribute('aria-expanded') !== 'true');
+      });
+
+      scrim.addEventListener('click', function () {
+        setNav(false);
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+          setNav(false);
+        }
+      });
+
+      /* The drawer overlays the page, so a followed link must close it. */
+      sidebar.addEventListener('click', function (event) {
+        if (event.target.closest('a') && toggle.getAttribute('aria-expanded') === 'true') {
+          setNav(false);
+        }
+      });
+    })();
   </script>
 </body>
 </html>

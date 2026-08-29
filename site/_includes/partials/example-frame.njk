@@ -1,22 +1,17 @@
-<aihio-card class="docs-example-card{% if tone == 'warning' %} docs-example-card--warning{% endif %}">
-  <aihio-card-header>
-    <div class="docs-component-card__meta">
-      <aihio-badge variant="{% if tone == 'warning' %}destructive{% else %}outline{% endif %}">{{ label }}</aihio-badge>
-      {% if meta %}
-        <span class="docs-component-card__version">{{ meta }}</span>
-      {% endif %}
-    </div>
-    <aihio-card-title>{{ title }}</aihio-card-title>
-    {% if description %}
-      <aihio-card-description>{{ description }}</aihio-card-description>
+<figure class="docs-example{% if tone == 'warning' %} docs-example--warning{% endif %}">
+  <figcaption class="docs-example__head">
+    {% if tone == 'warning' %}
+      <aihio-badge variant="destructive">{{ title }}</aihio-badge>
+    {% else %}
+      <span class="docs-example__label">{{ title }}</span>
     {% endif %}
-  </aihio-card-header>
+    {% if meta %}<span class="docs-example__meta">{{ meta }}</span>{% endif %}
+    {% if description %}<p class="docs-example__reason">{{ description }}</p>{% endif %}
+  </figcaption>
 
-  <aihio-card-content>
-    <div class="docs-example-card__preview{% if tone == 'warning' %} is-warning{% endif %}">
-      {{ markup | safe }}
-    </div>
+  <div class="docs-example__preview{% if tone == 'warning' %} is-warning{% endif %}">
+    {{ markup | safe }}
+  </div>
 
-    <pre class="docs-code"><code>{{ source | escape }}</code></pre>
-  </aihio-card-content>
-</aihio-card>
+  <pre class="docs-code"><code>{{ source | escape }}</code></pre>
+</figure>

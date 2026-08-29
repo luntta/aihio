@@ -4,19 +4,22 @@
   --radius: 0.5rem;
 
   /* Primitives */
-  --color-zinc-50: 0.98 0.002 247;
-  --color-zinc-100: 0.96 0.003 264;
-  --color-zinc-200: 0.92 0.004 264;
-  --color-zinc-300: 0.87 0.008 258;
-  --color-zinc-400: 0.71 0.015 261;
-  --color-zinc-450: 0.65 0.014 260;
-  --color-zinc-500: 0.55 0.014 259;
-  --color-zinc-550: 0.52 0.014 259;
-  --color-zinc-600: 0.45 0.013 256;
-  --color-zinc-700: 0.39 0.013 258;
-  --color-zinc-800: 0.31 0.012 256;
-  --color-zinc-900: 0.24 0.010 256;
-  --color-zinc-950: 0.15 0.007 256;
+  --color-zinc-0: 1 0 0;
+  --color-zinc-50: 0.9707 0.0027 286;
+  --color-zinc-100: 0.9406 0.0027 286;
+  --color-zinc-200: 0.9020 0.0040 286;
+  --color-zinc-300: 0.8700 0.0060 286;
+  --color-zinc-400: 0.7600 0.0070 286;
+  --color-zinc-450: 0.7105 0.0072 286;
+  --color-zinc-500: 0.6217 0.0074 286;
+  --color-zinc-550: 0.5399 0.0077 286;
+  --color-zinc-600: 0.4800 0.0070 286;
+  --color-zinc-700: 0.4000 0.0060 286;
+  --color-zinc-800: 0.3200 0.0050 286;
+  --color-zinc-850: 0.2603 0.0040 286;
+  --color-zinc-900: 0.2316 0.0038 286;
+  --color-zinc-950: 0.2006 0.0020 286;
+  --color-zinc-1000: 0 0 0;
   --color-red-50: 0.97 0.013 18;
   --color-red-100: 0.94 0.028 22;
   --color-red-200: 0.89 0.055 22;
@@ -62,6 +65,8 @@
   --spacing-1\.5: 0.375rem;
   --spacing-2\.5: 0.625rem;
   --spacing-3\.5: 0.875rem;
+  --fontFamily-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --fontFamily-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --fontSize-xs: 0.75rem;
   --fontSize-sm: 0.875rem;
   --fontSize-base: 1rem;
@@ -79,9 +84,13 @@
   --lineHeight-snug: 1.375;
   --lineHeight-normal: 1.5;
   --lineHeight-relaxed: 1.625;
+  --letterSpacing-display: -0.025em;
+  --letterSpacing-heading: -0.018em;
+  --letterSpacing-normal: -0.011em;
+  --letterSpacing-wide: 0.02em;
   --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+  --shadow-md: 0 8px 24px -6px oklch(0 0 0 / 0.12), 0 2px 6px -2px oklch(0 0 0 / 0.08);
+  --shadow-lg: 0 24px 64px -12px oklch(0 0 0 / 0.22), 0 6px 16px -6px oklch(0 0 0 / 0.12);
   --duration-fast: 100ms;
   --duration-normal: 150ms;
   --duration-slow: 200ms;
@@ -113,32 +122,32 @@
   --dialog-padding: 1.5rem;
 
   /* Semantic (light) */
-  --background: 1.0 0 0;
-  --foreground: var(--color-zinc-950);
-  --card: 1.0 0 0;
-  --card-foreground: var(--color-zinc-950);
-  --popover: 1.0 0 0;
-  --popover-foreground: var(--color-zinc-950);
+  --background: var(--color-zinc-0);
+  --foreground: var(--color-zinc-900);
+  --card: var(--color-zinc-50);
+  --card-foreground: var(--color-zinc-900);
+  --popover: var(--color-zinc-0);
+  --popover-foreground: var(--color-zinc-900);
   --primary: var(--color-zinc-900);
-  --primary-foreground: var(--color-zinc-50);
+  --primary-foreground: var(--color-zinc-0);
   --secondary: var(--color-zinc-100);
   --secondary-foreground: var(--color-zinc-900);
-  --muted: var(--color-zinc-100);
+  --muted: var(--color-zinc-50);
   --muted-foreground: var(--color-zinc-550);
   --accent: var(--color-zinc-100);
   --accent-foreground: var(--color-zinc-900);
   --destructive: var(--color-red-600);
-  --destructive-foreground: var(--color-zinc-50);
+  --destructive-foreground: var(--color-zinc-0);
   --destructive-text: var(--color-red-600);
   --success: var(--color-green-600);
-  --success-foreground: var(--color-zinc-50);
+  --success-foreground: var(--color-zinc-0);
   --success-text: var(--color-green-600);
   --warning: var(--color-amber-400);
-  --warning-foreground: var(--color-zinc-950);
+  --warning-foreground: var(--color-zinc-900);
   --warning-text: var(--color-amber-700);
-  --border: var(--color-zinc-300);
-  --input: var(--color-zinc-450);
-  --ring: var(--color-zinc-950);
+  --border: var(--color-zinc-200);
+  --input: var(--color-zinc-500);
+  --ring: var(--color-zinc-900);
 
   /* Intent (shared) */
   --color-intent-overlay-scrim: 0 0 0 / 0.8;
@@ -159,13 +168,19 @@
   --spacing-intent-field-padding-block: var(--spacing-2);
   --spacing-intent-field-padding-block-lg: var(--spacing-2\.5);
   --spacing-intent-form-field-gap: var(--spacing-3);
+  --fontFamily-intent-body: var(--fontFamily-sans);
+  --fontFamily-intent-code: var(--fontFamily-mono);
+  --letterSpacing-intent-body: var(--letterSpacing-normal);
+  --letterSpacing-intent-heading: var(--letterSpacing-heading);
+  --letterSpacing-intent-display: var(--letterSpacing-display);
+  --letterSpacing-intent-label: var(--letterSpacing-wide);
   --fontSize-intent-body: var(--fontSize-base);
   --fontSize-intent-body-sm: var(--fontSize-sm);
   --fontSize-intent-control: var(--fontSize-sm);
   --fontSize-intent-control-sm: var(--fontSize-xs);
   --fontSize-intent-control-lg: var(--fontSize-base);
   --fontSize-intent-badge: var(--fontSize-xs);
-  --fontSize-intent-heading: var(--fontSize-2xl);
+  --fontSize-intent-heading: var(--fontSize-xl);
   --fontSize-intent-heading-sm: var(--fontSize-lg);
   --fontWeight-intent-body: var(--fontWeight-normal);
   --fontWeight-intent-control: var(--fontWeight-medium);
@@ -212,30 +227,30 @@
 
 [data-theme="dark"] {
   /* Semantic (dark) */
-  --background: var(--color-zinc-950);
+  --background: var(--color-zinc-1000);
   --foreground: var(--color-zinc-50);
   --card: var(--color-zinc-950);
   --card-foreground: var(--color-zinc-50);
-  --popover: var(--color-zinc-950);
+  --popover: var(--color-zinc-900);
   --popover-foreground: var(--color-zinc-50);
   --primary: var(--color-zinc-50);
-  --primary-foreground: var(--color-zinc-900);
-  --secondary: var(--color-zinc-800);
+  --primary-foreground: var(--color-zinc-1000);
+  --secondary: var(--color-zinc-900);
   --secondary-foreground: var(--color-zinc-50);
-  --muted: var(--color-zinc-800);
-  --muted-foreground: var(--color-zinc-400);
-  --accent: var(--color-zinc-800);
+  --muted: var(--color-zinc-950);
+  --muted-foreground: var(--color-zinc-450);
+  --accent: var(--color-zinc-900);
   --accent-foreground: var(--color-zinc-50);
   --destructive: var(--color-red-600);
-  --destructive-foreground: var(--color-zinc-50);
+  --destructive-foreground: var(--color-zinc-0);
   --destructive-text: var(--color-red-400);
   --success: var(--color-green-600);
-  --success-foreground: var(--color-zinc-50);
+  --success-foreground: var(--color-zinc-0);
   --success-text: var(--color-green-400);
   --warning: var(--color-amber-400);
-  --warning-foreground: var(--color-zinc-950);
+  --warning-foreground: var(--color-zinc-1000);
   --warning-text: var(--color-amber-400);
-  --border: var(--color-zinc-700);
+  --border: var(--color-zinc-850);
   --input: var(--color-zinc-550);
   --ring: var(--color-zinc-300);
 
@@ -271,30 +286,30 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     /* Semantic (dark) — auto */
-    --background: var(--color-zinc-950);
+    --background: var(--color-zinc-1000);
     --foreground: var(--color-zinc-50);
     --card: var(--color-zinc-950);
     --card-foreground: var(--color-zinc-50);
-    --popover: var(--color-zinc-950);
+    --popover: var(--color-zinc-900);
     --popover-foreground: var(--color-zinc-50);
     --primary: var(--color-zinc-50);
-    --primary-foreground: var(--color-zinc-900);
-    --secondary: var(--color-zinc-800);
+    --primary-foreground: var(--color-zinc-1000);
+    --secondary: var(--color-zinc-900);
     --secondary-foreground: var(--color-zinc-50);
-    --muted: var(--color-zinc-800);
-    --muted-foreground: var(--color-zinc-400);
-    --accent: var(--color-zinc-800);
+    --muted: var(--color-zinc-950);
+    --muted-foreground: var(--color-zinc-450);
+    --accent: var(--color-zinc-900);
     --accent-foreground: var(--color-zinc-50);
     --destructive: var(--color-red-600);
-    --destructive-foreground: var(--color-zinc-50);
+    --destructive-foreground: var(--color-zinc-0);
     --destructive-text: var(--color-red-400);
     --success: var(--color-green-600);
-    --success-foreground: var(--color-zinc-50);
+    --success-foreground: var(--color-zinc-0);
     --success-text: var(--color-green-400);
     --warning: var(--color-amber-400);
-    --warning-foreground: var(--color-zinc-950);
+    --warning-foreground: var(--color-zinc-1000);
     --warning-text: var(--color-amber-400);
-    --border: var(--color-zinc-700);
+    --border: var(--color-zinc-850);
     --input: var(--color-zinc-550);
     --ring: var(--color-zinc-300);
 

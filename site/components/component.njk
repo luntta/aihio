@@ -21,27 +21,12 @@ eleventyComputed:
   <p>{{ component.description }}</p>
 </section>
 
-<section class="docs-stat-grid">
-  <div class="docs-stat-card">
-    <strong>{{ component.attributeEntries.length }}</strong>
-    <span>Attributes declared in the schema contract.</span>
-  </div>
-  <div class="docs-stat-card">
-    <strong>{{ component.slotEntries.length }}</strong>
-    <span>Named slots available to authors in markup.</span>
-  </div>
-  <div class="docs-stat-card">
-    <strong>{{ component.eventEntries.length }}</strong>
-    <span>Custom events and emitted interaction hooks.</span>
-  </div>
-</section>
-
 {% if component.examplesDetailed.length %}
   <section>
     <div class="docs-section-heading">
       <div>
-        <h2>Live Examples</h2>
-        <p>Rendered from the schema examples with matching source code shown underneath each preview.</p>
+        <h2>Live examples</h2>
+        <p>Rendered live from the schema, with the authored source beneath each preview.</p>
       </div>
     </div>
 
@@ -49,7 +34,7 @@ eleventyComputed:
       {% for example in component.examplesDetailed %}
         {% set label = "Example" %}
         {% set title = example.title %}
-        {% set description = "Valid authored markup for " + component.tag + "." %}
+        {% set description = null %}
         {% set markup = example.previewMarkup %}
         {% set source = example.markup %}
         {% set tone = "default" %}
@@ -64,7 +49,7 @@ eleventyComputed:
     <div class="docs-section-heading">
       <div>
         <h2>Counterexamples</h2>
-        <p>Known-bad patterns that the docs, runtime warnings, and linter all push authors away from.</p>
+        <p>Markup the runtime warns about and the linter rejects, with the reason it is wrong.</p>
       </div>
     </div>
 
@@ -91,6 +76,7 @@ eleventyComputed:
       </aihio-card-header>
       <aihio-card-content>
         {% if component.attributeEntries.length %}
+          <div class="docs-tablewrap">
           <table class="docs-table">
             <thead>
               <tr>
@@ -114,6 +100,7 @@ eleventyComputed:
               {% endfor %}
             </tbody>
           </table>
+          </div>
         {% else %}
           <p class="docs-muted">This component does not expose authored attributes.</p>
         {% endif %}
@@ -162,7 +149,7 @@ eleventyComputed:
   <aside class="docs-detail-grid__sidebar">
     <aihio-card>
       <aihio-card-header>
-        <aihio-card-title>Composition Rules</aihio-card-title>
+        <aihio-card-title>Composition rules</aihio-card-title>
         <aihio-card-description>Schema-level constraints enforced by docs, linting, and runtime validation.</aihio-card-description>
       </aihio-card-header>
       <aihio-card-content>
@@ -213,7 +200,7 @@ eleventyComputed:
 
     <aihio-card>
       <aihio-card-header>
-        <aihio-card-title>Related Patterns</aihio-card-title>
+        <aihio-card-title>Related patterns</aihio-card-title>
         <aihio-card-description>Seeded compositions that require this component.</aihio-card-description>
       </aihio-card-header>
       <aihio-card-content>
@@ -232,7 +219,7 @@ eleventyComputed:
     {% if component.relatedEntries.length %}
       <aihio-card>
         <aihio-card-header>
-          <aihio-card-title>Related Components</aihio-card-title>
+          <aihio-card-title>Related components</aihio-card-title>
           <aihio-card-description>Subcomponents or schema-linked neighbors.</aihio-card-description>
         </aihio-card-header>
         <aihio-card-content>
@@ -250,7 +237,7 @@ eleventyComputed:
 <section>
   <div class="docs-section-heading">
     <div>
-      <h2>Accessibility Contract</h2>
+      <h2>Accessibility contract</h2>
       <p>The runtime already handles some semantics automatically; authors are still responsible for the rules listed here.</p>
     </div>
   </div>
@@ -258,14 +245,14 @@ eleventyComputed:
   <aihio-tabs value="handled">
     <aihio-tab-list>
       <aihio-tab value="handled">Handled for you</aihio-tab>
-      <aihio-tab value="required">Author obligations</aihio-tab>
+      <aihio-tab value="required">Your obligations</aihio-tab>
     </aihio-tab-list>
 
     <aihio-tab-panel value="handled">
       <div class="docs-surface-grid">
         <aihio-card>
           <aihio-card-header>
-            <aihio-card-title>Built-in behaviors</aihio-card-title>
+            <aihio-card-title>Built-in behaviours</aihio-card-title>
             <aihio-card-description>Semantics and keyboard behaviors the component applies for you.</aihio-card-description>
           </aihio-card-header>
           <aihio-card-content>
@@ -287,7 +274,7 @@ eleventyComputed:
       <div class="docs-surface-grid">
         <aihio-card>
           <aihio-card-header>
-            <aihio-card-title>Required authoring rules</aihio-card-title>
+            <aihio-card-title>Your obligations</aihio-card-title>
             <aihio-card-description>These are the conditions that warnings and lint rules surface back to authors.</aihio-card-description>
           </aihio-card-header>
           <aihio-card-content>

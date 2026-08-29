@@ -31,7 +31,7 @@ export class AihioCard extends AihioElement {
       font-size: var(--fontSize-intent-heading);
       font-weight: var(--fontWeight-intent-heading);
       line-height: var(--lineHeight-intent-compact);
-      letter-spacing: -0.02em;
+      letter-spacing: var(--letterSpacing-intent-heading);
     }
 
     aihio-card-description {
@@ -47,6 +47,9 @@ export class AihioCard extends AihioElement {
 
     aihio-card-footer {
       display: flex;
+      /* Footers hold action rows. Unwrapped, a second button pushed straight
+         through the card edge on narrow viewports. */
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--spacing-intent-control-gap);
       padding: var(--card-padding);

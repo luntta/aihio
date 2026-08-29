@@ -3,95 +3,84 @@ layout: layouts/base.njk
 title: Overview
 description: Schema-derived reference docs and implementation guidance for the Aihio design system.
 ---
-<section class="docs-hero">
-  <div class="docs-hero__copy">
-    <div class="docs-eyebrow">
-      <aihio-badge>Schema-derived</aihio-badge>
-      <aihio-badge variant="secondary">Eleventy docs</aihio-badge>
-      <aihio-badge variant="outline">Zero-dependency components</aihio-badge>
-    </div>
-
-    <h1 class="docs-title">Design system docs that stay in sync with the source of truth.</h1>
-    <p class="docs-lede">
-      Aihio ships machine-readable component contracts, intent tokens, patterns, lint tooling, and MCP surfaces.
-      This site reads those generated artifacts directly and uses the same components it documents.
-    </p>
-
-    <div class="docs-callouts">
-      <aihio-alert>
-        <div slot="title">Generated from build artifacts</div>
-        <div slot="description">Component inventory, pattern counts, and API facts all come from the same schema emitted into <code>dist/</code>.</div>
-      </aihio-alert>
-    </div>
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge>Schema-derived</aihio-badge>
+    <aihio-badge variant="secondary">Native web components</aihio-badge>
+    <aihio-badge variant="outline">Zero dependencies</aihio-badge>
   </div>
 
-  <div class="docs-hero__preview">
-    <aihio-card class="docs-hero-card">
-      <aihio-card-header>
-        <aihio-card-title>Reference Preview</aihio-card-title>
-        <aihio-card-description>The docs shell is assembled with Aihio cards, badges, alerts, tabs, inputs, and buttons.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        <form>
-          <label class="docs-field">
-            <span>Component search</span>
-            <aihio-input placeholder="button, dialog, tabs"></aihio-input>
-          </label>
+  <h1>A design system that reads the same way to people and to agents.</h1>
 
-          <div class="docs-chip-row">
-            <aihio-badge variant="secondary">Attributes</aihio-badge>
-            <aihio-badge variant="secondary">A11y contract</aihio-badge>
-            <aihio-badge variant="secondary">Counterexamples</aihio-badge>
-          </div>
-        </form>
-      </aihio-card-content>
-      <aihio-card-footer>
-        <aihio-button onclick="window.location.href='{{ '/components/' | docsUrl(page.url) }}'">Browse components</aihio-button>
-        <aihio-button variant="outline" onclick="window.location.href='{{ '/components/' | docsUrl(page.url) }}'">View reference index</aihio-button>
-      </aihio-card-footer>
-    </aihio-card>
-  </div>
-</section>
+  <p class="docs-lede">
+    Aihio emits machine-readable component contracts, intent tokens, patterns, a linter, and an MCP server from one
+    build. This site is generated from those artifacts and built with the components it documents — so if a page here
+    is wrong, the package is wrong.
+  </p>
 
-<section class="docs-stat-grid">
-  <div class="docs-stat-card">
-    <strong>{{ docs.componentCount }}</strong>
-    <span>Schema-backed components with generated runtime and type metadata.</span>
-  </div>
-  <div class="docs-stat-card">
-    <strong>{{ docs.patternCount }}</strong>
-    <span>Seeded composition patterns reused by docs, prompts, linting, and agent tooling.</span>
-  </div>
-  <div class="docs-stat-card">
-    <strong>{{ docs.intentCount }}</strong>
-    <span>Intent vocabulary entries mapping author meaning onto tokens and components.</span>
-  </div>
+  <aihio-cluster>
+    <aihio-button onclick="location.href='{{ '/components/' | docsUrl(page.url) }}'">Browse components</aihio-button>
+    <aihio-button variant="outline" onclick="location.href='{{ '/ai/' | docsUrl(page.url) }}'">Wire up an agent</aihio-button>
+  </aihio-cluster>
 </section>
 
 <section>
   <div class="docs-section-heading">
     <div>
-      <h2>What This Site Covers</h2>
-      <p>The first phase focuses on the overview shell and generated component index. Detail pages, patterns, and AI/tooling sections land next.</p>
+      <h2>Quick start</h2>
+      <p>Three steps, no build step required. The stylesheet carries the tokens; the module registers every element.</p>
+    </div>
+  </div>
+
+  <ol class="docs-steps">
+    <li class="docs-step">
+      <p class="docs-step__label">Install the package</p>
+      <pre class="docs-code"><code>npm install aihio</code></pre>
+    </li>
+    <li class="docs-step">
+      <p class="docs-step__label">Load the styles and the elements</p>
+      <pre class="docs-code"><code>&lt;link rel="stylesheet" href="node_modules/aihio/dist/aihio.css"&gt;
+&lt;script type="module" src="node_modules/aihio/dist/aihio.js"&gt;&lt;/script&gt;</code></pre>
+    </li>
+    <li class="docs-step">
+      <p class="docs-step__label">Write markup</p>
+      <pre class="docs-code"><code>&lt;aihio-button variant="outline"&gt;Click me&lt;/aihio-button&gt;</code></pre>
+      <div class="docs-step__preview">
+        <aihio-button variant="outline">Click me</aihio-button>
+      </div>
+    </li>
+  </ol>
+
+  <p class="docs-step__aside">
+    In development, import <code>aihio/dev</code> instead to get schema-backed console warnings. The production bundle
+    never imports that module, so none of it ships.
+  </p>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>Where to go next</h2>
+      <p>Four surfaces, one schema behind all of them.</p>
     </div>
   </div>
 
   <div class="docs-feature-grid">
     <a class="docs-feature-card docs-feature-card--link" href="{{ '/components/' | docsUrl(page.url) }}">
-      <h3>Component Reference</h3>
-      <p>API facts, intents, examples, and accessibility obligations sourced from the generated schema.</p>
+      <h3>Component reference</h3>
+      <p>Attributes, slots, events, live examples, and the accessibility obligations each component leaves to you.</p>
     </a>
     <a class="docs-feature-card docs-feature-card--link" href="{{ '/patterns/' | docsUrl(page.url) }}">
-      <h3>Pattern Library</h3>
-      <p>Higher-level markup compositions such as auth flows, settings panels, tabbed settings, and toast stacks.</p>
+      <h3>Pattern library</h3>
+      <p>Auth flows, settings panels, tabbed settings, and toast stacks as authored markup you can lift wholesale.</p>
     </a>
     <a class="docs-feature-card docs-feature-card--link" href="{{ '/foundations/tokens/' | docsUrl(page.url) }}">
-      <h3>Design Foundations</h3>
-      <p>Intent-token vocabulary and the semantic bridge from raw values to component-facing roles.</p>
+      <h3>Token foundations</h3>
+      <p>The intent vocabulary, and the path from a raw value through semantic roles to a component decision.</p>
     </a>
     <a class="docs-feature-card docs-feature-card--link" href="{{ '/ai/' | docsUrl(page.url) }}">
-      <h3>AI Tooling</h3>
-      <p>Schema exports, linting, prompt fragments, and the local MCP server all documented in one place.</p>
+      <h3>AI &amp; tooling</h3>
+      <p>Schema exports, the structured linter, the prompt fragment, and a local MCP server for markup validation.</p>
     </a>
   </div>
 </section>
@@ -99,10 +88,10 @@ description: Schema-derived reference docs and implementation guidance for the A
 <section>
   <div class="docs-section-heading">
     <div>
-      <h2>Featured Components</h2>
-      <p>Phase 1 exposes the index first so the generated data model and docs shell are stable before per-component deep dives land.</p>
+      <h2>Featured components</h2>
+      <p>Every card below is rendered from <code>dist/schema.json</code>, not maintained by hand.</p>
     </div>
-    <a class="docs-inline-link" href="{{ '/components/' | docsUrl(page.url) }}">See the full component index</a>
+    <a class="docs-inline-link" href="{{ '/components/' | docsUrl(page.url) }}">All {{ docs.componentCount }} components</a>
   </div>
 
   <div class="docs-component-grid">

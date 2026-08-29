@@ -3,12 +3,24 @@
 @import './components.css';
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--fontFamily-intent-body);
   font-size: var(--fontSize-intent-body);
   font-weight: var(--fontWeight-intent-body);
   line-height: var(--lineHeight-intent-body);
+  letter-spacing: var(--letterSpacing-intent-body);
   color: oklch(var(--color-intent-page-fg));
   background-color: oklch(var(--color-intent-page-bg));
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--fontFamily-intent-code);
+  letter-spacing: 0;
 }
 
 :focus-visible {
