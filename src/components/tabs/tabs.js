@@ -31,7 +31,7 @@ export class AihioTabs extends AihioElement {
       }
     };
 
-    this.addEventListener('tab-select', this._onTabSelect);
+    this.addEventListener('aihio-tab-select', this._onTabSelect);
 
     this._observer = new MutationObserver((records) => {
       if (records.some((record) => record.target !== this)) {
@@ -216,7 +216,7 @@ export class AihioTab extends AihioElement {
   setup() {
     this._onClick = () => {
       if (this.hasAttribute('disabled')) return;
-      this.emit('tab-select', { value: this.attr('value', '') });
+      this.emit('aihio-tab-select', { value: this.attr('value', '') });
     };
 
     this._onKeyDown = (e) => {

@@ -22,8 +22,8 @@
     "toggle()": { "description": "Toggles the dropdown" }
   },
   "events": {
-    "open": { "description": "Fired when the dropdown opens" },
-    "close": { "description": "Fired when the dropdown closes" }
+    "aihio-open": { "description": "Fired when the dropdown opens" },
+    "aihio-close": { "description": "Fired when the dropdown closes" }
   },
   "slots": {
     "trigger": { "description": "The element that opens the dropdown. Must be focusable." },
@@ -71,7 +71,7 @@
         "disabled": { "type": "boolean", "default": false }
       },
       "events": {
-        "select": {
+        "aihio-select": {
           "description": "Fired when the item is selected",
           "detail": { "value": "string" }
         }

@@ -85,7 +85,12 @@ export class AihioElement extends AihioHTMLElement {
     this.setAttribute(attr, String(value));
   }
 
-  /** Emit a custom event */
+  /**
+   * Emit a custom event. Every name must carry the `aihio-` prefix: these
+   * events bubble and are composed, so an unprefixed `close` or `toggle` would
+   * be indistinguishable from the native event of the same name by the time it
+   * reaches a listener further up the tree.
+   */
   emit(name, detail) {
     this.dispatchEvent(
       new CustomEvent(name, { detail, bubbles: true, composed: true })

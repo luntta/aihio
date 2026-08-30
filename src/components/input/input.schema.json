@@ -60,8 +60,14 @@
     }
   },
   "events": {
-    "change": {
-      "description": "Fired on input, detail contains { value }",
+    "aihio-input": {
+      "description": "Fired on every keystroke, after the host value attribute is mirrored",
+      "detail": {
+        "value": "string"
+      }
+    },
+    "aihio-change": {
+      "description": "Fired when the value is committed (blur or Enter)",
       "detail": {
         "value": "string"
       }

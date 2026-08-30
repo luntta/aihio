@@ -139,10 +139,23 @@ const components = schema.components
         name: slot,
         ...definition,
       })),
-      eventEntries: Object.entries(component.events ?? {}).map(([event, definition]) => ({
-        name: event,
-        ...definition,
-      })),
+      eventEntries: [
+        ...Object.entries(component.events ?? {}).map(([event, definition]) => ({
+          name: event,
+          source: tag,
+          ...definition,
+        })),
+        // Sub-components like aihio-dropdown-item and aihio-tab dispatch their
+        // own events but have no page of their own, so their events would go
+        // undocumented if they were not folded into the parent's list.
+        ...(component.related ?? []).flatMap((related) =>
+          Object.entries(related.events ?? {}).map(([event, definition]) => ({
+            name: event,
+            source: related.$component,
+            ...definition,
+          }))
+        ),
+      ],
       relatedEntries: (component.related ?? []).map((related) => ({
         tag: related.$component,
         slug: tagToSlug(related.$component),

@@ -169,7 +169,7 @@ export class AihioDropdown extends AihioElement {
     }
 
     this.setAttribute('open', '');
-    this.emit('open');
+    this.emit('aihio-open');
 
     if (focus) {
       requestAnimationFrame(() => this._focusItem(focus));
@@ -179,7 +179,7 @@ export class AihioDropdown extends AihioElement {
   close({ restoreFocus = false } = {}) {
     if (!this.hasAttribute('open')) return;
     this.removeAttribute('open');
-    this.emit('close');
+    this.emit('aihio-close');
 
     if (restoreFocus) {
       this._getTrigger()?.focus();
@@ -276,7 +276,7 @@ export class AihioDropdownItem extends AihioElement {
 
     this._onClick = () => {
       if (this.hasAttribute('disabled')) return;
-      this.emit('select', { value: this.attr('value', this.textContent.trim()) });
+      this.emit('aihio-select', { value: this.attr('value', this.textContent.trim()) });
       this.closest('aihio-dropdown')?.close({ restoreFocus: true });
     };
 

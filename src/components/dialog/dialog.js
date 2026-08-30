@@ -175,14 +175,14 @@ export class AihioDialog extends AihioElement {
   open() {
     if (this.hasAttribute('open')) return;
     this.setAttribute('open', '');
-    this.emit('open');
+    this.emit('aihio-open');
   }
 
   close({ restoreFocus = true } = {}) {
     if (!this.hasAttribute('open')) return;
     this._restoreFocusOnClose = restoreFocus;
     this.removeAttribute('open');
-    this.emit('close');
+    this.emit('aihio-close');
   }
 
   _onOpen() {

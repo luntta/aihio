@@ -483,3 +483,32 @@ test('components that convey state through colour handle forced colours', () => 
     'shadow DOM components (dialog, dropdown) carry forced-colors handling'
   );
 });
+
+test('every custom event is namespaced and declared in the schema', () => {
+  const schema = JSON.parse(readFileSync(resolve(root, 'dist/schema.json'), 'utf8'));
+
+  const declared = new Set();
+  const walk = (entry) => {
+    for (const name of Object.keys(entry.events ?? {})) declared.add(name);
+    for (const related of entry.related ?? []) walk(related);
+  };
+  for (const component of schema.components) walk(component);
+
+  // `click` is the native event, documented on aihio-button rather than
+  // dispatched by it; everything the components emit themselves is prefixed so
+  // it cannot be confused with a native close/toggle/select/input further up
+  // the tree, where these bubbling composed events all land.
+  for (const name of declared) {
+    if (name === 'click') continue;
+    assert.match(name, /^aihio-/, `declared event ${name} is namespaced`);
+  }
+
+  const sources = readFileSync(resolve(root, 'dist/components.js'), 'utf8');
+  const emitted = [...sources.matchAll(/emit\("([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(emitted.length >= 7, 'the built bundle still carries emit call sites');
+
+  for (const name of emitted) {
+    assert.match(name, /^aihio-/, `emitted event ${name} is namespaced`);
+    assert.ok(declared.has(name), `emitted event ${name} is declared in a schema`);
+  }
+});

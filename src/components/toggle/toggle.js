@@ -105,7 +105,7 @@ export class AihioToggle extends AihioElement {
       } else {
         this.setAttribute('pressed', '');
       }
-      this.emit('toggle', { pressed: !pressed });
+      this.emit('aihio-toggle', { pressed: !pressed });
     };
 
     this._onKeyDown = (e) => {

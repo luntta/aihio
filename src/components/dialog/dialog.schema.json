@@ -15,8 +15,8 @@
     "close()": { "description": "Closes the dialog" }
   },
   "events": {
-    "open": { "description": "Fired when the dialog opens" },
-    "close": { "description": "Fired when the dialog closes" }
+    "aihio-open": { "description": "Fired when the dialog opens" },
+    "aihio-close": { "description": "Fired when the dialog closes" }
   },
   "composition": {
     "allowedChildren": [

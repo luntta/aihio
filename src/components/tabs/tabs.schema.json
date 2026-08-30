@@ -54,6 +54,12 @@
           "default": false,
           "description": "Disables the tab and removes it from keyboard navigation."
         }
+      },
+      "events": {
+        "aihio-tab-select": {
+          "description": "Fired when the tab is activated; aihio-tabs listens for this to drive selection",
+          "detail": { "value": "string" }
+        }
       }
     },
     {

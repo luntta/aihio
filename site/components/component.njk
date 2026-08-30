@@ -135,7 +135,12 @@ eleventyComputed:
           {% if component.eventEntries.length %}
             <ul class="docs-list">
               {% for event in component.eventEntries %}
-                <li><code>{{ event.name }}</code></li>
+                <li>
+                  <code>{{ event.name }}</code>
+                  {% if event.source != component.tag %}
+                    <span class="docs-muted">on <code>{{ event.source }}</code></span>
+                  {% endif %}
+                </li>
               {% endfor %}
             </ul>
           {% else %}

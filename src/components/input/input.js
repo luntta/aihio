@@ -126,11 +126,11 @@ export class AihioInput extends AihioElement {
       if (this.getAttribute('value') !== this._input.value) {
         this.setAttribute('value', this._input.value);
       }
-      this.emit('input', { value: this._input.value });
+      this.emit('aihio-input', { value: this._input.value });
     };
 
     this._onChange = () => {
-      this.emit('change', { value: this._input.value });
+      this.emit('aihio-change', { value: this._input.value });
     };
 
     this._input.addEventListener('input', this._onInput);

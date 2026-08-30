@@ -31,8 +31,8 @@
     "default": { "description": "Toggle label content" }
   },
   "events": {
-    "toggle": {
-      "description": "Fired when pressed state changes",
+    "aihio-toggle": {
+      "description": "Fired when the pressed state changes",
       "detail": { "pressed": "boolean" }
     }
   },

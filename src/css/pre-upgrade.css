@@ -1,0 +1,23 @@
+/* Guards for the window before a custom element upgrades.
+
+   Server-rendered markup is live HTML long before the module that defines
+   these elements has run. Light DOM components are fine: their rules are in
+   components.css and apply immediately, which is why aihio-tab-panel is
+   already hidden by its own `display: none` default. Shadow DOM components
+   are not — they are excluded from that stylesheet, so until they upgrade
+   their children are unstyled visible markup: a dialog body printed inline in
+   the page, a menu spilling its items under the trigger.
+
+   These rules stop matching the moment the element is defined. If the module
+   never loads at all the content stays hidden, which is the right answer for
+   both: neither a modal nor a menu is usable without its behaviour. */
+
+aihio-dialog:not(:defined) {
+  display: none;
+}
+
+/* The trigger is an ordinary button and should hold its space; only the menu
+   content it labels needs hiding. */
+aihio-dropdown:not(:defined) > :not([slot='trigger']) {
+  display: none;
+}

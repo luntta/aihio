@@ -1,6 +1,7 @@
 @import './tokens.css';
 @import './reset.css';
 @import './components.css';
+@import './pre-upgrade.css';
 
 body {
   font-family: var(--fontFamily-intent-body);

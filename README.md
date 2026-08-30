@@ -172,6 +172,69 @@ hand-written CSS:
 `aihio-cluster` is sized to its content, so add `grow` when you need `justify`
 to distribute across a row inside a flex parent such as a card footer.
 
+## Events
+
+Every event a component dispatches carries an `aihio-` prefix:
+
+| Event | Dispatched by | `detail` |
+| --- | --- | --- |
+| `aihio-input` | `aihio-input` | `{ value }` |
+| `aihio-change` | `aihio-input` | `{ value }` |
+| `aihio-toggle` | `aihio-toggle` | `{ pressed }` |
+| `aihio-open`, `aihio-close` | `aihio-dialog`, `aihio-dropdown` | — |
+| `aihio-select` | `aihio-dropdown-item` | `{ value }` |
+| `aihio-tab-select` | `aihio-tab` | `{ value }` |
+
+They all bubble and are composed, which is exactly why the prefix matters: an
+unprefixed `close`, `toggle`, `select`, or `input` reaching a listener higher up
+the tree would be indistinguishable from the native event of the same name.
+
+`aihio-input` deliberately leaves the native events alone rather than
+re-dispatching them. Its inner `<input>` is real light DOM, so native `input`
+and `change` bubble through the host on their own, with `event.target.value`
+carrying the value. Listen to the native pair for `v-model`-style bindings, or
+to the prefixed pair when you want `detail`.
+
+## Frameworks
+
+Components are light DOM unless they need a shadow root (only `aihio-dialog`,
+`aihio-dropdown`, and `aihio-tabs` do), every attribute is a string or boolean,
+and nothing takes an object or array prop. That is the shape that survives a
+virtual DOM without a wrapper layer.
+
+**Vue** needs the tags marked as custom elements, or it will try to resolve them
+as Vue components and warn on every one:
+
+```js
+// vite.config.js
+vue({
+  template: {
+    compilerOptions: { isCustomElement: (tag) => tag.startsWith('aihio-') },
+  },
+})
+```
+
+After that `v-model` binds on `aihio-input` — the host has a `value` accessor,
+so Vue sets the property — and `@aihio-tab-select` receives the custom events.
+
+**Svelte** needs no configuration. `on:aihio-select` binds directly, including
+the hyphenated names.
+
+**React** is not documented here yet. React 19 added property-setting for custom
+elements, which covers the attribute side; the event side has not been verified
+against this library.
+
+### Server rendering
+
+Custom elements do not upgrade on the server, so SSR'd markup is live HTML
+before the defining module has run. Light DOM components are styled by
+`aihio.css` from the first paint and simply lack behaviour until hydration.
+The shadow components would instead print their children inline — a dialog body
+in the middle of the page, a menu spilled under its trigger — so `aihio.css`
+holds them back until they are defined (`src/css/pre-upgrade.css`). Nothing is
+required of the consumer, but note that if the module never loads, a dialog and
+a dropdown menu stay hidden rather than appearing without behaviour.
+
 ## Tokens
 
 Design tokens follow the [W3C Design Token Community Group](https://tr.designtokens.org/format/) format, defined in JSON and compiled to CSS custom properties. Colors use Oklch for perceptual uniformity.
