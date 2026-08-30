@@ -72,6 +72,22 @@ const fixtures = [
       { ruleId: 'a11y-contract', component: 'aihio-tabs' },
     ],
   },
+  {
+    // A typo in the annotation. Nothing reads the attribute at runtime, so
+    // this is invisible without the rule.
+    file: 'intent-unknown.html',
+    expectedIssues: [
+      { ruleId: 'unknown-intent', component: 'aihio-button' },
+    ],
+  },
+  {
+    // A real intent on a component that does not offer it: aihio-badge is
+    // status/labeling/metadata, and nothing about it acts.
+    file: 'intent-mismatch.html',
+    expectedIssues: [
+      { ruleId: 'intent-mismatch', component: 'aihio-badge' },
+    ],
+  },
 ];
 
 test('known-bad markup fixtures are caught by the built linter', async () => {

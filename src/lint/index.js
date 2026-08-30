@@ -4,6 +4,8 @@ const schemaByTag = new Map(
   runtimeSchema.components.map((component) => [component.$component, component])
 );
 
+const intentVocabulary = new Set(runtimeSchema.intents ?? []);
+
 const knownTags = new Set(schemaByTag.keys());
 for (const component of runtimeSchema.components) {
   for (const related of component.related ?? []) {
@@ -120,6 +122,13 @@ export function lintMarkup(markup, options = {}) {
     }
 
     const schema = schemaByTag.get(node.tagName);
+
+    // Sub-components such as aihio-tab and aihio-dropdown-item have no schema
+    // entry of their own, so they fall through the check below. An intent
+    // annotation on one is still worth checking against the vocabulary, which
+    // is why this runs first.
+    issues.push(...collectIntentIssues(node, schema, context));
+
     if (!schema) continue;
 
     issues.push(...collectEnumIssues(node, schema, context));
@@ -299,6 +308,48 @@ function collectA11yIssues(node, schema, context) {
         message: requirement.requirement,
       })
     );
+  }
+
+  return issues;
+}
+
+/*
+ * data-aihio-intent states what role an element is playing, and the schema is
+ * what decides whether it can play it. The build enforces this over the seeded
+ * pattern library; this is the same pair of rules applied to author markup, so
+ * an annotation cannot quietly claim something the component never offered.
+ */
+function collectIntentIssues(node, schema, context) {
+  const issues = [];
+  const annotation = getAttribute(node, 'data-aihio-intent');
+
+  if (annotation === null) return issues;
+
+  for (const intent of String(annotation).split(/\s+/).filter(Boolean)) {
+    if (!intentVocabulary.has(intent)) {
+      issues.push(
+        createIssue({
+          ruleId: 'unknown-intent',
+          severity: 'error',
+          node,
+          context,
+          message: `data-aihio-intent "${intent}" is not one of the ${intentVocabulary.size} intents in the vocabulary.`,
+        })
+      );
+      continue;
+    }
+
+    if (schema && !(schema.intents ?? []).includes(intent)) {
+      issues.push(
+        createIssue({
+          ruleId: 'intent-mismatch',
+          severity: 'error',
+          node,
+          context,
+          message: `<${node.tagName}> is annotated data-aihio-intent="${intent}", but its schema declares ${(schema.intents ?? []).join(', ')}.`,
+        })
+      );
+    }
   }
 
   return issues;

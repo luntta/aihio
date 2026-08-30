@@ -15,7 +15,9 @@ export interface AihioLintIssue {
     | 'missing-required-child'
     | 'invalid-child'
     | 'forbidden-descendant'
-    | 'a11y-contract';
+    | 'a11y-contract'
+    | 'unknown-intent'
+    | 'intent-mismatch';
   severity: 'error' | 'warn';
   component: string | null;
   message: string;

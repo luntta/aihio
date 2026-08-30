@@ -82,6 +82,18 @@ aihio-lint ./example.html
 cat ./example.html | aihio-lint -
 ```
 
+Alongside the composition and `a11yContract` rules, the linter checks
+`data-aihio-intent` annotations against the schema: `unknown-intent` for a name
+outside the vocabulary, and `intent-mismatch` for a real intent on a component
+that does not declare it. Annotating is optional, but an annotation that is
+present has to be true.
+
+```bash
+$ aihio-lint badge.html
+<aihio-badge> is annotated data-aihio-intent="primary-action",
+but its schema declares status, labeling, metadata.
+```
+
 For MCP clients that launch local stdio servers, the package also ships `aihio-mcp` with two tools: `describe` and `lint`.
 
 ```json
