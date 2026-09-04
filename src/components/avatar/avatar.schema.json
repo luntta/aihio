@@ -2,7 +2,10 @@
   "$component": "aihio-avatar",
   "version": "1.0.0",
   "description": "An avatar component that shows an image or text fallback.",
-  "intents": ["identity", "labeling"],
+  "intents": [
+    "identity",
+    "labeling"
+  ],
   "attributes": {
     "src": {
       "type": "string",
@@ -18,7 +21,11 @@
     },
     "size": {
       "type": "enum",
-      "values": ["sm", "md", "lg"],
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
       "default": "md",
       "description": "Avatar size"
     }
@@ -35,12 +42,14 @@
       {
         "when": "src is set",
         "requirement": "Provide alt describing the person or entity (e.g. alt=\"Jane Doe\"). Empty alt is only acceptable for purely decorative avatars.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "avatar-alt"
       },
       {
         "when": "src is not set and fallback is empty",
         "requirement": "Provide alt so initials can be derived, or set fallback explicitly.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "avatar-fallback"
       }
     ]
   },

@@ -2,6 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioAlert extends AihioElement {
   static tag = 'aihio-alert';
+  static schemaVersion = '1.1.0';
   static observedAttributes = ['variant'];
   static styles = `
     aihio-alert {

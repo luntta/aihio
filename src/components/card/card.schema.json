@@ -2,11 +2,17 @@
   "$component": "aihio-card",
   "version": "1.0.0",
   "description": "A container component for grouping related content.",
-  "intents": ["container", "surface"],
+  "intents": [
+    "container",
+    "surface"
+  ],
   "attributes": {
     "variant": {
       "type": "enum",
-      "values": ["default", "outline"],
+      "values": [
+        "default",
+        "outline"
+      ],
       "default": "default",
       "description": "Visual style variant. Outline removes the shadow."
     }
@@ -47,11 +53,26 @@
     }
   ],
   "related": [
-    { "$component": "aihio-card-header", "description": "Card header container" },
-    { "$component": "aihio-card-title", "description": "Card title text" },
-    { "$component": "aihio-card-description", "description": "Card description text" },
-    { "$component": "aihio-card-content", "description": "Card main content area" },
-    { "$component": "aihio-card-footer", "description": "Card footer with actions" }
+    {
+      "$component": "aihio-card-header",
+      "description": "Card header container"
+    },
+    {
+      "$component": "aihio-card-title",
+      "description": "Card title text"
+    },
+    {
+      "$component": "aihio-card-description",
+      "description": "Card description text"
+    },
+    {
+      "$component": "aihio-card-content",
+      "description": "Card main content area"
+    },
+    {
+      "$component": "aihio-card-footer",
+      "description": "Card footer with actions"
+    }
   ],
   "examples": [
     "<aihio-card>\n  <aihio-card-header>\n    <aihio-card-title>Card Title</aihio-card-title>\n    <aihio-card-description>Card description.</aihio-card-description>\n  </aihio-card-header>\n  <aihio-card-content>\n    <p>Card content here.</p>\n  </aihio-card-content>\n  <aihio-card-footer>\n    <aihio-button>Action</aihio-button>\n  </aihio-card-footer>\n</aihio-card>"

@@ -113,7 +113,10 @@
         "detail": {
           "type": "object",
           "additionalProperties": { "type": "string" }
-        }
+        },
+        "cancelable": { "type": "boolean" },
+        "bubbles": { "type": "boolean" },
+        "composed": { "type": "boolean" }
       }
     },
     "method": {
@@ -121,7 +124,22 @@
       "required": ["description"],
       "additionalProperties": false,
       "properties": {
-        "description": { "type": "string", "minLength": 1 }
+        "description": { "type": "string", "minLength": 1 },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter" }
+        },
+        "returns": { "type": "string", "minLength": 1 }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$" },
+        "type": { "type": "string", "minLength": 1 },
+        "optional": { "type": "boolean" }
       }
     },
     "property": {
@@ -130,7 +148,8 @@
       "additionalProperties": false,
       "properties": {
         "type": { "type": "string" },
-        "description": { "type": "string", "minLength": 1 }
+        "description": { "type": "string", "minLength": 1 },
+        "readonly": { "type": "boolean" }
       }
     },
     "composition": {
@@ -171,7 +190,12 @@
       "properties": {
         "when": { "type": "string", "minLength": 1 },
         "requirement": { "type": "string", "minLength": 1 },
-        "severity": { "type": "string", "enum": ["error", "warn"] }
+        "severity": { "type": "string", "enum": ["error", "warn"] },
+        "rule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable evaluator id when this obligation is machine-checkable. Error-level obligations must provide one."
+        }
       }
     },
     "counterExample": {

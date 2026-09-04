@@ -6,6 +6,7 @@ const CONTROL_SELECTOR = 'aihio-input, input, select, textarea';
 
 export class AihioField extends AihioElement {
   static tag = 'aihio-field';
+  static schemaVersion = '1.1.0';
   static observedAttributes = ['error'];
   static styles = `
     aihio-field {
@@ -42,15 +43,49 @@ export class AihioField extends AihioElement {
 
   setup() {
     this._fieldId = ++fieldInstanceId;
+    this._observer = new MutationObserver(() => this.refresh());
+    this._onClick = (event) => {
+      const label = event.target?.closest?.('[slot="label"]');
+      if (!label || label.closest('aihio-field') !== this) return;
+      if (event.target?.closest?.('a, button, input, select, textarea, [role="button"]')) return;
+      this._getControl()?.focus?.({ preventScroll: true });
+    };
+    this.addEventListener('click', this._onClick);
+  }
+
+  connect() {
+    this._observer?.observe(this, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['slot', 'id'],
+    });
+  }
+
+  disconnect() {
+    this._observer?.disconnect();
+  }
+
+  _getControl() {
+    return [...this.querySelectorAll(CONTROL_SELECTOR)].find(
+      (control) => control.closest('aihio-field') === this
+    ) ?? null;
+  }
+
+  _getOwnedSlot(name) {
+    return [...this.querySelectorAll(`[slot="${name}"]`)].find(
+      (element) => element.closest('aihio-field') === this
+    ) ?? null;
   }
 
   sync() {
-    const control = this.querySelector(CONTROL_SELECTOR);
+    const control = this._getControl();
     if (!control) return;
 
-    const label = this.querySelector('[slot="label"]');
-    const description = this.querySelector('[slot="description"]');
-    const error = this.querySelector('[slot="error"]');
+    const label = this._getOwnedSlot('label');
+    const description = this._getOwnedSlot('description');
+    const error = this._getOwnedSlot('error');
 
     // An error slot with content is what puts the field in its error state, so
     // authors write the message and nothing else.
@@ -77,10 +112,12 @@ export class AihioField extends AihioElement {
 
     if (!label.id) label.id = `aihio-field-${this._fieldId}-label`;
 
-    // A real <label> also gives click-to-focus, so wire `for` when we can and
-    // fall back to aria-labelledby for any other element.
+    // Point a native label at the actual labelable control. A custom-element
+    // host is not labelable merely because it contains an input.
     if (label.tagName === 'LABEL') {
-      label.setAttribute('for', control.id);
+      const labelTarget = control.control ?? control.querySelector?.('input') ?? control;
+      if (!labelTarget.id) labelTarget.id = `${control.id}-native`;
+      label.setAttribute('for', labelTarget.id);
     }
 
     control.setAttribute('aria-labelledby', label.id);

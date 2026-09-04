@@ -4,6 +4,7 @@ let tabsInstanceId = 0;
 
 export class AihioTabs extends AihioElement {
   static tag = 'aihio-tabs';
+  static schemaVersion = '1.1.0';
   static shadow = true;
   static observedAttributes = ['value'];
   static styles = `
@@ -22,7 +23,7 @@ export class AihioTabs extends AihioElement {
     this._slot.addEventListener('slotchange', this._onSlotChange);
 
     this._onTabSelect = (e) => {
-      if (e.target === this) return;
+      if (e.target?.closest?.('aihio-tabs') !== this) return;
       const nextValue = e.detail?.value ?? '';
       if (nextValue !== this.getAttribute('value')) {
         this.setAttribute('value', nextValue);
@@ -39,7 +40,10 @@ export class AihioTabs extends AihioElement {
       }
     });
 
-    this._observer.observe(this, {
+  }
+
+  connect() {
+    this._observer?.observe(this, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -47,15 +51,13 @@ export class AihioTabs extends AihioElement {
     });
   }
 
-  teardown() {
-    this.removeEventListener('tab-select', this._onTabSelect);
-    this._slot?.removeEventListener('slotchange', this._onSlotChange);
+  disconnect() {
     this._observer?.disconnect();
   }
 
   sync() {
-    const tabs = [...this.querySelectorAll('aihio-tab')];
-    const panels = [...this.querySelectorAll('aihio-tab-panel')];
+    const tabs = this._owned('aihio-tab');
+    const panels = this._owned('aihio-tab-panel');
     if (tabs.length === 0) return;
 
     const enabledTabs = tabs.filter((tab) => !tab.hasAttribute('disabled'));
@@ -96,6 +98,12 @@ export class AihioTabs extends AihioElement {
       else panel.removeAttribute('aria-labelledby');
     });
   }
+
+  _owned(selector) {
+    return [...this.querySelectorAll(selector)].filter(
+      (element) => element.closest('aihio-tabs') === this
+    );
+  }
 }
 
 export class AihioTabList extends AihioElement {
@@ -119,7 +127,9 @@ export class AihioTabList extends AihioElement {
 
   setup() {
     this._onKeyDown = (e) => {
-      const tabs = [...this.querySelectorAll('aihio-tab:not([disabled])')];
+      const tabs = [...this.querySelectorAll('aihio-tab:not([disabled])')].filter(
+        (tab) => tab.closest('aihio-tab-list') === this
+      );
       if (tabs.length === 0) return;
 
       const current = tabs.findIndex((tab) => tab.hasAttribute('active'));
@@ -137,10 +147,6 @@ export class AihioTabList extends AihioElement {
     };
 
     this.addEventListener('keydown', this._onKeyDown);
-  }
-
-  teardown() {
-    this.removeEventListener('keydown', this._onKeyDown);
   }
 
   sync() {
@@ -229,11 +235,6 @@ export class AihioTab extends AihioElement {
 
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
-  }
-
-  teardown() {
-    this.removeEventListener('click', this._onClick);
-    this.removeEventListener('keydown', this._onKeyDown);
   }
 
   sync() {

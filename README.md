@@ -1,6 +1,6 @@
 # Aihio
 
-AI-first design system built on native web components. Zero dependencies.
+AI-first design system built on native web components. Zero runtime dependencies.
 
 Aihio is designed for AI agents to generate markup predictably — every component has a machine-readable schema, predictable attributes, flat composition, and an intent-token layer that maps prompt meaning onto concrete UI decisions. Visually it follows a clean, minimal aesthetic with an extensive Oklch-based token system and light/dark mode support.
 
@@ -22,6 +22,7 @@ npm install aihio
 Or import as a module:
 
 ```js
+import 'aihio/css';
 import 'aihio';
 ```
 
@@ -41,13 +42,29 @@ The warnings are a separate module that the production bundle never imports, so
 import { AihioButton, AihioDialog } from 'aihio/components';
 ```
 
+Each component also has a focused, tree-shakeable entrypoint. These entrypoints
+export classes but do not register them for you:
+
+```js
+import 'aihio/css';
+import { AihioButton } from 'aihio/button';
+
+if (!customElements.get(AihioButton.tag)) {
+  customElements.define(AihioButton.tag, AihioButton);
+}
+```
+
+The same form is available for all 13 top-level components. Import
+`aihio/runtime` when schema inspection is needed without importing component
+implementations.
+
 The root bundle also exposes `Aihio.describe()` for runtime introspection:
 
 ```js
 import { Aihio } from 'aihio';
 
 const buttonSchema = Aihio.describe('aihio-button');
-// { $component: 'aihio-button', version: '1.0.0', ... }
+// { $component: 'aihio-button', version: '1.3.0', ... }
 ```
 
 Schema-derived TypeScript declarations ship in `dist/aihio.d.ts`, including intent and variant unions plus JSX element typings:
@@ -170,9 +187,18 @@ other:
   `<fieldset disabled>`, natively and in both directions.
 - `name` on `aihio-input` is what puts the value in `FormData`. Without it the
   field submits nothing, and both the linter and the dev build say so.
+- Like a native input, the host's `value` **attribute** is the reset/default
+  value and its `value` **property** is live state. Typing never writes the live
+  value back into HTML, so serializing the element does not leak passwords or
+  other user-entered data. Set `defaultValue` when you intend to change both
+  the reset value and the `value` attribute.
+- Native validation is exposed through `validity`, `validationMessage`,
+  `willValidate`, `checkValidity()`, `reportValidity()`, and
+  `setCustomValidity()`; the delegated control is available as `control`.
 - `aihio-field` generates the ids and wires `aria-labelledby` and
   `aria-describedby`, pointing the description at the error message while the
-  field is erroring.
+  field is erroring. Clicking either a native `<label>` or other
+  `slot="label"` content focuses the delegated input.
 
 ## Layout
 
@@ -198,12 +224,16 @@ Every event a component dispatches carries an `aihio-` prefix:
 | `aihio-change` | `aihio-input` | `{ value }` |
 | `aihio-toggle` | `aihio-toggle` | `{ pressed }` |
 | `aihio-open`, `aihio-close` | `aihio-dialog`, `aihio-dropdown` | — |
+| `aihio-before-close` | `aihio-dialog`, `aihio-dropdown` | `{ reason }` |
 | `aihio-select` | `aihio-dropdown-item` | `{ value }` |
 | `aihio-tab-select` | `aihio-tab` | `{ value }` |
 
 They all bubble and are composed, which is exactly why the prefix matters: an
 unprefixed `close`, `toggle`, `select`, or `input` reaching a listener higher up
 the tree would be indistinguishable from the native event of the same name.
+
+`aihio-before-close` is cancelable. Call `preventDefault()` to keep an overlay
+open while, for example, an unsaved-changes confirmation is shown.
 
 `aihio-input` deliberately leaves the native events alone rather than
 re-dispatching them. Its inner `<input>` is real light DOM, so native `input`
@@ -218,8 +248,12 @@ Components are light DOM unless they need a shadow root (only `aihio-dialog`,
 and nothing takes an object or array prop. That is the shape that survives a
 virtual DOM without a wrapper layer.
 
-**Vue** needs the tags marked as custom elements, or it will try to resolve them
-as Vue components and warn on every one:
+React 19, Vue 3, and Svelte 5 are exercised in the browser test suite. Each can
+set the `value` property and receive the native bubbling `input` event without
+a wrapper component.
+
+**Vue** templates need the tags marked as custom elements, or Vue will try to
+resolve them as Vue components and warn on every one:
 
 ```js
 // vite.config.js
@@ -230,15 +264,15 @@ vue({
 })
 ```
 
-After that `v-model` binds on `aihio-input` — the host has a `value` accessor,
-so Vue sets the property — and `@aihio-tab-select` receives the custom events.
+After that, bind `:value` and update your model from `@input`; custom events such
+as `@aihio-tab-select` are available directly.
 
-**Svelte** needs no configuration. `on:aihio-select` binds directly, including
-the hyphenated names.
+**Svelte** needs no configuration. Use `value={value}` with `oninput`; Svelte's
+`bind:value` directive is restricted to native form controls. Hyphenated custom
+events can be attached directly.
 
-**React** is not documented here yet. React 19 added property-setting for custom
-elements, which covers the attribute side; the event side has not been verified
-against this library.
+**React 19** sets recognized custom-element properties directly. `value={value}`
+and `onInput={handler}` therefore work as expected.
 
 ### Wrapped native controls
 
@@ -253,10 +287,10 @@ children it is given are moved into the `<button>` when the element upgrades:
 <aihio-button><button type="button">Save</button></aihio-button>
 ```
 
-Static and server-rendered markup is unaffected, and so is a framework that
-updates the label in place. A framework that inserts children *after* mount is
-not: they land on the host, outside the control. Give it a subtree of its own
-when the content is dynamic, and the framework never sees a node move:
+Static and server-rendered markup is unaffected. Aihio also watches direct child
+updates and re-adopts new label nodes into the delegated control; this behavior
+is covered by the React, Vue, and Svelte browser harnesses. When a framework
+should own the complete control subtree, author the native button explicitly:
 
 ```jsx
 <aihio-button><button type="submit">{label}{spinner}</button></aihio-button>
@@ -275,6 +309,27 @@ in the middle of the page, a menu spilled under its trigger — so `aihio.css`
 holds them back until they are defined (`src/css/pre-upgrade.css`). Nothing is
 required of the consumer, but note that if the module never loads, a dialog and
 a dropdown menu stay hidden rather than appearing without behaviour.
+
+### Native overlays
+
+`aihio-dialog` delegates modality to `<dialog>.showModal()`, including the
+browser's inert outside document and top-layer backdrop. `aihio-dropdown` uses
+a manual Popover API surface when available, with a fallback for older engines,
+so Escape and outside-click close requests can still be canceled. Menus are
+positioned against the trigger, flip above it when needed, and clamp to the
+viewport. A shared scroll lock keeps the page locked until the final stacked
+dialog closes.
+
+## Verification
+
+```bash
+npm test                 # unit, schema, linter, and browser fixture tests
+npm run typecheck        # generated declarations + JSX contract
+npm run test:browsers    # Chromium, Firefox, WebKit + React/Vue/Svelte harnesses
+```
+
+CI installs all three Playwright engines and runs the complete `npm run check`
+pipeline, including documentation and automated accessibility checks.
 
 ## Tokens
 

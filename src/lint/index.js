@@ -1,4 +1,6 @@
 import { runtimeSchema } from '../schema/runtime.js';
+import { collectA11yRuleViolations } from '../schema/a11y-rules.js';
+import { parseFragment } from 'parse5';
 
 const schemaByTag = new Map(
   runtimeSchema.components.map((component) => [component.$component, component])
@@ -13,85 +15,6 @@ for (const component of runtimeSchema.components) {
   }
 }
 
-const VOID_ELEMENTS = new Set([
-  'area',
-  'base',
-  'br',
-  'col',
-  'embed',
-  'hr',
-  'img',
-  'input',
-  'link',
-  'meta',
-  'param',
-  'source',
-  'track',
-  'wbr',
-]);
-
-const BUTTON_SUBMITS_FORM = 'the button submits a form';
-const INPUT_NEEDS_NAME =
-  'the field is inside a <form> and its value should be submitted';
-
-function isFormActionButton(node) {
-  const type = getAttribute(node, 'type');
-  return type === 'submit' || type === 'reset';
-}
-
-const a11yRequirementCheckers = {
-  'aihio-alert': {
-    'variant="destructive"': (node) =>
-      getAttribute(node, 'variant') === 'destructive' &&
-      !hasNamedSlotContent(node, 'title') &&
-      !hasNamedSlotContent(node, 'description'),
-  },
-  'aihio-avatar': {
-    'src is set': (node) => hasNonEmptyAttribute(node, 'src') && !hasAttribute(node, 'alt'),
-    'src is not set and fallback is empty': (node) =>
-      !hasNonEmptyAttribute(node, 'src') &&
-      normalizeText(getAttribute(node, 'fallback')).length === 0 &&
-      normalizeText(getAttribute(node, 'alt')).length === 0,
-  },
-  'aihio-button': {
-    'size="icon" or the button has no visible text': (node, context) =>
-      requiresExplicitAccessibleName(node) && !hasAccessibleName(node, context),
-    [BUTTON_SUBMITS_FORM]: (node) => isFormActionButton(node) && !hasAncestor(node, 'form'),
-  },
-  'aihio-dialog': {
-    'dialog has no aihio-dialog-title': (node) =>
-      !findDescendants(node, (child) => child.tagName === 'aihio-dialog-title').length &&
-      !hasNonEmptyAttribute(node, 'aria-label'),
-  },
-  'aihio-dropdown': {
-    'the trigger is icon-only': (node, context) => {
-      const trigger = getDropdownTrigger(node);
-      return Boolean(trigger && requiresExplicitAccessibleName(trigger) && !hasAccessibleName(trigger, context));
-    },
-  },
-  'aihio-field': {
-    'the field has no slot="label" content': (node, context) => {
-      if (fieldHasLabel(node)) return false;
-      const control = findDescendants(node, (child) => child.tagName === 'aihio-input')[0];
-      return !control || !hasNonEmptyAttribute(control, 'aria-label');
-    },
-  },
-  'aihio-input': {
-    'input has no visible <label> associated by for/id': (node, context) => !hasAssociatedLabel(node, context),
-    'error=true': (node, context) =>
-      hasAttribute(node, 'error') && !referencesExistingIds(node, 'aria-describedby', context),
-    [INPUT_NEEDS_NAME]: (node) =>
-      hasAncestor(node, 'form') && !hasNonEmptyAttribute(node, 'name'),
-  },
-  'aihio-tabs': {
-    'every aihio-tab and aihio-tab-panel': (node) => !hasExactTabValuePairs(node),
-  },
-  'aihio-toggle': {
-    'toggle has no visible text (icon-only)': (node, context) =>
-      requiresExplicitAccessibleName(node) && !hasAccessibleName(node, context),
-  },
-};
-
 export function lintMarkup(markup, options = {}) {
   const source = options.source ?? '<inline>';
   const normalizedMarkup = String(markup ?? '');
@@ -99,8 +22,6 @@ export function lintMarkup(markup, options = {}) {
   const elements = [...walkElements(document)];
   const context = {
     source,
-    ids: indexIds(elements),
-    labelsByFor: indexLabelsByFor(elements),
     resolveLocation: createLocationResolver(normalizedMarkup),
   };
   const issues = [];
@@ -289,28 +210,15 @@ function collectCompositionIssues(node, schema, context) {
 }
 
 function collectA11yIssues(node, schema, context) {
-  const issues = [];
-  const checkers = a11yRequirementCheckers[schema.$component];
-
-  if (!checkers) return issues;
-
-  for (const requirement of schema.a11yContract?.required ?? []) {
-    const checker = checkers[requirement.when];
-    if (!checker) continue;
-    if (!checker(node, context, schema)) continue;
-
-    issues.push(
-      createIssue({
-        ruleId: 'a11y-contract',
-        severity: requirement.severity,
-        node,
-        context,
-        message: requirement.requirement,
-      })
-    );
-  }
-
-  return issues;
+  return collectA11yRuleViolations(node, schema, astAdapter).map((requirement) =>
+    createIssue({
+      ruleId: 'a11y-contract',
+      severity: requirement.severity,
+      node,
+      context,
+      message: requirement.requirement,
+    })
+  );
 }
 
 /*
@@ -369,94 +277,44 @@ function createIssue({ ruleId, severity, node, context, message }) {
 
 function parseMarkup(markup) {
   const root = { type: 'root', children: [], parent: null, start: 0, end: markup.length };
-  const stack = [root];
-  const pattern = /<!--[\s\S]*?-->|<\/?([A-Za-z][A-Za-z0-9:-]*)([^>]*)>/g;
-  let lastIndex = 0;
-
-  for (const match of markup.matchAll(pattern)) {
-    const raw = match[0];
-    const start = match.index ?? 0;
-
-    if (start > lastIndex) {
-      appendText(stack[stack.length - 1], markup.slice(lastIndex, start), lastIndex, start);
-    }
-
-    lastIndex = start + raw.length;
-
-    if (raw.startsWith('<!--')) {
-      continue;
-    }
-
-    const tagName = match[1].toLowerCase();
-    const attrSource = match[2] ?? '';
-
-    if (raw.startsWith('</')) {
-      closeElement(stack, tagName, lastIndex);
-      continue;
-    }
-
-    const node = {
-      type: 'element',
-      tagName,
-      attributes: parseAttributes(attrSource),
-      children: [],
-      parent: stack[stack.length - 1],
-      start,
-      end: lastIndex,
-    };
-
-    stack[stack.length - 1].children.push(node);
-
-    const selfClosing = raw.endsWith('/>') || VOID_ELEMENTS.has(tagName);
-    if (!selfClosing) {
-      stack.push(node);
-    }
-  }
-
-  if (lastIndex < markup.length) {
-    appendText(stack[stack.length - 1], markup.slice(lastIndex), lastIndex, markup.length);
-  }
-
-  while (stack.length > 1) {
-    stack.pop().end = markup.length;
-  }
-
+  const fragment = parseFragment(markup, { sourceCodeLocationInfo: true });
+  for (const child of fragment.childNodes ?? []) appendParsedNode(child, root, markup.length);
   return root;
 }
 
-function parseAttributes(source) {
-  const normalized = source.replace(/\/\s*$/, '');
-  const attributes = {};
-  const pattern = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+function appendParsedNode(parsed, parent, sourceLength) {
+  if (parsed.nodeName === '#comment') return;
+  const location = parsed.sourceCodeLocation;
 
-  for (const match of normalized.matchAll(pattern)) {
-    const name = match[1].toLowerCase();
-    const value = match[2] ?? match[3] ?? match[4] ?? '';
-    attributes[name] = value;
-  }
-
-  return attributes;
-}
-
-function appendText(parent, value, start, end) {
-  parent.children.push({
-    type: 'text',
-    value,
-    parent,
-    start,
-    end,
-  });
-}
-
-function closeElement(stack, tagName, end) {
-  for (let index = stack.length - 1; index > 0; index -= 1) {
-    const node = stack[index];
-    if (node.tagName !== tagName) continue;
-
-    stack.splice(index);
-    node.end = end;
+  if (parsed.nodeName === '#text') {
+    parent.children.push({
+      type: 'text',
+      value: parsed.value ?? '',
+      parent,
+      start: location?.startOffset ?? parent.start,
+      end: location?.endOffset ?? parent.end,
+    });
     return;
   }
+
+  if (!parsed.tagName) return;
+  const node = {
+    type: 'element',
+    tagName: parsed.tagName.toLowerCase(),
+    attributes: Object.fromEntries(
+      (parsed.attrs ?? []).map(({ name, value }) => [name.toLowerCase(), value])
+    ),
+    children: [],
+    parent,
+    start: location?.startOffset ?? 0,
+    end: location?.endOffset ?? sourceLength,
+  };
+  parent.children.push(node);
+
+  const childNodes = parsed.tagName === 'template'
+    ? parsed.content?.childNodes ?? []
+    : parsed.childNodes ?? [];
+  for (const child of childNodes) appendParsedNode(child, node, sourceLength);
 }
 
 function* walkElements(node) {
@@ -477,34 +335,6 @@ function findDescendants(node, predicate) {
   }
 
   return matches;
-}
-
-function indexIds(elements) {
-  const ids = new Map();
-
-  for (const element of elements) {
-    const id = getAttribute(element, 'id');
-    if (!id) continue;
-    ids.set(id, element);
-  }
-
-  return ids;
-}
-
-function indexLabelsByFor(elements) {
-  const labelsByFor = new Map();
-
-  for (const element of elements) {
-    if (element.tagName !== 'label') continue;
-    const target = getAttribute(element, 'for');
-    if (!target) continue;
-
-    const labels = labelsByFor.get(target) ?? [];
-    labels.push(element);
-    labelsByFor.set(target, labels);
-  }
-
-  return labelsByFor;
 }
 
 function createLocationResolver(markup) {
@@ -595,21 +425,6 @@ function getAncestor(node, tagName) {
   return null;
 }
 
-/**
- * aihio-field wires aria-labelledby onto its control at runtime, which static
- * markup cannot show. Recognise the authored shape instead, so a correctly
- * built field does not report the control as unlabelled.
- */
-function fieldProvidesLabel(node) {
-  const field = getAncestor(node, 'aihio-field');
-  if (!field) return false;
-
-  return findDescendants(
-    field,
-    (child) => getAttribute(child, 'slot') === 'label'
-  ).some((label) => normalizeText(getTextContent(label)).length > 0);
-}
-
 function getAttribute(node, name) {
   return Object.prototype.hasOwnProperty.call(node.attributes ?? {}, name)
     ? node.attributes[name]
@@ -618,11 +433,6 @@ function getAttribute(node, name) {
 
 function hasAttribute(node, name) {
   return Object.prototype.hasOwnProperty.call(node.attributes ?? {}, name);
-}
-
-function hasNonEmptyAttribute(node, name) {
-  const value = getAttribute(node, name);
-  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function getTextContent(node) {
@@ -638,102 +448,16 @@ function isAihioTag(tagName) {
   return typeof tagName === 'string' && tagName.startsWith('aihio-');
 }
 
-function referencesExistingIds(node, attrName, context) {
-  const raw = getAttribute(node, attrName);
-  if (!raw) return false;
-
-  return raw
-    .split(/\s+/)
-    .filter(Boolean)
-    .every((id) => context.ids.has(id));
-}
-
-function fieldHasLabel(node) {
-  return findDescendants(
-    node,
-    (child) => getAttribute(child, 'slot') === 'label'
-  ).some((label) => normalizeText(getTextContent(label)).length > 0);
-}
-
-function hasAssociatedLabel(node, context) {
-  if (hasAncestor(node, 'aihio-field')) return true;
-
-  if (hasNonEmptyAttribute(node, 'aria-label')) return true;
-  if (referencesExistingIds(node, 'aria-labelledby', context)) return true;
-  if (hasAncestor(node, 'label')) return true;
-
-  const id = getAttribute(node, 'id');
-  if (!id) return false;
-
-  return (context.labelsByFor.get(id) ?? []).length > 0;
-}
-
-function isIconSized(node) {
-  return getAttribute(node, 'size') === 'icon';
-}
-
-function hasAccessibleName(node, context) {
-  if (hasNonEmptyAttribute(node, 'aria-label')) return true;
-  if (referencesExistingIds(node, 'aria-labelledby', context)) return true;
-
-  // On an icon-sized control the text content is a glyph ("\u2715", "\u22ef"), which
-  // names the shape and not the action. Only an explicit label counts there —
-  // otherwise every icon button would look named and the rule would never fire.
-  if (isIconSized(node)) return false;
-
-  return normalizeText(getTextContent(node)).length > 0;
-}
-
-function requiresExplicitAccessibleName(node) {
-  return isIconSized(node) || normalizeText(getTextContent(node)).length === 0;
-}
-
-function hasNamedSlotContent(node, slotName) {
-  return (node.children ?? [])
-    .filter((child) => child.type === 'element' && getAttribute(child, 'slot') === slotName)
-    .some((child) => normalizeText(getTextContent(child)).length > 0 || (child.children ?? []).length > 0);
-}
-
-function getDropdownTrigger(node) {
-  return (node.children ?? []).find(
-    (child) => child.type === 'element' && getAttribute(child, 'slot') === 'trigger'
-  ) ?? null;
-}
-
-function hasExactTabValuePairs(node) {
-  const tabs = findDescendants(node, (child) => child.tagName === 'aihio-tab');
-  const panels = findDescendants(node, (child) => child.tagName === 'aihio-tab-panel');
-
-  if (tabs.length === 0 && panels.length === 0) return true;
-  if (tabs.length === 0 || panels.length === 0) return false;
-
-  const tabCounts = countAttributeValues(tabs, 'value');
-  const panelCounts = countAttributeValues(panels, 'value');
-
-  if (tabCounts.size !== panelCounts.size) {
-    return false;
-  }
-
-  for (const [value, count] of tabCounts) {
-    if (count !== 1 || panelCounts.get(value) !== 1) {
-      return false;
-    }
-  }
-
-  for (const count of panelCounts.values()) {
-    if (count !== 1) return false;
-  }
-
-  return true;
-}
-
-function countAttributeValues(nodes, attrName) {
-  const counts = new Map();
-
-  for (const node of nodes) {
-    const value = getAttribute(node, attrName) ?? '';
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-
-  return counts;
-}
+const astAdapter = {
+  tag: (node) => node?.type === 'element' ? node.tagName : null,
+  children: (node) => (node?.children ?? []).filter((child) => child.type === 'element'),
+  parent: (node) => node?.parent ?? null,
+  attr: getAttribute,
+  hasAttr: hasAttribute,
+  text: getTextContent,
+  root: (node) => {
+    let current = node;
+    while (current?.parent) current = current.parent;
+    return current;
+  },
+};

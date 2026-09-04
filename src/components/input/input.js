@@ -2,6 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioInput extends AihioElement {
   static tag = 'aihio-input';
+  static schemaVersion = '1.2.0';
   static observedAttributes = [
     'type',
     'size',
@@ -13,6 +14,21 @@ export class AihioInput extends AihioElement {
     'required',
     'readonly',
     'autocomplete',
+    'min',
+    'max',
+    'minlength',
+    'maxlength',
+    'pattern',
+    'step',
+    'inputmode',
+    'enterkeyhint',
+    'autocapitalize',
+    'spellcheck',
+    'multiple',
+    'accept',
+    'capture',
+    'list',
+    'form',
     'aria-label',
     'aria-labelledby',
     'aria-describedby',
@@ -107,25 +123,25 @@ export class AihioInput extends AihioElement {
     this._input = this.querySelector('input') ?? document.createElement('input');
     this._form = null;
 
-    // The host `value` attribute tracks the live value (it is mirrored back on
-    // every keystroke), so it cannot also serve as the reset target. Capture
-    // the authored value once and hand it to the inner input as its
-    // defaultValue, which is what form.reset() restores to.
-    this._input.defaultValue = this.getAttribute('value') ?? '';
+    // As with a native input, the `value` attribute is the reset default while
+    // the property carries live state. Never mirror typing into markup: apart
+    // from breaking reset semantics, doing so can serialize private values.
+    const authoredDefault = this.getAttribute('value') ?? this._input.getAttribute('value') ?? '';
+    this._input.defaultValue = authoredDefault;
+    if (this._pendingValue !== undefined) {
+      this._input.value = this._pendingValue;
+      this._pendingValue = undefined;
+    } else {
+      this._input.value = authoredDefault;
+    }
 
     this._onReset = () => {
-      // The reset event fires before the controls are reset, so read back on
-      // the next microtask and mirror the restored value onto the host.
-      queueMicrotask(() => {
-        if (!this._input) return;
-        this.setAttribute('value', this._input.value);
-      });
+      // The reset event fires before native controls reset. No host attribute
+      // is touched: value is live state, while the attribute is defaultValue.
+      queueMicrotask(() => this.emit('aihio-input', { value: this.value }));
     };
 
     this._onInput = () => {
-      if (this.getAttribute('value') !== this._input.value) {
-        this.setAttribute('value', this._input.value);
-      }
       this.emit('aihio-input', { value: this._input.value });
     };
 
@@ -141,10 +157,15 @@ export class AihioInput extends AihioElement {
     }
   }
 
-  teardown() {
-    this._input?.removeEventListener('input', this._onInput);
-    this._input?.removeEventListener('change', this._onChange);
+  disconnect() {
     this._detachForm();
+  }
+
+  syncAttribute(name, _oldValue, newValue) {
+    if (name !== 'value' || !this._input) return;
+    const value = newValue ?? '';
+    this._input.defaultValue = value;
+    this._input.value = value;
   }
 
   _syncFormListener() {
@@ -166,7 +187,6 @@ export class AihioInput extends AihioElement {
 
     const type = this.attr('type', 'text');
     const placeholder = this.attr('placeholder', '');
-    const value = this.attr('value', '');
     const disabled = this.boolAttr('disabled');
     const error = this.boolAttr('error');
     const required = this.boolAttr('required');
@@ -174,7 +194,6 @@ export class AihioInput extends AihioElement {
 
     if (this._input.type !== type) this._input.type = type;
     if (this._input.placeholder !== placeholder) this._input.placeholder = placeholder;
-    if (this._input.value !== value) this._input.value = value;
     if (this._input.disabled !== disabled) this._input.disabled = disabled;
     if (this._input.required !== required) this._input.required = required;
     if (this._input.readOnly !== readOnly) this._input.readOnly = readOnly;
@@ -182,8 +201,9 @@ export class AihioInput extends AihioElement {
     // The inner <input> is real light DOM inside the author's <form>, so
     // forwarding name/autocomplete is all that form submission needs — no
     // ElementInternals, no value shadowing.
-    syncAttribute(this, this._input, 'name');
-    syncAttribute(this, this._input, 'autocomplete');
+    for (const name of FORWARDED_ATTRIBUTES) {
+      syncAttribute(this, this._input, name);
+    }
 
     this._input.setAttribute('aria-invalid', String(error));
 
@@ -199,11 +219,21 @@ export class AihioInput extends AihioElement {
   }
 
   set value(v) {
-    this.setAttribute('value', String(v ?? ''));
+    const value = String(v ?? '');
+    if (this._input) this._input.value = value;
+    else this._pendingValue = value;
   }
 
-  focus() {
-    this._input?.focus();
+  get defaultValue() {
+    return this.getAttribute('value') ?? '';
+  }
+
+  set defaultValue(value) {
+    this.setAttribute('value', String(value ?? ''));
+  }
+
+  focus(options) {
+    this._input?.focus(options);
   }
 
   /** The form this field submits to, or null when it is outside one. */
@@ -216,6 +246,18 @@ export class AihioInput extends AihioElement {
     return this._input?.validity ?? null;
   }
 
+  get validationMessage() {
+    return this._input?.validationMessage ?? '';
+  }
+
+  get willValidate() {
+    return this._input?.willValidate ?? false;
+  }
+
+  get control() {
+    return this._input ?? null;
+  }
+
   checkValidity() {
     return this._input?.checkValidity() ?? true;
   }
@@ -223,7 +265,35 @@ export class AihioInput extends AihioElement {
   reportValidity() {
     return this._input?.reportValidity() ?? true;
   }
+
+  setCustomValidity(message) {
+    this._input?.setCustomValidity(String(message ?? ''));
+  }
+
+  select() {
+    this._input?.select();
+  }
 }
+
+const FORWARDED_ATTRIBUTES = [
+  'name',
+  'autocomplete',
+  'min',
+  'max',
+  'minlength',
+  'maxlength',
+  'pattern',
+  'step',
+  'inputmode',
+  'enterkeyhint',
+  'autocapitalize',
+  'spellcheck',
+  'multiple',
+  'accept',
+  'capture',
+  'list',
+  'form',
+];
 
 function syncAttribute(host, input, name) {
   const value = host.getAttribute(name);

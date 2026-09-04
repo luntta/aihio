@@ -1,8 +1,12 @@
 {
   "$component": "aihio-dialog",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modal dialog with backdrop, focus trap, and ESC to close.",
-  "intents": ["overlay", "modal", "dismissible"],
+  "intents": [
+    "overlay",
+    "modal",
+    "dismissible"
+  ],
   "attributes": {
     "open": {
       "type": "boolean",
@@ -11,12 +15,45 @@
     }
   },
   "methods": {
-    "open()": { "description": "Opens the dialog" },
-    "close()": { "description": "Closes the dialog" }
+    "open()": {
+      "description": "Opens the dialog modally in the browser top layer.",
+      "returns": "void"
+    },
+    "close()": {
+      "description": "Requests that the dialog close.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "{ restoreFocus?: boolean; reason?: string }",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    }
   },
   "events": {
-    "aihio-open": { "description": "Fired when the dialog opens" },
-    "aihio-close": { "description": "Fired when the dialog closes" }
+    "aihio-open": {
+      "description": "Fired after the dialog opens.",
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-close": {
+      "description": "Fired after the dialog closes.",
+      "detail": {
+        "reason": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-before-close": {
+      "description": "Cancelable request fired before the dialog closes.",
+      "detail": {
+        "reason": "string"
+      },
+      "cancelable": true,
+      "bubbles": true,
+      "composed": true
+    }
   },
   "composition": {
     "allowedChildren": [
@@ -27,19 +64,20 @@
   },
   "a11yContract": {
     "handled": [
-      "role=\"dialog\" and aria-modal=\"true\" are set on the panel",
+      "The native <dialog> panel supplies dialog semantics, and showModal() supplies modality",
       "aria-labelledby is wired to aihio-dialog-title when present",
       "aria-describedby is wired to aihio-dialog-description when present",
-      "Focus is trapped within the dialog while open",
+      "Native modal dialog behavior makes the document outside the dialog inert and contains keyboard focus",
       "Escape closes the dialog",
-      "Background scroll is locked while open",
-      "Focus is restored to the trigger on close"
+      "Focus is restored to the trigger on close",
+      "A shared overlay lock prevents concurrent dialogs from restoring page scroll too early"
     ],
     "required": [
       {
         "when": "dialog has no aihio-dialog-title",
         "requirement": "Provide aria-label on aihio-dialog describing the dialog's purpose; otherwise screen readers announce an unnamed dialog.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "dialog-accessible-name"
       },
       {
         "when": "dialog confirms a destructive action",
@@ -59,10 +97,22 @@
     }
   ],
   "related": [
-    { "$component": "aihio-dialog-header", "description": "Dialog header container" },
-    { "$component": "aihio-dialog-title", "description": "Dialog title text" },
-    { "$component": "aihio-dialog-description", "description": "Dialog description text" },
-    { "$component": "aihio-dialog-footer", "description": "Dialog footer with actions" }
+    {
+      "$component": "aihio-dialog-header",
+      "description": "Dialog header container"
+    },
+    {
+      "$component": "aihio-dialog-title",
+      "description": "Dialog title text"
+    },
+    {
+      "$component": "aihio-dialog-description",
+      "description": "Dialog description text"
+    },
+    {
+      "$component": "aihio-dialog-footer",
+      "description": "Dialog footer with actions"
+    }
   ],
   "examples": [
     "<aihio-dialog>\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>"

@@ -2,7 +2,10 @@
   "$component": "aihio-toggle",
   "version": "1.0.0",
   "description": "A toggle button that can be pressed or unpressed.",
-  "intents": ["toggle-state", "action"],
+  "intents": [
+    "toggle-state",
+    "action"
+  ],
   "attributes": {
     "pressed": {
       "type": "boolean",
@@ -16,28 +19,43 @@
     },
     "variant": {
       "type": "enum",
-      "values": ["default", "outline"],
+      "values": [
+        "default",
+        "outline"
+      ],
       "default": "default",
       "description": "Visual style variant"
     },
     "size": {
       "type": "enum",
-      "values": ["sm", "md", "lg"],
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
       "default": "md",
       "description": "Toggle size"
     }
   },
   "slots": {
-    "default": { "description": "Toggle label content" }
+    "default": {
+      "description": "Toggle label content"
+    }
   },
   "events": {
     "aihio-toggle": {
       "description": "Fired when the pressed state changes",
-      "detail": { "pressed": "boolean" }
+      "detail": {
+        "pressed": "boolean"
+      }
     }
   },
   "composition": {
-    "forbiddenChildren": ["aihio-button", "aihio-toggle", "aihio-input"]
+    "forbiddenChildren": [
+      "aihio-button",
+      "aihio-toggle",
+      "aihio-input"
+    ]
   },
   "a11yContract": {
     "handled": [
@@ -51,7 +69,8 @@
       {
         "when": "toggle has no visible text (icon-only)",
         "requirement": "Provide aria-label describing what the toggle controls (e.g. aria-label=\"Bold\").",
-        "severity": "error"
+        "severity": "error",
+        "rule": "toggle-accessible-name"
       }
     ]
   },

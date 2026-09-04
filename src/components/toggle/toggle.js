@@ -2,6 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioToggle extends AihioElement {
   static tag = 'aihio-toggle';
+  static schemaVersion = '1.0.0';
   static observedAttributes = ['pressed', 'disabled', 'variant', 'size'];
   static styles = `
     aihio-toggle {
@@ -119,12 +120,6 @@ export class AihioToggle extends AihioElement {
     this.addEventListener('click', this._onClickCapture, { capture: true });
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
-  }
-
-  teardown() {
-    this.removeEventListener('click', this._onClickCapture, { capture: true });
-    this.removeEventListener('click', this._onClick);
-    this.removeEventListener('keydown', this._onKeyDown);
   }
 
   sync() {

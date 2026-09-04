@@ -91,9 +91,14 @@ export class AihioElement extends AihioHTMLElement {
    * be indistinguishable from the native event of the same name by the time it
    * reaches a listener further up the tree.
    */
-  emit(name, detail) {
-    this.dispatchEvent(
-      new CustomEvent(name, { detail, bubbles: true, composed: true })
+  emit(name, detail, options = {}) {
+    return this.dispatchEvent(
+      new CustomEvent(name, {
+        detail,
+        bubbles: options.bubbles ?? true,
+        composed: options.composed ?? true,
+        cancelable: options.cancelable ?? false,
+      })
     );
   }
 
@@ -108,13 +113,14 @@ export class AihioElement extends AihioHTMLElement {
 
   connectedCallback() {
     this._ensureSetup();
+    this.connect?.();
     runDevHook(this, 'connect');
     this.refresh();
   }
 
   disconnectedCallback() {
     runDevHook(this, 'disconnect');
-    this.teardown?.();
+    this.disconnect?.();
   }
 
   refresh() {
@@ -127,4 +133,10 @@ export class AihioElement extends AihioHTMLElement {
 
   /** Override in subclasses for repeated state syncing */
   sync() {}
+
+  /** Override for work that must run on every connection. */
+  connect() {}
+
+  /** Override to release document/window resources while disconnected. */
+  disconnect() {}
 }

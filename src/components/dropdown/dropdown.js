@@ -4,6 +4,7 @@ let dropdownInstanceId = 0;
 
 export class AihioDropdown extends AihioElement {
   static tag = 'aihio-dropdown';
+  static schemaVersion = '1.1.0';
   static shadow = true;
   static observedAttributes = ['open', 'align'];
   static styles = `
@@ -14,11 +15,14 @@ export class AihioDropdown extends AihioElement {
 
     .content {
       display: none;
-      position: absolute;
+      position: fixed;
+      inset: auto;
+      margin: 0;
       z-index: 50;
       min-width: 8rem;
-      top: calc(100% + var(--spacing-intent-cluster-gap-tight));
-      left: 0;
+      max-width: calc(100vw - (var(--spacing-intent-stack-md) * 2));
+      max-height: calc(100dvh - (var(--spacing-intent-stack-md) * 2));
+      overflow-y: auto;
       border-radius: var(--radius-intent-interactive);
       border: 1px solid oklch(var(--color-intent-border-subtle));
       background-color: oklch(var(--color-intent-overlay-bg));
@@ -28,12 +32,11 @@ export class AihioDropdown extends AihioElement {
       animation: dropdown-in var(--duration-intent-feedback) ease;
     }
 
-    :host([align="end"]) .content {
-      left: auto;
-      right: 0;
+    .content[data-fallback-open] {
+      display: block;
     }
 
-    :host([open]) .content {
+    .content:popover-open {
       display: block;
     }
 
@@ -65,7 +68,7 @@ export class AihioDropdown extends AihioElement {
     this._dropdownId = ++dropdownInstanceId;
     this.shadowRoot.innerHTML = `
       <slot name="trigger"></slot>
-      <div class="content" role="menu" part="content">
+      <div class="content" role="menu" part="content" popover="manual">
         <slot></slot>
       </div>
     `;
@@ -73,6 +76,9 @@ export class AihioDropdown extends AihioElement {
     this._content = this.shadowRoot.querySelector('.content');
     this._triggerSlot = this.shadowRoot.querySelector('slot[name="trigger"]');
     this._content.id = `aihio-dropdown-${this._dropdownId}-content`;
+    this._supportsPopover = typeof this._content.showPopover === 'function';
+    this._isOpen = false;
+    this._restoreFocusOnClose = false;
 
     this._onClick = (e) => {
       if (!this._isTriggerEvent(e)) return;
@@ -121,34 +127,50 @@ export class AihioDropdown extends AihioElement {
     this._onOutsidePointerDown = (e) => {
       if (!this.hasAttribute('open')) return;
       if (e.composedPath().includes(this)) return;
-      this.close();
+      this.close({ reason: 'outside' });
     };
 
     this._onTriggerSlotChange = () => this.refresh();
+    this._onViewportChange = () => this._positionContent();
+    this._onPopoverToggle = (event) => {
+      if (event.newState !== 'closed' || !this._isOpen) return;
+      this._isOpen = false;
+      this.removeAttribute('open');
+      this._removeViewportListeners();
+      this.emit('aihio-close', { reason: 'native-dismiss' });
+    };
 
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
     this._triggerSlot.addEventListener('slotchange', this._onTriggerSlotChange);
+    this._content.addEventListener('toggle', this._onPopoverToggle);
+  }
+
+  connect() {
+    document.removeEventListener('pointerdown', this._onOutsidePointerDown);
     document.addEventListener('pointerdown', this._onOutsidePointerDown);
   }
 
-  teardown() {
-    this.removeEventListener('click', this._onClick);
-    this.removeEventListener('keydown', this._onKeyDown);
-    this._triggerSlot?.removeEventListener('slotchange', this._onTriggerSlotChange);
+  disconnect() {
     document.removeEventListener('pointerdown', this._onOutsidePointerDown);
+    this._removeViewportListeners();
+    if (this._supportsPopover && this._content?.matches(':popover-open')) {
+      this._content.hidePopover();
+    }
+    this._content?.removeAttribute('data-fallback-open');
+    this._isOpen = false;
   }
 
   sync() {
     const isOpen = this.hasAttribute('open');
     const trigger = this._getTrigger();
 
-    this._content.hidden = !isOpen;
+    if (isOpen && !this._isOpen) this._showContent();
+    else if (!isOpen && this._isOpen) this._hideContent();
 
     if (!trigger) return;
 
     trigger.setAttribute('aria-haspopup', 'menu');
-    trigger.setAttribute('aria-controls', this._content.id);
     trigger.setAttribute('aria-expanded', String(isOpen));
   }
 
@@ -169,29 +191,28 @@ export class AihioDropdown extends AihioElement {
     }
 
     this.setAttribute('open', '');
-    this.emit('aihio-open');
 
     if (focus) {
       requestAnimationFrame(() => this._focusItem(focus));
     }
   }
 
-  close({ restoreFocus = false } = {}) {
+  close({ restoreFocus = false, reason = 'api' } = {}) {
     if (!this.hasAttribute('open')) return;
+    if (!this.emit('aihio-before-close', { reason }, { cancelable: true })) return;
+    this._restoreFocusOnClose = restoreFocus;
+    this._closeReason = reason;
     this.removeAttribute('open');
-    this.emit('aihio-close');
-
-    if (restoreFocus) {
-      this._getTrigger()?.focus();
-    }
   }
 
   _getTrigger() {
-    return this.querySelector('[slot="trigger"]');
+    return [...this.children].find((child) => child.getAttribute('slot') === 'trigger') ?? null;
   }
 
   _getItems() {
-    return [...this.querySelectorAll('aihio-dropdown-item:not([disabled])')];
+    return [...this.querySelectorAll('aihio-dropdown-item:not([disabled])')].filter(
+      (item) => item.closest('aihio-dropdown') === this
+    );
   }
 
   _isTriggerEvent(e) {
@@ -221,6 +242,67 @@ export class AihioDropdown extends AihioElement {
       : (current + direction + items.length) % items.length;
 
     items[next]?.focus();
+  }
+
+  _showContent() {
+    if (!this.isConnected) return;
+    this._isOpen = true;
+    if (this._supportsPopover) {
+      if (!this._content.matches(':popover-open')) this._content.showPopover();
+    } else {
+      this._content.setAttribute('data-fallback-open', '');
+    }
+    this._addViewportListeners();
+    this._positionContent();
+    this.emit('aihio-open');
+  }
+
+  _hideContent() {
+    this._isOpen = false;
+    if (this._supportsPopover && this._content.matches(':popover-open')) {
+      this._content.hidePopover();
+    }
+    this._content.removeAttribute('data-fallback-open');
+    this._removeViewportListeners();
+
+    if (this._restoreFocusOnClose) this._getTrigger()?.focus({ preventScroll: true });
+    this._restoreFocusOnClose = false;
+    this.emit('aihio-close', { reason: this._closeReason ?? 'attribute' });
+    this._closeReason = null;
+  }
+
+  _addViewportListeners() {
+    window.addEventListener('resize', this._onViewportChange);
+    window.addEventListener('scroll', this._onViewportChange, true);
+  }
+
+  _removeViewportListeners() {
+    window.removeEventListener('resize', this._onViewportChange);
+    window.removeEventListener('scroll', this._onViewportChange, true);
+  }
+
+  _positionContent() {
+    if (!this._isOpen) return;
+    const trigger = this._getTrigger();
+    if (!trigger) return;
+
+    const edge = 8;
+    const gap = 4;
+    const triggerRect = trigger.getBoundingClientRect();
+    const contentRect = this._content.getBoundingClientRect();
+    let left = this.attr('align', 'start') === 'end'
+      ? triggerRect.right - contentRect.width
+      : triggerRect.left;
+    left = Math.min(Math.max(edge, left), Math.max(edge, window.innerWidth - contentRect.width - edge));
+
+    let top = triggerRect.bottom + gap;
+    if (top + contentRect.height > window.innerHeight - edge) {
+      const above = triggerRect.top - contentRect.height - gap;
+      top = above >= edge ? above : edge;
+    }
+
+    this._content.style.left = `${Math.round(left)}px`;
+    this._content.style.top = `${Math.round(top)}px`;
   }
 }
 
@@ -291,12 +373,6 @@ export class AihioDropdownItem extends AihioElement {
     this.addEventListener('click', this._onClickCapture, { capture: true });
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
-  }
-
-  teardown() {
-    this.removeEventListener('click', this._onClickCapture, { capture: true });
-    this.removeEventListener('click', this._onClick);
-    this.removeEventListener('keydown', this._onKeyDown);
   }
 
   sync() {

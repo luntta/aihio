@@ -1,4 +1,5 @@
 import { AihioElement } from '../base.js';
+import { isTopOverlay, lockDocumentScroll, unlockDocumentScroll } from '../overlay-stack.js';
 
 let dialogInstanceId = 0;
 
@@ -19,6 +20,7 @@ const FOCUSABLE_SELECTOR = [
 
 export class AihioDialog extends AihioElement {
   static tag = 'aihio-dialog';
+  static schemaVersion = '1.1.0';
   static shadow = true;
   static observedAttributes = ['open', 'aria-label'];
   static styles = `
@@ -26,26 +28,10 @@ export class AihioDialog extends AihioElement {
       display: contents;
     }
 
-    .backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      background-color: oklch(var(--color-intent-overlay-scrim));
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-intent-stack-md);
-    }
-
-    :host([open]) .backdrop {
-      display: flex;
-    }
-
     .panel {
-      position: relative;
       width: 100%;
       max-width: var(--dialog-width);
-      max-height: calc(100vh - (var(--spacing-intent-stack-md) * 2));
+      max-height: calc(100dvh - (var(--spacing-intent-stack-md) * 2));
       overflow-y: auto;
       border-radius: var(--radius-intent-surface);
       border: 1px solid oklch(var(--color-intent-border-subtle));
@@ -55,6 +41,16 @@ export class AihioDialog extends AihioElement {
       box-shadow: var(--shadow-intent-modal);
       animation: dialog-in var(--duration-intent-overlay) ease;
       outline: none;
+      overscroll-behavior: contain;
+      margin: auto;
+    }
+
+    .panel:not([open]) {
+      display: none;
+    }
+
+    .panel::backdrop {
+      background-color: oklch(var(--color-intent-overlay-scrim));
     }
 
     @keyframes dialog-in {
@@ -101,53 +97,58 @@ export class AihioDialog extends AihioElement {
     this._restoreFocusOnClose = true;
 
     this.shadowRoot.innerHTML = `
-      <div class="backdrop" part="backdrop">
-        <div class="panel" role="dialog" aria-modal="true" part="panel" tabindex="-1">
-          <slot></slot>
-        </div>
-      </div>
+      <dialog class="panel" part="panel">
+        <slot></slot>
+      </dialog>
     `;
 
-    this._backdrop = this.shadowRoot.querySelector('.backdrop');
     this._panel = this.shadowRoot.querySelector('.panel');
     this._slot = this.shadowRoot.querySelector('slot');
 
-    this._onBackdropClick = (e) => {
-      if (e.target === e.currentTarget) {
-        this.close();
-      }
+    this._onPanelClick = (event) => {
+      if (event.target !== this._panel) return;
+      const rect = this._panel.getBoundingClientRect();
+      const inside = event.clientX >= rect.left && event.clientX <= rect.right &&
+        event.clientY >= rect.top && event.clientY <= rect.bottom;
+      if (!inside) this.close({ reason: 'backdrop' });
     };
 
-    this._onDocumentKeyDown = (e) => {
-      if (!this.hasAttribute('open')) return;
+    this._onCancel = (event) => {
+      event.preventDefault();
+      this.close({ restoreFocus: true, reason: 'escape' });
+    };
 
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        this.close({ restoreFocus: true });
-      } else if (e.key === 'Tab') {
-        this._trapFocus(e);
+    this._onDocumentKeyDown = (event) => {
+      if (!this._isOpen || !isTopOverlay(this)) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.close({ restoreFocus: true, reason: 'escape' });
+      } else if (event.key === 'Tab') {
+        this._trapFocus(event);
       }
     };
 
     this._onSlotChange = () => this.refresh();
 
-    this._backdrop.addEventListener('click', this._onBackdropClick);
+    this._panel.addEventListener('click', this._onPanelClick);
+    this._panel.addEventListener('cancel', this._onCancel);
     this._slot.addEventListener('slotchange', this._onSlotChange);
   }
 
-  teardown() {
-    this._backdrop?.removeEventListener('click', this._onBackdropClick);
-    this._slot?.removeEventListener('slotchange', this._onSlotChange);
+  disconnect() {
     if (this._isOpen) {
-      this._onClose();
+      this._isOpen = false;
+      if (this._panel?.open) this._panel.close();
+      unlockDocumentScroll(this);
+      document.removeEventListener('keydown', this._onDocumentKeyDown);
     }
   }
 
   sync() {
     if (!this._panel) return;
 
-    const title = this.querySelector('aihio-dialog-title');
-    const description = this.querySelector('aihio-dialog-description');
+    const title = this._getOwnedPart('aihio-dialog-title');
+    const description = this._getOwnedPart('aihio-dialog-description');
 
     if (title && !title.id) title.id = `aihio-dialog-${this._dialogId}-title`;
     if (description && !description.id) {
@@ -177,22 +178,28 @@ export class AihioDialog extends AihioElement {
   open() {
     if (this.hasAttribute('open')) return;
     this.setAttribute('open', '');
-    this.emit('aihio-open');
   }
 
-  close({ restoreFocus = true } = {}) {
+  close({ restoreFocus = true, reason = 'api' } = {}) {
     if (!this.hasAttribute('open')) return;
+    if (!this.emit('aihio-before-close', { reason }, { cancelable: true })) return;
     this._restoreFocusOnClose = restoreFocus;
+    this._closeReason = reason;
     this.removeAttribute('open');
-    this.emit('aihio-close');
   }
 
   _onOpen() {
+    if (!this.isConnected) return;
     this._isOpen = true;
     this._previousFocus = document.activeElement;
-    this._previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    lockDocumentScroll(this);
     document.addEventListener('keydown', this._onDocumentKeyDown);
+
+    if (!this._panel.open) {
+      this._panel.showModal();
+    }
+
+    this.emit('aihio-open');
 
     requestAnimationFrame(() => {
       const focusable = this._getFocusableElements();
@@ -204,49 +211,52 @@ export class AihioDialog extends AihioElement {
     });
   }
 
-  _onClose() {
+  _onClose({ restoreFocus, reason } = {}) {
     this._isOpen = false;
-    document.body.style.overflow = this._previousBodyOverflow ?? '';
+    if (this._panel?.open) this._panel.close();
+    unlockDocumentScroll(this);
     document.removeEventListener('keydown', this._onDocumentKeyDown);
 
-    const shouldRestoreFocus = this._restoreFocusOnClose !== false;
+    const shouldRestoreFocus = restoreFocus ?? this._restoreFocusOnClose !== false;
     this._restoreFocusOnClose = true;
 
     if (shouldRestoreFocus && this._previousFocus?.focus) {
-      this._previousFocus.focus();
+      this._previousFocus.focus({ preventScroll: true });
     }
+    this.emit('aihio-close', { reason: reason ?? this._closeReason ?? 'attribute' });
+    this._closeReason = null;
   }
 
   _getFocusableElements() {
     return [...this.querySelectorAll(FOCUSABLE_SELECTOR)].filter((element) => {
       if (element.hasAttribute?.('disabled')) return false;
       if (element.getAttribute?.('aria-hidden') === 'true') return false;
-      return true;
+      return element.closest('aihio-dialog') === this;
     });
   }
 
-  _trapFocus(e) {
+  _getOwnedPart(selector) {
+    return [...this.querySelectorAll(selector)].find(
+      (element) => element.closest('aihio-dialog') === this
+    ) ?? null;
+  }
+
+  _trapFocus(event) {
     const focusable = this._getFocusableElements();
     if (focusable.length === 0) {
-      e.preventDefault();
+      event.preventDefault();
       this._panel.focus();
       return;
     }
 
     const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+    const last = focusable.at(-1);
     const active = document.activeElement;
-
-    if (e.shiftKey) {
-      if (active === first || active === this._panel) {
-        e.preventDefault();
-        last.focus();
-      }
-      return;
-    }
-
-    if (active === last) {
-      e.preventDefault();
+    if (event.shiftKey && (active === first || active === this._panel)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
       first.focus();
     }
   }

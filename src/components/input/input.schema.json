@@ -1,6 +1,6 @@
 {
   "$component": "aihio-input",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A text input component with size variants and error state.",
   "intents": [
     "form-field",
@@ -42,7 +42,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Form field name. Required for the value to appear in FormData \u2014 without it the field submits nothing."
+      "description": "Form field name. Required for the value to appear in FormData — without it the field submits nothing."
     },
     "required": {
       "type": "boolean",
@@ -57,11 +57,71 @@
     "autocomplete": {
       "type": "string",
       "description": "Forwarded to the inner input (e.g. email, current-password, one-time-code)."
+    },
+    "min": {
+      "type": "string",
+      "description": "Minimum value for number and date-like inputs."
+    },
+    "max": {
+      "type": "string",
+      "description": "Maximum value for number and date-like inputs."
+    },
+    "minlength": {
+      "type": "number",
+      "description": "Minimum permitted text length."
+    },
+    "maxlength": {
+      "type": "number",
+      "description": "Maximum permitted text length."
+    },
+    "pattern": {
+      "type": "string",
+      "description": "Regular expression the value must match."
+    },
+    "step": {
+      "type": "string",
+      "description": "Permitted numeric or date step."
+    },
+    "inputmode": {
+      "type": "string",
+      "description": "Hint for the virtual keyboard to display."
+    },
+    "enterkeyhint": {
+      "type": "string",
+      "description": "Hint for the virtual keyboard Enter key label."
+    },
+    "autocapitalize": {
+      "type": "string",
+      "description": "Automatic capitalization behavior."
+    },
+    "spellcheck": {
+      "type": "boolean",
+      "description": "Whether spelling and grammar checking is enabled."
+    },
+    "multiple": {
+      "type": "boolean",
+      "description": "Allows multiple values for supported input types."
+    },
+    "accept": {
+      "type": "string",
+      "description": "Accepted file types when type=file."
+    },
+    "capture": {
+      "type": "string",
+      "description": "Preferred capture source when type=file."
+    },
+    "list": {
+      "type": "string",
+      "description": "Id of a datalist providing suggestions."
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the input."
     }
   },
   "events": {
     "aihio-input": {
-      "description": "Fired on every keystroke, after the host value attribute is mirrored",
+      "description": "Fired on every keystroke. The live value is available through detail and the value property; it is never copied into the value attribute.",
       "detail": {
         "value": "string"
       }
@@ -78,13 +138,34 @@
       "type": "string",
       "description": "Get or set the current value"
     },
+    "defaultValue": {
+      "type": "string",
+      "description": "Get or set the reset value reflected by the value attribute"
+    },
+    "control": {
+      "type": "HTMLInputElement | null",
+      "readonly": true,
+      "description": "The native input delegated to by the component"
+    },
     "form": {
       "type": "HTMLFormElement | null",
+      "readonly": true,
       "description": "The owning form, or null outside one"
     },
     "validity": {
       "type": "ValidityState | null",
+      "readonly": true,
       "description": "Native constraint validation state"
+    },
+    "validationMessage": {
+      "type": "string",
+      "readonly": true,
+      "description": "Native validation message"
+    },
+    "willValidate": {
+      "type": "boolean",
+      "readonly": true,
+      "description": "Whether the control participates in constraint validation"
     }
   },
   "composition": {
@@ -93,24 +174,27 @@
   "a11yContract": {
     "handled": [
       "aria-invalid reflects the error attribute",
-      "The inner <input> inherits placeholder, value, type, and disabled state",
-      "The inner <input> is real light DOM, so name, required, readonly, and autocomplete give native form participation and validation"
+      "The inner <input> inherits placeholder, type, disabled state, constraints, and the authored default value",
+      "The inner <input> is real light DOM, so name, required, readonly, autocomplete, and form ownership give native submission and validation"
     ],
     "required": [
       {
         "when": "input has no visible <label> associated by for/id",
         "requirement": "Provide aria-label on aihio-input, or wrap in a <label>. Placeholder is not a label.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "input-label"
       },
       {
         "when": "error=true",
         "requirement": "Describe the error via aria-describedby pointing to a visible message; the red border alone is not conveyed to screen readers.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "input-error-description"
       },
       {
         "when": "the field is inside a <form> and its value should be submitted",
         "requirement": "Set name. A field without a name is omitted from FormData entirely.",
-        "severity": "warn"
+        "severity": "warn",
+        "rule": "input-form-name"
       }
     ]
   },
@@ -130,15 +214,42 @@
   ],
   "examples": [
     "<label>\n  Email\n  <aihio-input type=\"email\" placeholder=\"you@example.com\"></aihio-input>\n</label>",
-    "<aihio-input aria-label=\"Search\" placeholder=\"Search\u2026\"></aihio-input>",
+    "<aihio-input aria-label=\"Search\" placeholder=\"Search…\"></aihio-input>",
     "<aihio-input error aria-describedby=\"pw-error\" type=\"password\"></aihio-input>\n<p id=\"pw-error\">Password is too short.</p>"
   ],
   "methods": {
     "checkValidity()": {
-      "description": "Runs native constraint validation and returns whether the field is valid."
+      "description": "Runs native constraint validation and returns whether the field is valid.",
+      "returns": "boolean"
     },
     "reportValidity()": {
-      "description": "Runs native constraint validation and shows the browser message if invalid."
+      "description": "Runs native constraint validation and shows the browser message if invalid.",
+      "returns": "boolean"
+    },
+    "setCustomValidity()": {
+      "description": "Sets a custom validation message.",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "returns": "void"
+    },
+    "select()": {
+      "description": "Selects the input text.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the native input.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
     }
   }
 }

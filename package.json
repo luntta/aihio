@@ -26,6 +26,62 @@
       "types": "./dist/components.d.ts",
       "default": "./dist/components.dev.js"
     },
+    "./alert": {
+      "types": "./dist/alert.d.ts",
+      "default": "./dist/alert.js"
+    },
+    "./avatar": {
+      "types": "./dist/avatar.d.ts",
+      "default": "./dist/avatar.js"
+    },
+    "./badge": {
+      "types": "./dist/badge.d.ts",
+      "default": "./dist/badge.js"
+    },
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "default": "./dist/button.js"
+    },
+    "./card": {
+      "types": "./dist/card.d.ts",
+      "default": "./dist/card.js"
+    },
+    "./cluster": {
+      "types": "./dist/cluster.d.ts",
+      "default": "./dist/cluster.js"
+    },
+    "./dialog": {
+      "types": "./dist/dialog.d.ts",
+      "default": "./dist/dialog.js"
+    },
+    "./dropdown": {
+      "types": "./dist/dropdown.d.ts",
+      "default": "./dist/dropdown.js"
+    },
+    "./field": {
+      "types": "./dist/field.d.ts",
+      "default": "./dist/field.js"
+    },
+    "./input": {
+      "types": "./dist/input.d.ts",
+      "default": "./dist/input.js"
+    },
+    "./stack": {
+      "types": "./dist/stack.d.ts",
+      "default": "./dist/stack.js"
+    },
+    "./tabs": {
+      "types": "./dist/tabs.d.ts",
+      "default": "./dist/tabs.js"
+    },
+    "./toggle": {
+      "types": "./dist/toggle.d.ts",
+      "default": "./dist/toggle.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    },
     "./prompt": {
       "types": "./dist/prompt.d.ts",
       "default": "./dist/prompt.js"
@@ -35,7 +91,9 @@
       "default": "./dist/lint.js"
     },
     "./css": "./dist/aihio.css",
-    "./schema": "./dist/schema.json"
+    "./schema": "./dist/schema.json",
+    "./schema/min": "./dist/schema.min.json",
+    "./prompt.md": "./dist/aihio.prompt.md"
   },
   "files": [
     "dist/"
@@ -49,9 +107,12 @@
     "docs:build": "npm run build && eleventy",
     "docs:dev": "node dev.js",
     "docs:test": "node --test test/docs-build.check.js",
-    "test": "npm run build && node --test test/browser.test.js test/build.test.js test/lint-fixtures.test.js test/mcp.test.js",
-    "check": "npm test && npm run docs:build && npm run docs:test",
-    "prepare": "npm run build"
+    "test": "npm run build && node --test test/browser.test.js test/build.test.js test/lint-fixtures.test.js test/lint-parser.test.js test/mcp.test.js",
+    "check": "npm test && npm run typecheck && npm run docs:build && npm run docs:test && npm run test:browsers",
+    "prepare": "npm run build",
+    "test:frameworks:build": "node test/frameworks/build.js",
+    "test:browsers": "npm run build && npm run test:frameworks:build && playwright test",
+    "typecheck": "npm run build && tsc -p tsconfig.test.json"
   },
   "repository": {
     "type": "git",
@@ -74,6 +135,22 @@
   "homepage": "https://github.com/luntta/aihio#readme",
   "devDependencies": {
     "@11ty/eleventy": "^3.1.5",
-    "esbuild": "^0.25.0"
-  }
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "esbuild": "^0.25.0",
+    "parse5": "^8.0.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "svelte": "^5.57.0",
+    "typescript": "^7.0.2",
+    "vue": "^3.5.42"
+  },
+  "sideEffects": [
+    "./dist/aihio.js",
+    "./dist/aihio.dev.js",
+    "./dist/components.dev.js",
+    "./dist/*.css"
+  ]
 }

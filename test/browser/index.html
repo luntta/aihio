@@ -359,7 +359,7 @@
     await runTest('button adopts an authored control instead of duplicating it', async () => {
       sandbox.innerHTML = `
         <form id="authored-form">
-          <aihio-button id="wrapper" variant="outline"><button type="submit">Sign in</button></aihio-button>
+          <aihio-button id="wrapper" variant="outline"><button type="submit" name="authored" disabled>Sign in</button></aihio-button>
         </form>
       `;
       await nextFrame(2);
@@ -371,6 +371,14 @@
       assert(wrapper.control === controls[0], 'the authored button should become the control');
       assert(wrapper.control.type === 'submit', 'an authored type should survive when the host states none');
       assert(wrapper.type === 'submit', 'the host should report the type it delegates to');
+      assert(wrapper.control.disabled, 'an authored disabled state should survive');
+
+      wrapper.setAttribute('name', 'override');
+      await nextFrame();
+      assert(wrapper.control.name === 'override', 'a host form attribute should override the authored control');
+      wrapper.removeAttribute('name');
+      await nextFrame();
+      assert(wrapper.control.name === 'authored', 'removing a host override should restore the authored attribute');
 
       wrapper.setAttribute('type', 'button');
       await nextFrame();
@@ -399,8 +407,8 @@
 
       assert(plainControl.id.length > 0, 'the control should be given an id');
       assert(
-        plainLabel.getAttribute('for') === plainControl.id,
-        'a <label> in the label slot should point at the control'
+        plainLabel.getAttribute('for') === plainControl.control.id,
+        'a <label> in the label slot should point at the native control'
       );
       assert(
         plainControl.getAttribute('aria-labelledby') === plainLabel.id,

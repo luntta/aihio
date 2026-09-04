@@ -107,12 +107,26 @@ test('generated TypeScript declarations snapshot the button API and JSX surface'
   disabled?: boolean;
   loading?: boolean;
   type?: AihioButtonType;
+  name?: string;
+  value?: string;
+  form?: string;
+  formaction?: string;
+  formmethod?: AihioButtonFormmethod;
+  formenctype?: AihioButtonFormenctype;
+  formnovalidate?: boolean;
+  formtarget?: string;
 }
 export type AihioButtonProps = AihioIntrinsicElementProps & AihioButtonAttributes;
 
 export declare class AihioButton extends HTMLElement {
   static tag: "aihio-button";
   static schemaVersion: string | undefined;
+  readonly control: HTMLButtonElement | null;
+  readonly form: HTMLFormElement | null;
+  type: "button" | "submit" | "reset";
+  click(): void;
+  focus(options?: FocusOptions): void;
+  blur(): void;
 }`;
 
   assert.match(declarations, /export type AihioIntent = "action" \| "primary-action"/);
@@ -203,15 +217,24 @@ test('runtime bundle exposes Aihio.describe and schema-backed component versions
     const componentsUrl = `${pathToFileURL(resolve(root, 'dist/components.js')).href}?t=${Date.now()}`;
 
     const { Aihio, describe } = await import(aihioUrl);
-    const { AihioButton, AihioDialog, AihioInput } = await import(componentsUrl);
+    const componentModule = await import(componentsUrl);
+    const { AihioButton, AihioDialog, AihioInput } = componentModule;
 
     assert.equal(globalThis.Aihio, Aihio, 'runtime bundle publishes Aihio globally');
     assert.equal(Aihio.describe, describe, 'named describe export matches the Aihio namespace');
-    assert.equal(Aihio.describe('aihio-button')?.version, '1.2.0', 'button schema is introspectable by tag');
+    assert.equal(Aihio.describe('aihio-button')?.version, '1.3.0', 'button schema is introspectable by tag');
     assert.equal(Aihio.describe({ tagName: 'AIHIO-DIALOG' })?.$component, 'aihio-dialog', 'describe accepts live-element-like objects');
-    assert.equal(AihioButton.schemaVersion, '1.2.0', 'button class carries schemaVersion');
-    assert.equal(AihioDialog.schemaVersion, '1.0.0', 'dialog class carries schemaVersion');
-    assert.equal(AihioInput.schemaVersion, '1.1.0', 'input class carries schemaVersion');
+    assert.equal(AihioButton.schemaVersion, '1.3.0', 'button class carries schemaVersion');
+    assert.equal(AihioDialog.schemaVersion, '1.1.0', 'dialog class carries schemaVersion');
+    assert.equal(AihioInput.schemaVersion, '1.2.0', 'input class carries schemaVersion');
+    for (const component of Object.values(componentModule)) {
+      if (!component?.tag || !component.schemaVersion) continue;
+      assert.equal(
+        component.schemaVersion,
+        Aihio.describe(component.tag)?.version,
+        `${component.tag} class and schema versions stay in sync`
+      );
+    }
   } finally {
     globalThis.Aihio = previousAihio;
   }
@@ -227,8 +250,22 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
+  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'dialog', 'dropdown', 'field', 'input', 'stack', 'tabs', 'toggle']) {
+    assert.equal(pkg.exports[`./${component}`].types, `./dist/${component}.d.ts`);
+    assert.equal(pkg.exports[`./${component}`].default, `./dist/${component}.js`);
+  }
+  assert.equal(pkg.exports['./runtime'].types, './dist/runtime.d.ts');
+  assert.equal(pkg.exports['./runtime'].default, './dist/runtime.js');
+  assert.ok(!pkg.sideEffects.includes('./dist/button.js'), 'granular component imports remain tree-shakeable');
   assert.match(pkg.bin['aihio-lint'], /^\.?\/?dist\/aihio-lint\.js$/);
   assert.match(pkg.bin['aihio-mcp'], /^\.?\/?dist\/aihio-mcp\.js$/);
+});
+
+test('granular component entrypoints do not pull the whole library into the bundle', () => {
+  const button = readFileSync(resolve(root, 'dist/button.js'), 'utf8');
+
+  assert.ok(Buffer.byteLength(button) < 15_000, 'button entry stays below its focused bundle budget');
+  assert.doesNotMatch(button, /aihio-dialog|aihio-tabs|aihio-dropdown/);
 });
 
 test('schema output exposes intent vocabulary and every component carries required AI-first fields', () => {
@@ -244,6 +281,11 @@ test('schema output exposes intent vocabulary and every component carries requir
       assert.ok(vocabulary.has(intent), `${component.$component}: intent "${intent}" is in vocabulary`);
     }
     assert.ok(component.a11yContract && Array.isArray(component.a11yContract.handled), `${component.$component} has a11yContract.handled`);
+    for (const requirement of component.a11yContract?.required ?? []) {
+      if (requirement.severity === 'error') {
+        assert.ok(requirement.rule, `${component.$component}: error-level a11y requirements are machine-checkable`);
+      }
+    }
     assert.ok(Array.isArray(component.counterExamples), `${component.$component} has counterExamples`);
   }
 });

@@ -1,8 +1,12 @@
 {
   "$component": "aihio-tabs",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A tabbed interface component with keyboard navigation.",
-  "intents": ["tabs", "navigation", "layout"],
+  "intents": [
+    "tabs",
+    "navigation",
+    "layout"
+  ],
   "attributes": {
     "value": {
       "type": "string",
@@ -10,8 +14,14 @@
     }
   },
   "composition": {
-    "requiredChildren": ["aihio-tab-list", "aihio-tab-panel"],
-    "allowedChildren": ["aihio-tab-list", "aihio-tab-panel"]
+    "requiredChildren": [
+      "aihio-tab-list",
+      "aihio-tab-panel"
+    ],
+    "allowedChildren": [
+      "aihio-tab-list",
+      "aihio-tab-panel"
+    ]
   },
   "a11yContract": {
     "handled": [
@@ -25,7 +35,8 @@
       {
         "when": "every aihio-tab and aihio-tab-panel",
         "requirement": "Match each tab's value to exactly one panel's value. Mismatched values leave panels orphaned.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "tabs-value-pairs"
       }
     ]
   },
@@ -40,7 +51,10 @@
     }
   ],
   "related": [
-    { "$component": "aihio-tab-list", "description": "Container for tab triggers" },
+    {
+      "$component": "aihio-tab-list",
+      "description": "Container for tab triggers"
+    },
     {
       "$component": "aihio-tab",
       "description": "Individual tab trigger",
@@ -58,7 +72,9 @@
       "events": {
         "aihio-tab-select": {
           "description": "Fired when the tab is activated; aihio-tabs listens for this to drive selection",
-          "detail": { "value": "string" }
+          "detail": {
+            "value": "string"
+          }
         }
       }
     },

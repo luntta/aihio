@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validate } from './validate.js';
+import { A11Y_RULE_IDS } from './a11y-rules.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const schemaDir = __dirname;
@@ -13,6 +14,7 @@ const minPath = resolve(distDir, 'schema.min.json');
 const runtimePath = resolve(schemaDir, 'runtime-schema.js');
 const typesPath = resolve(distDir, 'aihio.d.ts');
 const componentTypesPath = resolve(distDir, 'components.d.ts');
+const runtimeTypesPath = resolve(distDir, 'runtime.d.ts');
 const promptTemplatePath = resolve(schemaDir, 'prompt-template.md');
 const promptMarkdownPath = resolve(distDir, 'aihio.prompt.md');
 const promptModulePath = resolve(distDir, 'prompt.js');
@@ -69,6 +71,15 @@ for (const dir of readdirSync(componentsDir, { withFileTypes: true })) {
     }
   }
 
+  for (const requirement of schema.a11yContract?.required ?? []) {
+    if (requirement.severity === 'error' && !requirement.rule) {
+      errors.push(`${schemaPath}/a11yContract/required: error-level obligation ${JSON.stringify(requirement.when)} requires a stable rule id`);
+    }
+    if (requirement.rule && !A11Y_RULE_IDS.has(requirement.rule)) {
+      errors.push(`${schemaPath}/a11yContract/required: unknown a11y rule ${JSON.stringify(requirement.rule)}`);
+    }
+  }
+
   seen.add(schema.$component);
   schemas.push(schema);
 }
@@ -112,10 +123,20 @@ writeFileSync(minPath, JSON.stringify(stripped), 'utf8');
 writeFileSync(runtimePath, toRuntimeModule(stripped), 'utf8');
 writeFileSync(typesPath, toTypeDeclarations(merged), 'utf8');
 writeFileSync(componentTypesPath, toComponentTypeDeclarations(merged), 'utf8');
+writeFileSync(runtimeTypesPath, toRuntimeTypeDeclarations(), 'utf8');
+for (const component of sorted) {
+  const name = component.$component.slice('aihio-'.length);
+  writeFileSync(
+    resolve(distDir, `${name}.d.ts`),
+    toIndividualTypeDeclarations(component),
+    'utf8'
+  );
+}
 const promptMarkdown = toPromptMarkdown(merged);
 writeFileSync(promptMarkdownPath, promptMarkdown, 'utf8');
 writeFileSync(promptModulePath, toPromptModule(promptMarkdown), 'utf8');
 writeFileSync(promptTypesPath, toStringModuleTypes(), 'utf8');
+await validateCanonicalPatterns(patterns);
 console.log(`schema → ${outPath} (${schemas.length} components, ${patterns.length} patterns)`);
 console.log(`schema → ${minPath} (agent-minified)`);
 console.log(`schema runtime → ${runtimePath}`);
@@ -123,6 +144,32 @@ console.log(`schema types → ${typesPath}`);
 console.log(`schema component types → ${componentTypesPath}`);
 console.log(`schema prompt → ${promptMarkdownPath}`);
 console.log(`schema prompt module → ${promptModulePath}`);
+
+async function validateCanonicalPatterns(canonicalPatterns) {
+  const { lintMarkup } = await import(`../lint/index.js?schema-build=${Date.now()}`);
+  const failures = [];
+
+  for (const pattern of canonicalPatterns) {
+    const candidates = [
+      { id: pattern.id, markup: pattern.markup },
+      ...(pattern.variations ?? []).map((variation) => ({
+        id: `${pattern.id}/${variation.id}`,
+        markup: variation.markup,
+      })),
+    ];
+
+    for (const candidate of candidates) {
+      const result = lintMarkup(candidate.markup, { source: `pattern:${candidate.id}` });
+      for (const issue of result.issues) {
+        failures.push(`${candidate.id}: ${issue.ruleId} at ${issue.path}: ${issue.message}`);
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`canonical pattern lint failed:\n  ${failures.join('\n  ')}`);
+  }
+}
 
 // Drop human-facing prose (descriptions, examples, intent definitions) so the
 // agent-minified build stays compact. Structural fields that drive markup
@@ -146,9 +193,26 @@ function stripComponent(component) {
   };
   if (component.attributes) stripped.attributes = mapEntries(component.attributes, stripAttribute);
   if (component.slots) stripped.slots = mapEntries(component.slots, ({ accepts }) => ({ ...(accepts ? { accepts } : {}) }));
-  if (component.events) stripped.events = mapEntries(component.events, ({ detail }) => ({ ...(detail ? { detail } : {}) }));
-  if (component.methods) stripped.methods = mapEntries(component.methods, () => ({}));
-  if (component.properties) stripped.properties = mapEntries(component.properties, ({ type }) => ({ type }));
+  if (component.events) {
+    stripped.events = mapEntries(component.events, ({ detail, cancelable, bubbles, composed }) => ({
+      ...(detail ? { detail } : {}),
+      ...(cancelable !== undefined ? { cancelable } : {}),
+      ...(bubbles !== undefined ? { bubbles } : {}),
+      ...(composed !== undefined ? { composed } : {}),
+    }));
+  }
+  if (component.methods) {
+    stripped.methods = mapEntries(component.methods, ({ parameters, returns }) => ({
+      ...(parameters ? { parameters } : {}),
+      ...(returns ? { returns } : {}),
+    }));
+  }
+  if (component.properties) {
+    stripped.properties = mapEntries(component.properties, ({ type, readonly }) => ({
+      type,
+      ...(readonly ? { readonly: true } : {}),
+    }));
+  }
   if (component.composition) stripped.composition = component.composition;
   if (component.a11yContract) stripped.a11yContract = component.a11yContract;
   if (component.counterExamples) {
@@ -526,10 +590,25 @@ function toTypeDeclarations(doc) {
     '',
     'export interface AihioRuntimeEventSchema {',
     '  detail?: Record<string, string>;',
+    '  cancelable?: boolean;',
+    '  bubbles?: boolean;',
+    '  composed?: boolean;',
+    '}',
+    '',
+    'export interface AihioRuntimeMethodParameter {',
+    '  name: string;',
+    '  type: string;',
+    '  optional?: boolean;',
+    '}',
+    '',
+    'export interface AihioRuntimeMethodSchema {',
+    '  parameters?: readonly AihioRuntimeMethodParameter[];',
+    '  returns?: string;',
     '}',
     '',
     'export interface AihioRuntimePropertySchema {',
     '  type: string;',
+    '  readonly?: boolean;',
     '}',
     '',
     'export interface AihioRuntimeComposition {',
@@ -542,12 +621,15 @@ function toTypeDeclarations(doc) {
     '  requiredSlots?: readonly string[];',
     '}',
     '',
+    `export type AihioA11yRuleId = ${toUnion([...A11Y_RULE_IDS].sort())};`,
+    '',
     "export type AihioRuntimeSeverity = 'error' | 'warn';",
     '',
     'export interface AihioRuntimeA11yRequirement {',
     '  when: string;',
     '  requirement: string;',
     '  severity: AihioRuntimeSeverity;',
+    '  rule?: AihioA11yRuleId;',
     '}',
     '',
     'export interface AihioRuntimeA11yContract {',
@@ -570,7 +652,7 @@ function toTypeDeclarations(doc) {
     '  attributes?: Record<string, AihioRuntimeAttributeSchema>;',
     '  slots?: Record<string, AihioRuntimeSlotSchema>;',
     '  events?: Record<string, AihioRuntimeEventSchema>;',
-    '  methods?: Record<string, Record<string, never>>;',
+    '  methods?: Record<string, AihioRuntimeMethodSchema>;',
     '  properties?: Record<string, AihioRuntimePropertySchema>;',
     '  composition?: AihioRuntimeComposition;',
     '  a11yContract?: AihioRuntimeA11yContract;',
@@ -679,6 +761,43 @@ function toComponentTypeDeclarations(doc) {
     formatNamedExport(typeExports, { from: './aihio.js', typeOnly: true }),
     '',
   ].join('\n');
+}
+
+function toIndividualTypeDeclarations(component) {
+  const { elements } = collectTypeComponents([component]);
+  const enumTypes = collectEnumTypes(elements);
+  const classExports = elements.map(({ className }) => className);
+  const typeExports = unique([
+    ...enumTypes.map(({ typeName }) => typeName),
+    ...elements.flatMap(({ className }) => [`${className}Attributes`, `${className}Props`]),
+  ]);
+
+  return [
+    '/* Generated by src/schema/build.js — do not edit */',
+    '',
+    formatNamedExport(classExports, { from: './components.js' }),
+    '',
+    formatNamedExport(typeExports, { from: './aihio.js', typeOnly: true }),
+    '',
+  ].join('\n');
+}
+
+function toRuntimeTypeDeclarations() {
+  return `/* Generated by src/schema/build.js — do not edit */
+import type { AihioDescribeTarget, AihioRuntimeComponentSchema, AihioSchemaDocument } from './aihio.js';
+
+export interface AihioDevWarning {
+  key: string;
+  message: string;
+  severity?: 'error' | 'warn';
+}
+
+export declare const runtimeSchema: AihioSchemaDocument;
+export declare function describe(target: AihioDescribeTarget): AihioRuntimeComponentSchema | null;
+export declare function getSchemaVersion(target: AihioDescribeTarget): string | null;
+export declare function collectDevWarnings(element: Element): AihioDevWarning[];
+export declare function formatDevWarning(element: Element, warning: AihioDevWarning): string;
+`;
 }
 
 function toPromptMarkdown(doc) {
@@ -1008,8 +1127,8 @@ function renderComponentTypeBlock(component) {
   const lines = [];
   const attributes = Object.entries(component.attributes);
   const properties = Object.entries(component.properties);
-  const methods = Object.keys(component.methods)
-    .map(parseMethodName)
+  const methods = Object.entries(component.methods)
+    .map(([signature, descriptor]) => parseMethod(signature, descriptor))
     .filter(Boolean);
 
   if (attributes.length === 0) {
@@ -1034,11 +1153,14 @@ function renderComponentTypeBlock(component) {
   }
 
   for (const [name, descriptor] of properties) {
-    lines.push(`  ${formatTypeKey(name)}: ${toPropertyType(descriptor.type)};`);
+    lines.push(`  ${descriptor.readonly ? 'readonly ' : ''}${formatTypeKey(name)}: ${toPropertyType(descriptor.type)};`);
   }
 
-  for (const methodName of methods) {
-    lines.push(`  ${methodName}(): void;`);
+  for (const method of methods) {
+    const parameters = (method.descriptor.parameters ?? []).map((parameter) =>
+      `${parameter.name}${parameter.optional ? '?' : ''}: ${toDeclaredType(parameter.type)}`
+    ).join(', ');
+    lines.push(`  ${method.name}(${parameters}): ${toDeclaredType(method.descriptor.returns, 'void')};`);
   }
 
   lines.push('}');
@@ -1055,7 +1177,11 @@ function toAttributeType(component, name, attr) {
 }
 
 function toPropertyType(type) {
-  return toPrimitiveType(type);
+  return toDeclaredType(type);
+}
+
+function toDeclaredType(type, fallback = 'unknown') {
+  return typeof type === 'string' && type.trim().length > 0 ? type.trim() : fallback;
 }
 
 function toPrimitiveType(type) {
@@ -1071,9 +1197,9 @@ function toPrimitiveType(type) {
   }
 }
 
-function parseMethodName(signature) {
+function parseMethod(signature, descriptor) {
   const match = /^([A-Za-z_$][A-Za-z0-9_$]*)\(\)$/.exec(signature);
-  return match?.[1] ?? null;
+  return match ? { name: match[1], descriptor } : null;
 }
 
 function formatTypeKey(name) {

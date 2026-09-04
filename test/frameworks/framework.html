@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Aihio framework fixture</title></head>
+  <body data-status="loading">
+    <main id="app"></main>
+    <script type="module">
+      const framework = new URL(location.href).searchParams.get('framework');
+      if (!['react', 'vue', 'svelte'].includes(framework)) throw new Error('Unknown framework');
+      await import(`/test/frameworks/generated/${framework}.js`);
+    </script>
+  </body>
+</html>

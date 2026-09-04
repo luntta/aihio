@@ -1,5 +1,3 @@
-import { getSchemaVersion } from '../schema/runtime.js';
-
 import { AihioAlert } from './alert/alert.js';
 import { AihioAvatar } from './avatar/avatar.js';
 import { AihioBadge } from './badge/badge.js';
@@ -35,27 +33,6 @@ import {
   AihioTabs,
 } from './tabs/tabs.js';
 import { AihioToggle } from './toggle/toggle.js';
-
-[
-  AihioAlert,
-  AihioAvatar,
-  AihioBadge,
-  AihioButton,
-  AihioCard,
-  AihioCluster,
-  AihioDialog,
-  AihioDropdown,
-  AihioField,
-  AihioInput,
-  AihioStack,
-  AihioTabs,
-  AihioToggle,
-].forEach((component) => {
-  const version = getSchemaVersion(component);
-  if (version) {
-    component.schemaVersion = version;
-  }
-});
 
 export { AihioAlert };
 export { AihioAvatar };

@@ -2,6 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioAvatar extends AihioElement {
   static tag = 'aihio-avatar';
+  static schemaVersion = '1.0.0';
   static observedAttributes = ['src', 'alt', 'fallback', 'size'];
   static styles = `
     aihio-avatar {

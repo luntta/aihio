@@ -2,6 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioCard extends AihioElement {
   static tag = 'aihio-card';
+  static schemaVersion = '1.0.0';
   static observedAttributes = ['variant'];
   static styles = `
     aihio-card {

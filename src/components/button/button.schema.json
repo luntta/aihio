@@ -1,6 +1,6 @@
 {
   "$component": "aihio-button",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A button component with multiple visual variants and sizes.",
   "intents": [
     "action",
@@ -52,6 +52,48 @@
       ],
       "default": "button",
       "description": "Form behaviour, forwarded to the native <button> this component renders. submit submits the owning form (running native constraint validation first); reset resets it. Defaults to button, which does neither."
+    },
+    "name": {
+      "type": "string",
+      "description": "Submitter name included with form data."
+    },
+    "value": {
+      "type": "string",
+      "description": "Submitter value included with form data."
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the button."
+    },
+    "formaction": {
+      "type": "string",
+      "description": "Submit URL override for submit buttons."
+    },
+    "formmethod": {
+      "type": "enum",
+      "values": [
+        "get",
+        "post",
+        "dialog"
+      ],
+      "description": "HTTP method override for submit buttons."
+    },
+    "formenctype": {
+      "type": "enum",
+      "values": [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain"
+      ],
+      "description": "Encoding override for submit buttons."
+    },
+    "formnovalidate": {
+      "type": "boolean",
+      "description": "Skips form validation when this submit button is used."
+    },
+    "formtarget": {
+      "type": "string",
+      "description": "Browsing context target for the form response."
     }
   },
   "slots": {
@@ -84,12 +126,14 @@
       {
         "when": "size=\"icon\" or the button has no visible text",
         "requirement": "Provide aria-label describing the action (e.g. aria-label=\"Close\").",
-        "severity": "error"
+        "severity": "error",
+        "rule": "button-accessible-name"
       },
       {
         "when": "the button submits a form",
-        "requirement": "Set type=\"submit\" and place the button inside the <form> it submits. A submit button outside its form does nothing.",
-        "severity": "warn"
+        "requirement": "Set type=\"submit\" and either place the button inside its <form> or reference that form with the form attribute.",
+        "severity": "warn",
+        "rule": "button-form-owner"
       }
     ]
   },
@@ -117,5 +161,42 @@
     "<aihio-button variant=\"destructive\">Delete</aihio-button>",
     "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>",
     "<form>\n  <label>\n    Email\n    <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  </label>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>"
-  ]
+  ],
+  "properties": {
+    "control": {
+      "type": "HTMLButtonElement | null",
+      "readonly": true,
+      "description": "The native button delegated to by the component"
+    },
+    "form": {
+      "type": "HTMLFormElement | null",
+      "readonly": true,
+      "description": "The owning form, or null outside one"
+    },
+    "type": {
+      "type": "\"button\" | \"submit\" | \"reset\"",
+      "description": "Current native button type"
+    }
+  },
+  "methods": {
+    "click()": {
+      "description": "Activates the native button.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the native button.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    },
+    "blur()": {
+      "description": "Removes focus from the native button.",
+      "returns": "void"
+    }
+  }
 }

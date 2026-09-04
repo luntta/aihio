@@ -3,6 +3,22 @@ import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
 
 import * as esbuild from 'esbuild';
 
+const componentNames = [
+  'alert',
+  'avatar',
+  'badge',
+  'button',
+  'card',
+  'cluster',
+  'dialog',
+  'dropdown',
+  'field',
+  'input',
+  'stack',
+  'tabs',
+  'toggle',
+];
+
 function runNodeScript(script) {
   execFileSync('node', [script], { stdio: 'inherit' });
 }
@@ -21,6 +37,11 @@ await esbuild.build({
     { in: 'src/aihio.js', out: 'aihio' },
     { in: 'src/components/index.js', out: 'components' },
     { in: 'src/lint/index.js', out: 'lint' },
+    { in: 'src/schema/runtime.js', out: 'runtime' },
+    ...componentNames.map((name) => ({
+      in: `src/components/${name}/${name}.js`,
+      out: name,
+    })),
   ],
   bundle: true,
   format: 'esm',
@@ -77,4 +98,4 @@ await esbuild.build({
 copyFileSync('docs/intent-tokens.md', 'dist/intent-tokens.md');
 copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
-console.log('build → dist/aihio.js, dist/aihio.dev.js, dist/components.js, dist/components.dev.js, dist/lint.js, dist/aihio-lint.js, dist/aihio-mcp.js, dist/aihio.css');
+console.log('build → package, component, lint, MCP, schema runtime, and CSS entrypoints in dist/');

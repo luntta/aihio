@@ -1,6 +1,6 @@
 {
   "$component": "aihio-field",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Form field wrapper that lays out a label, control, description, and error message, and wires the accessibility relationships between them.",
   "intents": [
     "form-field",
@@ -67,7 +67,7 @@
   "a11yContract": {
     "handled": [
       "Generates ids for the label, description, and error, and wires aria-labelledby and aria-describedby on the control",
-      "Sets for on the label when it is a <label> element, so clicking it focuses the control",
+      "Sets for on native label content and delegates label clicks to the wrapped native control",
       "Reflects the error state onto the control, which sets aria-invalid",
       "Points aria-describedby at the error message while erroring, and at the description otherwise, so only the relevant text is announced"
     ],
@@ -75,7 +75,8 @@
       {
         "when": "the field has no slot=\"label\" content",
         "requirement": "Provide slot=\"label\" content, or an aria-label on the control. aihio-field wires a label but cannot invent one.",
-        "severity": "error"
+        "severity": "error",
+        "rule": "field-label"
       }
     ]
   },

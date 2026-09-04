@@ -47,7 +47,8 @@
       {
         "when": "variant=\"destructive\"",
         "requirement": "Include slot=\"title\" or slot=\"description\" so assistive tech has content to announce. Colour alone is not a sufficient signal.",
-        "severity": "warn"
+        "severity": "warn",
+        "rule": "alert-announced-content"
       }
     ]
   },
@@ -62,7 +63,7 @@
     },
     {
       "markup": "<aihio-alert variant=\"success\" role=\"alert\">Saved</aihio-alert>",
-      "reason": "role=\"alert\" interrupts the screen reader. A confirmation should announce politely \u2014 drop the role and let the success variant set role=\"status\"."
+      "reason": "role=\"alert\" interrupts the screen reader. A confirmation should announce politely — drop the role and let the success variant set role=\"status\"."
     }
   ],
   "examples": [
