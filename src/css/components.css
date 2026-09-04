@@ -155,18 +155,26 @@ aihio-badge {
     }
 
 /* aihio-button */
-aihio-button {
+aihio-button:defined {
+      display: contents;
+    }
+
+    aihio-button:not(:defined),
+    aihio-button > button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: var(--spacing-intent-control-gap);
       white-space: nowrap;
       border-radius: var(--radius-intent-interactive);
+      font-family: inherit;
       font-size: var(--fontSize-intent-control);
       font-weight: var(--fontWeight-intent-control);
       height: var(--button-height-md);
+      margin: 0;
       padding-inline: var(--button-padding-x-md);
       border: 1px solid transparent;
+      appearance: none;
       cursor: pointer;
       transition: background-color var(--duration-intent-feedback) ease,
                   color var(--duration-intent-feedback) ease,
@@ -178,44 +186,55 @@ aihio-button {
     }
 
     /* Variants */
-    aihio-button:not([variant]),
-    aihio-button[variant="default"] {
+    aihio-button:not(:defined):not([variant]),
+    aihio-button:not([variant]) > button,
+    aihio-button:not(:defined)[variant="default"],
+    aihio-button[variant="default"] > button {
       background-color: oklch(var(--color-intent-action-primary-bg));
       color: oklch(var(--color-intent-action-primary-fg));
     }
-    aihio-button:not([variant]):hover,
-    aihio-button[variant="default"]:hover {
+    aihio-button:not(:defined):not([variant]):hover,
+    aihio-button:not([variant]) > button:hover,
+    aihio-button:not(:defined)[variant="default"]:hover,
+    aihio-button[variant="default"] > button:hover {
       background-color: oklch(var(--color-intent-action-primary-bg) / 0.9);
     }
 
-    aihio-button[variant="secondary"] {
+    aihio-button:not(:defined)[variant="secondary"],
+    aihio-button[variant="secondary"] > button {
       background-color: oklch(var(--color-intent-action-secondary-bg));
       color: oklch(var(--color-intent-action-secondary-fg));
     }
-    aihio-button[variant="secondary"]:hover {
+    aihio-button:not(:defined)[variant="secondary"]:hover,
+    aihio-button[variant="secondary"] > button:hover {
       background-color: oklch(var(--color-intent-action-secondary-bg) / 0.8);
     }
 
-    aihio-button[variant="outline"] {
+    aihio-button:not(:defined)[variant="outline"],
+    aihio-button[variant="outline"] > button {
       background-color: transparent;
       color: oklch(var(--color-intent-page-fg));
       border-color: oklch(var(--color-intent-border-subtle));
     }
-    aihio-button[variant="outline"]:hover {
+    aihio-button:not(:defined)[variant="outline"]:hover,
+    aihio-button[variant="outline"] > button:hover {
       background-color: oklch(var(--color-intent-action-accent-bg));
       color: oklch(var(--color-intent-action-accent-fg));
     }
 
-    aihio-button[variant="ghost"] {
+    aihio-button:not(:defined)[variant="ghost"],
+    aihio-button[variant="ghost"] > button {
       background-color: transparent;
       color: oklch(var(--color-intent-page-fg));
     }
-    aihio-button[variant="ghost"]:hover {
+    aihio-button:not(:defined)[variant="ghost"]:hover,
+    aihio-button[variant="ghost"] > button:hover {
       background-color: oklch(var(--color-intent-action-accent-bg));
       color: oklch(var(--color-intent-action-accent-fg));
     }
 
-    aihio-button[variant="link"] {
+    aihio-button:not(:defined)[variant="link"],
+    aihio-button[variant="link"] > button {
       background-color: transparent;
       color: oklch(var(--color-intent-action-primary-bg));
       text-decoration: underline;
@@ -223,49 +242,64 @@ aihio-button {
       height: auto;
       padding-inline: 0;
     }
-    aihio-button[variant="link"]:hover {
+    aihio-button:not(:defined)[variant="link"]:hover,
+    aihio-button[variant="link"] > button:hover {
       text-underline-offset: 2px;
     }
 
-    aihio-button[variant="destructive"] {
+    aihio-button:not(:defined)[variant="destructive"],
+    aihio-button[variant="destructive"] > button {
       background-color: oklch(var(--color-intent-state-destructive-bg));
       color: oklch(var(--color-intent-state-destructive-fg));
     }
-    aihio-button[variant="destructive"]:hover {
+    aihio-button:not(:defined)[variant="destructive"]:hover,
+    aihio-button[variant="destructive"] > button:hover {
       background-color: oklch(var(--color-intent-state-destructive-bg) / 0.9);
     }
 
     /* Sizes */
-    aihio-button[size="sm"] {
+    aihio-button:not(:defined)[size="sm"],
+    aihio-button[size="sm"] > button {
       height: var(--button-height-sm);
       padding-inline: var(--button-padding-x-sm);
       font-size: var(--fontSize-intent-control-sm);
       border-radius: var(--radius-intent-interactive-compact);
     }
-    aihio-button[size="lg"] {
+    aihio-button:not(:defined)[size="lg"],
+    aihio-button[size="lg"] > button {
       height: var(--button-height-lg);
       padding-inline: var(--button-padding-x-lg);
       font-size: var(--fontSize-intent-control-lg);
       border-radius: var(--radius-intent-interactive);
     }
-    aihio-button[size="icon"] {
+    aihio-button:not(:defined)[size="icon"],
+    aihio-button[size="icon"] > button {
       height: var(--button-height-icon);
       width: var(--button-height-icon);
       padding: 0;
     }
 
-    /* States */
-    aihio-button[disabled] {
+    /* States. The upgraded shape keys off :disabled rather than the host
+       attribute, because <fieldset disabled> disables the control natively and
+       never touches the host. */
+    aihio-button:not(:defined)[disabled],
+    aihio-button > button:disabled {
       pointer-events: none;
       opacity: 0.5;
     }
-    aihio-button[loading] {
+
+    /* Loading is disabled too, but it reads as busy rather than unavailable,
+       so it keeps full opacity unless it is also explicitly disabled. */
+    aihio-button:not(:defined)[loading],
+    aihio-button[loading]:not([disabled]) > button {
       pointer-events: none;
+      opacity: 1;
     }
 
     /* A loading button has to look different, not just behave differently.
        aria-busy covers assistive tech; this covers everyone else. */
-    aihio-button[loading]::before {
+    aihio-button:not(:defined)[loading]::before,
+    aihio-button[loading] > button::before {
       content: "";
       width: 1em;
       height: 1em;
@@ -281,48 +315,55 @@ aihio-button {
     }
 
     @media (prefers-reduced-motion: reduce) {
-      aihio-button[loading]::before {
+      aihio-button:not(:defined)[loading]::before,
+    aihio-button[loading] > button::before {
         animation: none;
         border-block-start-color: currentColor;
         opacity: 0.5;
       }
     }
 
-    aihio-button:focus-visible {
+    aihio-button:not(:defined):focus-visible,
+    aihio-button > button:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
     }
 
-    /* Forced colours override background and colour, so a custom element
-       styled only with a fill becomes invisible. System colour keywords are
-       honoured inside this query, and the disabled opacity is dropped because
-       GrayText is the signal HCM users actually read. */
+    /* Forced colours override background and colour, so a control styled only
+       with a fill becomes invisible. System colour keywords are honoured
+       inside this query, and the disabled opacity is dropped because GrayText
+       is the signal HCM users actually read. */
     @media (forced-colors: active) {
-      aihio-button {
+      aihio-button:not(:defined),
+    aihio-button > button {
         background-color: ButtonFace;
         color: ButtonText;
         border-color: ButtonBorder;
       }
 
-      aihio-button:hover {
+      aihio-button:not(:defined):hover,
+    aihio-button > button:hover {
         background-color: ButtonFace;
         color: ButtonText;
       }
 
-      aihio-button[variant="link"] {
+      aihio-button:not(:defined)[variant="link"],
+    aihio-button[variant="link"] > button {
         background-color: transparent;
         color: LinkText;
         border-color: transparent;
       }
 
-      aihio-button[disabled],
-      aihio-button[loading] {
+      aihio-button:not(:defined)[disabled],
+      aihio-button:not(:defined)[loading],
+      aihio-button > button:disabled {
         color: GrayText;
         border-color: GrayText;
         opacity: 1;
       }
 
-      aihio-button:focus-visible {
+      aihio-button:not(:defined):focus-visible,
+    aihio-button > button:focus-visible {
         outline-color: Highlight;
       }
     }

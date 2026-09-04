@@ -69,8 +69,9 @@
       const button = document.querySelector('#button');
       const toggle = document.querySelector('#toggle');
 
-      assert(button.getAttribute('aria-disabled') === 'true', 'button should expose aria-disabled');
-      assert(button.tabIndex === -1, 'disabled button should not be tabbable');
+      assert(button.control instanceof HTMLButtonElement, 'the button should delegate to a native <button>');
+      assert(button.control.textContent.trim() === 'Save', 'the label should be adopted into the control');
+      assert(button.control.disabled, 'disabled should disable the control natively');
 
       let clicks = 0;
       button.addEventListener('click', () => {
@@ -81,7 +82,11 @@
 
       button.removeAttribute('disabled');
       await nextFrame();
-      assert(button.tabIndex === 0, 'enabled button should restore tabIndex');
+      assert(!button.control.disabled, 'the control should be re-enabled with the host');
+
+      button.click();
+      await nextFrame();
+      assert(clicks === 1, 'an enabled button should click through to the host');
 
       assert(toggle.getAttribute('aria-pressed') === 'true', 'toggle should reflect pressed state');
       toggle.removeAttribute('disabled');
@@ -190,7 +195,7 @@
       dispatchKey(items[1], 'Escape');
       await nextFrame();
       assert(!dropdown.hasAttribute('open'), 'Escape should close the dropdown');
-      assert(document.activeElement === trigger, 'closing the dropdown should restore focus to the trigger');
+      assert(document.activeElement === trigger.control, 'closing the dropdown should restore focus to the trigger');
     });
 
     await runTest('dialog focuses content, traps focus, and restores opener focus', async () => {
@@ -247,14 +252,22 @@
       const form = sandbox.querySelector('#signin');
       const [reset, submit, plain] = [...sandbox.querySelectorAll('aihio-button')];
 
-      assert(submit.form === form, 'a form-associated button should resolve its owning form');
-      assert([...form.elements].includes(submit), 'the button should be a member of form.elements');
+      assert(submit.form === form, 'a button should resolve its owning form');
+      assert([...form.elements].includes(submit.control), 'the control should be a member of form.elements');
       assert(form.elements.email?.value === 'a@b.co', 'the named field should be submittable');
 
+      // Being a real submit button in the form is what makes Enter in a field
+      // submit it: implicit submission looks for a submit button and does
+      // nothing when a form with several fields has none.
+      assert(submit.control.type === 'submit', 'type should be forwarded to the control');
+      assert(form.querySelector('button[type="submit"]') === submit.control, 'the form should own a native submit button');
+
       let submits = 0;
+      let submitter = null;
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         submits += 1;
+        submitter = event.submitter;
       });
 
       plain.click();
@@ -264,6 +277,7 @@
       submit.click();
       await nextFrame();
       assert(submits === 1, 'type="submit" should submit the owning form');
+      assert(submitter === submit.control, 'the submit event should identify the button as its submitter');
 
       const field = sandbox.querySelector('aihio-input');
       field.value = 'changed@b.co';
@@ -274,6 +288,93 @@
         form.elements.email.value === 'a@b.co',
         `type="reset" should reset the form, got ${form.elements.email.value}`
       );
+    });
+
+    await runTest('fieldset disabled toggles the button in both directions', async () => {
+      sandbox.innerHTML = `
+        <form>
+          <fieldset id="fieldset">
+            <aihio-button id="plain">Save</aihio-button>
+            <aihio-button id="authored" disabled>Never</aihio-button>
+          </fieldset>
+        </form>
+      `;
+      await nextFrame(2);
+
+      const fieldset = sandbox.querySelector('#fieldset');
+      const plain = sandbox.querySelector('#plain');
+      const authored = sandbox.querySelector('#authored');
+
+      // A fieldset disables its controls without touching their attributes, so
+      // :disabled — not the reflected .disabled property — is what says whether
+      // a control is actually disabled.
+      let clicks = 0;
+      plain.addEventListener('click', () => {
+        clicks += 1;
+      });
+
+      assert(!plain.control.matches(':disabled'), 'a button in an enabled fieldset should be enabled');
+
+      fieldset.disabled = true;
+      await nextFrame();
+      assert(plain.control.matches(':disabled'), '<fieldset disabled> should disable the control');
+      plain.click();
+      await nextFrame();
+      assert(clicks === 0, 'a button in a disabled fieldset should not activate');
+
+      fieldset.disabled = false;
+      await nextFrame();
+      assert(!plain.control.matches(':disabled'), 're-enabling the fieldset should re-enable the control');
+      plain.click();
+      await nextFrame();
+      assert(clicks === 1, 'a re-enabled button should activate again');
+
+      assert(authored.control.matches(':disabled'), 'an explicitly disabled button should stay disabled');
+      assert(authored.hasAttribute('disabled'), 'the authored disabled attribute should survive');
+    });
+
+    await runTest('button mirrors aria-* onto the control it delegates to', async () => {
+      sandbox.innerHTML = `
+        <aihio-button id="icon" size="icon" aria-label="Close">&#x2715;</aihio-button>
+      `;
+      await nextFrame(2);
+
+      const icon = sandbox.querySelector('#icon');
+      assert(icon.control.getAttribute('aria-label') === 'Close', 'aria-label should reach the control');
+
+      icon.setAttribute('aria-label', 'Dismiss');
+      await nextFrame();
+      assert(icon.control.getAttribute('aria-label') === 'Dismiss', 'the mirror should follow the host');
+
+      icon.removeAttribute('aria-label');
+      await nextFrame();
+      assert(!icon.control.hasAttribute('aria-label'), 'removing it on the host should clear the mirror');
+
+      icon.setAttribute('loading', '');
+      await nextFrame();
+      assert(icon.control.getAttribute('aria-busy') === 'true', 'loading should mark the control busy');
+      assert(icon.control.disabled, 'loading should disable the control');
+    });
+
+    await runTest('button adopts an authored control instead of duplicating it', async () => {
+      sandbox.innerHTML = `
+        <form id="authored-form">
+          <aihio-button id="wrapper" variant="outline"><button type="submit">Sign in</button></aihio-button>
+        </form>
+      `;
+      await nextFrame(2);
+
+      const wrapper = sandbox.querySelector('#wrapper');
+      const controls = wrapper.querySelectorAll('button');
+
+      assert(controls.length === 1, 'an authored <button> should not be duplicated');
+      assert(wrapper.control === controls[0], 'the authored button should become the control');
+      assert(wrapper.control.type === 'submit', 'an authored type should survive when the host states none');
+      assert(wrapper.type === 'submit', 'the host should report the type it delegates to');
+
+      wrapper.setAttribute('type', 'button');
+      await nextFrame();
+      assert(wrapper.control.type === 'button', 'a host type should win over the authored one');
     });
 
     await runTest('field wires labelling, description, and error state', async () => {

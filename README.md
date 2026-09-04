@@ -143,8 +143,9 @@ When you import `aihio/dev`, connected components also emit console warnings for
 
 ## Forms
 
-`aihio-button` is form-associated and `aihio-input` wraps a real light-DOM
-`<input>`, so a form built from Aihio components submits like any other:
+`aihio-button` wraps a real light-DOM `<button>` and `aihio-input` a real
+light-DOM `<input>`, so a form built from Aihio components submits like any
+other:
 
 ```html
 <form>
@@ -161,9 +162,12 @@ When you import `aihio/dev`, connected components also emit console warnings for
 </form>
 ```
 
-- `type="submit"` calls `requestSubmit()` on the owning form, so native
-  constraint validation runs first; `type="reset"` resets it.
-- The button is a member of `form.elements` and honours `<fieldset disabled>`.
+- `type="submit"` is forwarded to the control, which is an ordinary submit
+  button in the form: native constraint validation runs first, `Enter` in a
+  field submits, and `SubmitEvent.submitter` identifies the button that did it.
+  `type="reset"` resets the form.
+- The control is a member of `form.elements` and is disabled and re-enabled by
+  `<fieldset disabled>`, natively and in both directions.
 - `name` on `aihio-input` is what puts the value in `FormData`. Without it the
   field submits nothing, and both the linter and the dev build say so.
 - `aihio-field` generates the ids and wires `aria-labelledby` and
@@ -235,6 +239,31 @@ the hyphenated names.
 **React** is not documented here yet. React 19 added property-setting for custom
 elements, which covers the attribute side; the event side has not been verified
 against this library.
+
+### Wrapped native controls
+
+`aihio-button` and `aihio-input` render a real control in their own light DOM
+rather than emulating one, because that is the only way a component
+participates in a form the way the platform does. For the button that means the
+children it is given are moved into the `<button>` when the element upgrades:
+
+```html
+<aihio-button>Save</aihio-button>
+<!-- becomes -->
+<aihio-button><button type="button">Save</button></aihio-button>
+```
+
+Static and server-rendered markup is unaffected, and so is a framework that
+updates the label in place. A framework that inserts children *after* mount is
+not: they land on the host, outside the control. Give it a subtree of its own
+when the content is dynamic, and the framework never sees a node move:
+
+```jsx
+<aihio-button><button type="submit">{label}{spinner}</button></aihio-button>
+```
+
+An authored `<button>` is adopted rather than duplicated, and keeps its own
+`type` unless the host states one.
 
 ### Server rendering
 

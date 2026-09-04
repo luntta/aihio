@@ -9,7 +9,9 @@ const FOCUSABLE_SELECTOR = [
   'select:not([disabled])',
   'textarea:not([disabled])',
   '[tabindex]:not([tabindex="-1"])',
-  'aihio-button:not([disabled]):not([loading])',
+  // aihio-button is not listed: it delegates to a real <button>, which the
+  // native entry above already matches. Listing the host too would put the
+  // wrapper in the list at the same position as the control it wraps.
   'aihio-toggle:not([disabled])',
   'aihio-dropdown-item:not([disabled])',
   'aihio-tab:not([disabled])',

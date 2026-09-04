@@ -1,6 +1,6 @@
 {
   "$component": "aihio-button",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A button component with multiple visual variants and sizes.",
   "intents": [
     "action",
@@ -51,7 +51,7 @@
         "reset"
       ],
       "default": "button",
-      "description": "Form behaviour. submit calls requestSubmit() on the owning form (running native validation first); reset resets it. Defaults to button, which does neither."
+      "description": "Form behaviour, forwarded to the native <button> this component renders. submit submits the owning form (running native constraint validation first); reset resets it. Defaults to button, which does neither."
     }
   },
   "slots": {
@@ -74,14 +74,11 @@
   },
   "a11yContract": {
     "handled": [
-      "role=\"button\" is set",
-      "tabindex is managed \u2014 removed from tab order when disabled or loading",
-      "aria-disabled reflects disabled state",
-      "aria-busy reflects loading state",
-      "Enter and Space activate the button",
-      "Click events are suppressed while disabled or loading",
-      "Form association: the button is a member of its owning form and honours <fieldset disabled>",
-      "type=\"submit\" submits the owning form via requestSubmit(), so native constraint validation runs first"
+      "The component renders a real <button> and forwards its attributes to it, so the role, Enter and Space activation, focus behaviour, disabled semantics, and the forced-colours mapping are the platform's rather than an emulation of it",
+      "aria-* set on the host is mirrored onto that control",
+      "aria-busy reflects loading state, which also disables the control",
+      "Form participation is native: the button is a submitter of its owning form, so Enter in a field submits, SubmitEvent.submitter identifies it, and <fieldset disabled> disables it in both directions",
+      "type=\"submit\" runs native constraint validation before the form submits"
     ],
     "required": [
       {
