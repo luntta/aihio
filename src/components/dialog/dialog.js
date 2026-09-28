@@ -264,48 +264,16 @@ export class AihioDialog extends AihioElement {
 
 export class AihioDialogHeader extends AihioElement {
   static tag = 'aihio-dialog-header';
-  static styles = `
-    aihio-dialog-header {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      margin-bottom: var(--spacing-intent-stack-md);
-    }
-  `;
 }
 
 export class AihioDialogTitle extends AihioElement {
   static tag = 'aihio-dialog-title';
-  static styles = `
-    aihio-dialog-title {
-      display: block;
-      font-size: var(--fontSize-intent-heading-sm);
-      font-weight: var(--fontWeight-intent-heading);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
-    }
-  `;
 }
 
 export class AihioDialogDescription extends AihioElement {
   static tag = 'aihio-dialog-description';
-  static styles = `
-    aihio-dialog-description {
-      display: block;
-      font-size: var(--fontSize-intent-body-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
-    }
-  `;
 }
 
 export class AihioDialogFooter extends AihioElement {
   static tag = 'aihio-dialog-footer';
-  static styles = `
-    aihio-dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--spacing-intent-control-gap);
-      margin-top: var(--spacing-intent-stack-lg);
-    }
-  `;
 }

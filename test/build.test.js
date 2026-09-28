@@ -526,6 +526,18 @@ test('components that convey state through colour handle forced colours', () => 
   );
 });
 
+test('light-DOM component styles ship in aihio.css and not a second time in the JavaScript', () => {
+  const css = readFileSync(resolve(root, 'dist/aihio.css'), 'utf8');
+  const bundle = readFileSync(resolve(root, 'dist/aihio.js'), 'utf8');
+  const dialogEntry = readFileSync(resolve(root, 'dist/dialog.js'), 'utf8');
+
+  assert.ok(css.includes('aihio-alert[variant=destructive]') || css.includes('aihio-alert[variant="destructive"]'));
+  assert.ok(!bundle.includes('aihio-alert[variant="destructive"]'), 'alert CSS stays out of the bundle');
+  assert.ok(!bundle.includes('aihio-button:not(:defined)'), 'button CSS stays out of the bundle');
+  // Shadow components adopt their styles at runtime, so those stay.
+  assert.ok(dialogEntry.includes('::backdrop'), 'the dialog keeps its shadow styles');
+});
+
 test('every custom event is namespaced and declared in the schema', () => {
   const schema = JSON.parse(readFileSync(resolve(root, 'dist/schema.json'), 'utf8'));
 
