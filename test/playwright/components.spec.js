@@ -217,7 +217,12 @@ test('dropdown item hover reads against the overlay in the dark theme', async ({
 test('a highlighted dropdown item keeps visible text in forced colors', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto('/test/playwright/fixture.html');
-  test.skip(!(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)), 'forced colors emulation unsupported');
+  // WebKit matches the emulated media query but has no forced colours mode
+  // behind it: no backplate to opt out of, and no forced-color-adjust property.
+  test.skip(
+    !(await page.evaluate(() => matchMedia('(forced-colors: active)').matches && CSS.supports('forced-color-adjust', 'none'))),
+    'forced colors mode unsupported'
+  );
   await page.locator('#fixture').evaluate((root) => {
     root.innerHTML = `
       <aihio-dropdown id="menu">

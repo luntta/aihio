@@ -19,6 +19,11 @@ for (const { id, markup } of candidates) {
       // mid-transition when axe measures contrast.
       await page.locator('#fixture').evaluate(async (root, { html, theme }) => {
         document.documentElement.dataset.theme = theme;
+        // WebKit bug: a dropdown <select> inserted in the same task as a root
+        // attribute change leaves its ancestors inheriting the root's old
+        // values, so the settings card around one kept the light --card.
+        // Reading a computed style resolves the theme before the markup lands.
+        getComputedStyle(document.documentElement).color;
         root.innerHTML = html;
         await Promise.all([...root.querySelectorAll('*')]
           .filter((element) => element.localName.startsWith('aihio-'))
