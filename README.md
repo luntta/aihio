@@ -140,7 +140,7 @@ For MCP clients that launch local stdio servers, the package also ships `aihio-m
 | `aihio-toggle` | Pressed/unpressed button (a real `<button aria-pressed>`), such as Bold in a toolbar |
 | `aihio-tabs` | Tabbed interface with keyboard navigation |
 | `aihio-dialog` | Modal dialog with focus trap, ESC to close, backdrop |
-| `aihio-dropdown` | Dropdown menu with keyboard navigation and click-outside |
+| `aihio-dropdown` | Dropdown menu with keyboard navigation, typeahead, and link items (`<aihio-dropdown-item><a href>`) |
 
 ## AI-First
 

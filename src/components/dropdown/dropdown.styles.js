@@ -20,9 +20,28 @@ export default {
                   color var(--duration-intent-feedback-fast) ease;
     }
 
+    /* A link item: the <a> is the menuitem, so it carries the row's padding
+       and the whole row is the link's hit area. */
+    aihio-dropdown-item:has(> a[href]) {
+      padding: 0;
+    }
+
+    aihio-dropdown-item > a[href] {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: var(--spacing-intent-control-gap);
+      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
+      border-radius: inherit;
+      color: inherit;
+      text-decoration: none;
+      outline: none;
+    }
+
     /* Not accent: in the dark theme accent matches the overlay surface. */
     aihio-dropdown-item:hover,
-    aihio-dropdown-item:focus-visible {
+    aihio-dropdown-item:focus-visible,
+    aihio-dropdown-item:has(> a:focus-visible) {
       background-color: oklch(var(--color-intent-overlay-highlight-bg));
       color: oklch(var(--color-intent-overlay-fg));
     }
@@ -37,7 +56,8 @@ export default {
          Canvas backplate behind its text, and HighlightText on Canvas is
          invisible. The colours are stated explicitly instead. */
       aihio-dropdown-item:hover,
-      aihio-dropdown-item:focus {
+      aihio-dropdown-item:focus,
+      aihio-dropdown-item:has(> a:focus) {
         forced-color-adjust: none;
         background-color: Highlight;
         color: HighlightText;

@@ -1,6 +1,6 @@
 {
   "$component": "aihio-dropdown",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A dropdown menu with trigger, keyboard navigation, and click-outside to close.",
   "intents": [
     "menu",
@@ -106,9 +106,12 @@
       "aria-haspopup=\"menu\" is set on the trigger",
       "aria-expanded is toggled on the trigger",
       "role=\"menu\" is set on the content panel",
-      "role=\"menuitem\" is set on each dropdown item",
+      "role=\"menuitem\" is set on each dropdown item — or, when the item's child is <a href>, on that link, which also takes the focus",
       "Arrow keys move focus between items; Home/End jump to first/last",
+      "Typing a character moves to the next item whose label starts with it; a repeated letter cycles through the matches",
+      "A link item follows itself natively on Enter (so Ctrl/Cmd+Enter and middle-click open a new tab); Space is mapped to it",
       "Escape closes and restores focus to the trigger",
+      "Tab and Shift+Tab close the menu and move on through the page",
       "Click outside closes the menu",
       "The Popover API provides top-layer rendering where supported; the component handles Escape and outside-pointer dismissal so close requests remain cancelable",
       "The menu flips above the trigger and clamps to viewport edges when needed"
@@ -129,13 +132,13 @@
     },
     {
       "markup": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\">Menu</aihio-button>\n  <a href=\"/x\">Link</a>\n</aihio-dropdown>",
-      "reason": "Children should be aihio-dropdown-item/separator so keyboard navigation and menuitem roles work. Wrap links in aihio-dropdown-item."
+      "reason": "Children should be aihio-dropdown-item/separator so keyboard navigation and menuitem roles work. Put the link inside an item: <aihio-dropdown-item><a href=\"/x\">Link</a></aihio-dropdown-item>."
     }
   ],
   "related": [
     {
       "$component": "aihio-dropdown-item",
-      "description": "A selectable item in the dropdown",
+      "description": "A selectable item in the dropdown. Give it a single <a href> child to make it a link.",
       "attributes": {
         "value": {
           "type": "string",
@@ -161,6 +164,7 @@
     }
   ],
   "examples": [
-    "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Open</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n  <aihio-dropdown-item>Settings</aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item>Logout</aihio-dropdown-item>\n</aihio-dropdown>"
+    "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Open</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n  <aihio-dropdown-item>Settings</aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item>Logout</aihio-dropdown-item>\n</aihio-dropdown>",
+    "<aihio-dropdown align=\"end\">\n  <aihio-button slot=\"trigger\" variant=\"ghost\">Account</aihio-button>\n  <aihio-dropdown-item><a href=\"/profile\">Profile</a></aihio-dropdown-item>\n  <aihio-dropdown-item><a href=\"/settings\">Settings</a></aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item value=\"sign-out\">Sign out</aihio-dropdown-item>\n</aihio-dropdown>"
   ]
 }

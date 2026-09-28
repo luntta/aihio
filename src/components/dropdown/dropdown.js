@@ -2,9 +2,13 @@ import { AihioElement } from '../base.js';
 
 let dropdownInstanceId = 0;
 
+// Keys typed within this long of each other build one typeahead query.
+const TYPEAHEAD_RESET = 500;
+const COMBINING_MARK = /\p{M}/gu;
+
 export class AihioDropdown extends AihioElement {
   static tag = 'aihio-dropdown';
-  static schemaVersion = '1.1.0';
+  static schemaVersion = '1.2.0';
   static shadow = true;
   static observedAttributes = ['open', 'align'];
   static styles = `
@@ -109,6 +113,13 @@ export class AihioDropdown extends AihioElement {
         return;
       }
 
+      // Tab leaves the menu, so it closes. The default action still runs and
+      // moves focus on through the page, rather than back to the trigger.
+      if (e.key === 'Tab') {
+        this.close({ reason: 'tab' });
+        return;
+      }
+
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         this._focusAdjacentItem(1);
@@ -121,6 +132,8 @@ export class AihioDropdown extends AihioElement {
       } else if (e.key === 'End') {
         e.preventDefault();
         this._focusItem('last');
+      } else if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        this._typeahead(e.key);
       }
     };
 
@@ -236,12 +249,44 @@ export class AihioDropdown extends AihioElement {
     const items = this._getItems();
     if (items.length === 0) return;
 
-    const current = items.findIndex((item) => item === document.activeElement);
+    const current = this._activeItemIndex(items);
     const next = current === -1
       ? direction > 0 ? 0 : items.length - 1
       : (current + direction + items.length) % items.length;
 
     items[next]?.focus();
+  }
+
+  /* A link item's focus is on its <a>, not on the item itself. */
+  _activeItemIndex(items) {
+    const active = document.activeElement;
+    return items.findIndex((item) => item === active || item.contains(active));
+  }
+
+  /* Typing moves to the next item whose label starts with what was typed. A
+     repeated single letter cycles through every item that starts with it, the
+     way a native <select> does. */
+  _typeahead(key) {
+    clearTimeout(this._typeaheadTimer);
+    this._typeaheadTimer = setTimeout(() => {
+      this._typeaheadQuery = '';
+    }, TYPEAHEAD_RESET);
+    this._typeaheadQuery = (this._typeaheadQuery ?? '') + foldLabel(key);
+
+    const items = this._getItems();
+    const query = this._typeaheadQuery;
+    const cycling = [...query].every((character) => character === query[0]);
+    const needle = cycling ? query[0] : query;
+    const current = this._activeItemIndex(items);
+    const start = cycling ? current + 1 : Math.max(current, 0);
+
+    for (let offset = 0; offset < items.length; offset += 1) {
+      const item = items[(start + offset) % items.length];
+      if (foldLabel(item.textContent).startsWith(needle)) {
+        item.focus();
+        return;
+      }
+    }
   }
 
   _showContent() {
@@ -338,21 +383,60 @@ export class AihioDropdownItem extends AihioElement {
 
     this._onKeyDown = (e) => {
       if (this.hasAttribute('disabled')) return;
+      // A link follows itself on Enter, natively, which keeps Ctrl/Cmd+Enter
+      // opening it in a new tab. Space is not a link key, so it is mapped.
+      const link = this._getLink();
+      if (link && e.key === 'Enter') return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        this.click();
+        (link ?? this).click();
       }
     };
+
+    this._observer = new MutationObserver(() => this.refresh());
 
     this.addEventListener('click', this._onClickCapture, { capture: true });
     this.addEventListener('click', this._onClick);
     this.addEventListener('keydown', this._onKeyDown);
   }
 
+  connect() {
+    this._observer?.observe(this, { childList: true });
+  }
+
+  disconnect() {
+    this._observer?.disconnect();
+  }
+
+  /* An item whose child is <a href> is a link, and the link itself is the
+     menuitem: it takes the role and the focus, so Enter, middle-click,
+     Ctrl/Cmd-click, "copy link", and the status-bar URL are all native. A
+     role="menuitem" wrapper around a link would be one interactive element
+     nested in another, and Enter on the wrapper would never reach the link. */
+  _getLink() {
+    return this.querySelector(':scope > a[href]');
+  }
+
   sync() {
-    this.setAttribute('role', 'menuitem');
-    this.setAttribute('tabindex', '-1');
-    this.setAria('disabled', this.boolAttr('disabled') ? 'true' : null);
+    const link = this._getLink();
+    const menuitem = link ?? this;
+
+    if (link) {
+      this.setAttribute('role', 'none');
+      this.removeAttribute('tabindex');
+      this.removeAttribute('aria-disabled');
+    }
+
+    menuitem.setAttribute('role', 'menuitem');
+    menuitem.setAttribute('tabindex', '-1');
+    if (this.boolAttr('disabled')) menuitem.setAttribute('aria-disabled', 'true');
+    else menuitem.removeAttribute('aria-disabled');
+  }
+
+  focus(options) {
+    const link = this._getLink();
+    if (link) link.focus(options);
+    else super.focus(options);
   }
 }
 
@@ -362,4 +446,12 @@ export class AihioDropdownSeparator extends AihioElement {
   sync() {
     this.setAttribute('role', 'separator');
   }
+}
+
+function foldLabel(text) {
+  return String(text ?? '')
+    .trim()
+    .normalize('NFD')
+    .replace(COMBINING_MARK, '')
+    .toLocaleLowerCase();
 }
