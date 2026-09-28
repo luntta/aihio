@@ -2,7 +2,7 @@
   "id": "data-card-grid",
   "name": "Data Card Grid",
   "intents": ["layout", "surface", "status", "identity", "secondary-action"],
-  "description": "A dashboard-style grid of compact summary cards with metadata, ownership, and a follow-up action.",
-  "requiredComponents": ["aihio-card", "aihio-badge", "aihio-avatar", "aihio-button"],
+  "description": "A dashboard-style grid of compact summary cards with status, ownership, and a follow-up action. aihio-grid drops columns as it narrows, and the cards are a list.",
+  "requiredComponents": ["aihio-grid", "aihio-card", "aihio-badge", "aihio-avatar", "aihio-button", "aihio-stack", "aihio-cluster"],
   "variations": []
 }

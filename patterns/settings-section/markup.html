@@ -1,38 +1,46 @@
 <aihio-card data-aihio-intent="surface">
-  <aihio-card-header>
-    <aihio-card-title>Workspace settings</aihio-card-title>
-    <aihio-card-description>Update the defaults your team sees on first login.</aihio-card-description>
-  </aihio-card-header>
-  <aihio-card-content>
-    <div>
-      <aihio-badge data-aihio-intent="status" variant="secondary">Live</aihio-badge>
-    </div>
+  <form>
+    <aihio-card-header>
+      <aihio-cluster data-aihio-intent="layout" justify="between">
+        <aihio-card-title>Workspace settings</aihio-card-title>
+        <aihio-badge data-aihio-intent="status" variant="secondary">Live</aihio-badge>
+      </aihio-cluster>
+      <aihio-card-description>Update the defaults your team sees on first login.</aihio-card-description>
+    </aihio-card-header>
+    <aihio-card-content>
+      <aihio-stack data-aihio-intent="layout" gap="lg">
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Workspace name</label>
+          <aihio-input
+            data-aihio-intent="text-entry"
+            name="workspace-name"
+            value="Northwind"
+            required
+          ></aihio-input>
+        </aihio-field>
 
-    <label>
-      <span>Workspace name</span>
-      <aihio-input
-        data-aihio-intent="form-field text-entry"
-        value="Northwind"
-      ></aihio-input>
-    </label>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Default landing page</label>
+          <select name="landing-page">
+            <option value="overview">Overview</option>
+            <option value="projects" selected>Projects</option>
+            <option value="settings">Settings</option>
+          </select>
+          <span slot="description">Where members arrive after they sign in.</span>
+        </aihio-field>
 
-    <div>
-      <span>Default landing page</span>
-      <aihio-dropdown data-aihio-intent="menu selection">
-        <aihio-button slot="trigger" data-aihio-intent="secondary-action" variant="outline">Projects</aihio-button>
-        <aihio-dropdown-item>Overview</aihio-dropdown-item>
-        <aihio-dropdown-item>Projects</aihio-dropdown-item>
-        <aihio-dropdown-item>Settings</aihio-dropdown-item>
-      </aihio-dropdown>
-    </div>
-
-    <div>
-      <span>Email notifications</span>
-      <aihio-toggle data-aihio-intent="toggle-state" pressed>Enabled</aihio-toggle>
-    </div>
-  </aihio-card-content>
-  <aihio-card-footer>
-    <aihio-button data-aihio-intent="secondary-action" variant="outline">Reset</aihio-button>
-    <aihio-button data-aihio-intent="primary-action">Save changes</aihio-button>
-  </aihio-card-footer>
+        <aihio-field data-aihio-intent="form-field">
+          <label slot="label">Email notifications</label>
+          <aihio-switch data-aihio-intent="toggle-state" name="email-notifications" checked></aihio-switch>
+          <span slot="description">A digest of workspace activity, sent weekly.</span>
+        </aihio-field>
+      </aihio-stack>
+    </aihio-card-content>
+    <aihio-card-footer>
+      <aihio-cluster data-aihio-intent="layout" grow justify="end">
+        <aihio-button data-aihio-intent="secondary-action" variant="outline" type="reset">Reset</aihio-button>
+        <aihio-button data-aihio-intent="primary-action" type="submit">Save changes</aihio-button>
+      </aihio-cluster>
+    </aihio-card-footer>
+  </form>
 </aihio-card>

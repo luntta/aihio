@@ -7,65 +7,82 @@
 
   <aihio-tab-panel value="profile">
     <aihio-card data-aihio-intent="surface">
-      <aihio-card-header>
-        <aihio-card-title>Profile</aihio-card-title>
-        <aihio-card-description>Update how your name and email appear to the team.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        <label>
-          <span>Full name</span>
-          <aihio-input data-aihio-intent="form-field text-entry" value="Jane Doe"></aihio-input>
-        </label>
-
-        <label>
-          <span>Email</span>
-          <aihio-input data-aihio-intent="form-field text-entry" type="email" value="jane@company.com"></aihio-input>
-        </label>
-      </aihio-card-content>
-      <aihio-card-footer>
-        <aihio-button data-aihio-intent="primary-action">Save profile</aihio-button>
-      </aihio-card-footer>
+      <form>
+        <aihio-card-header>
+          <aihio-card-title>Profile</aihio-card-title>
+          <aihio-card-description>Update how your name and email appear to the team.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          <aihio-stack data-aihio-intent="layout">
+            <aihio-field data-aihio-intent="form-field">
+              <label slot="label">Full name</label>
+              <aihio-input data-aihio-intent="text-entry" name="name" autocomplete="name" value="Jane Doe" required></aihio-input>
+            </aihio-field>
+            <aihio-field data-aihio-intent="form-field">
+              <label slot="label">Email</label>
+              <aihio-input data-aihio-intent="text-entry" type="email" name="email" autocomplete="email" value="jane@company.com" required></aihio-input>
+            </aihio-field>
+          </aihio-stack>
+        </aihio-card-content>
+        <aihio-card-footer>
+          <aihio-cluster data-aihio-intent="layout" grow justify="end">
+            <aihio-button data-aihio-intent="primary-action" type="submit">Save profile</aihio-button>
+          </aihio-cluster>
+        </aihio-card-footer>
+      </form>
     </aihio-card>
   </aihio-tab-panel>
 
   <aihio-tab-panel value="notifications">
     <aihio-card data-aihio-intent="surface">
-      <aihio-card-header>
-        <aihio-card-title>Notifications</aihio-card-title>
-        <aihio-card-description>Choose which updates should interrupt your day.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        <div>
-          <span>Incident digests</span>
-          <aihio-toggle data-aihio-intent="toggle-state" pressed>Enabled</aihio-toggle>
-        </div>
-
-        <div>
-          <span>Weekly summary</span>
-          <aihio-toggle data-aihio-intent="toggle-state">Disabled</aihio-toggle>
-        </div>
-      </aihio-card-content>
-      <aihio-card-footer>
-        <aihio-button data-aihio-intent="primary-action">Save notifications</aihio-button>
-      </aihio-card-footer>
+      <form>
+        <aihio-card-header>
+          <aihio-card-title>Notifications</aihio-card-title>
+          <aihio-card-description>Choose which updates should interrupt your day.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          <aihio-stack data-aihio-intent="layout" gap="lg">
+            <aihio-field data-aihio-intent="form-field">
+              <label slot="label">Incident digests</label>
+              <aihio-switch data-aihio-intent="toggle-state" name="incident-digests" checked></aihio-switch>
+              <span slot="description">A summary of open incidents every morning.</span>
+            </aihio-field>
+            <aihio-field data-aihio-intent="form-field">
+              <label slot="label">Weekly summary</label>
+              <aihio-switch data-aihio-intent="toggle-state" name="weekly-summary"></aihio-switch>
+              <span slot="description">Activity across every project, sent on Mondays.</span>
+            </aihio-field>
+          </aihio-stack>
+        </aihio-card-content>
+        <aihio-card-footer>
+          <aihio-cluster data-aihio-intent="layout" grow justify="end">
+            <aihio-button data-aihio-intent="primary-action" type="submit">Save notifications</aihio-button>
+          </aihio-cluster>
+        </aihio-card-footer>
+      </form>
     </aihio-card>
   </aihio-tab-panel>
 
   <aihio-tab-panel value="security">
     <aihio-card data-aihio-intent="surface">
-      <aihio-card-header>
-        <aihio-card-title>Security</aihio-card-title>
-        <aihio-card-description>Rotate credentials and confirm recovery options.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        <label>
-          <span>Recovery email</span>
-          <aihio-input data-aihio-intent="form-field text-entry" type="email" value="security@company.com"></aihio-input>
-        </label>
-      </aihio-card-content>
-      <aihio-card-footer>
-        <aihio-button data-aihio-intent="primary-action">Save security settings</aihio-button>
-      </aihio-card-footer>
+      <form>
+        <aihio-card-header>
+          <aihio-card-title>Security</aihio-card-title>
+          <aihio-card-description>Rotate credentials and confirm recovery options.</aihio-card-description>
+        </aihio-card-header>
+        <aihio-card-content>
+          <aihio-field data-aihio-intent="form-field">
+            <label slot="label">Recovery email</label>
+            <aihio-input data-aihio-intent="text-entry" type="email" name="recovery-email" autocomplete="email" value="security@company.com"></aihio-input>
+            <span slot="description">Used only if you lose access to your account.</span>
+          </aihio-field>
+        </aihio-card-content>
+        <aihio-card-footer>
+          <aihio-cluster data-aihio-intent="layout" grow justify="end">
+            <aihio-button data-aihio-intent="primary-action" type="submit">Save security settings</aihio-button>
+          </aihio-cluster>
+        </aihio-card-footer>
+      </form>
     </aihio-card>
   </aihio-tab-panel>
 </aihio-tabs>

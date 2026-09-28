@@ -3,6 +3,6 @@
   "name": "Toast-Style Alert Stack",
   "intents": ["alert", "informational", "status", "layout"],
   "description": "A lightweight stacked-notification pattern for transient system updates.",
-  "requiredComponents": ["aihio-alert"],
+  "requiredComponents": ["aihio-alert", "aihio-stack"],
   "variations": []
 }

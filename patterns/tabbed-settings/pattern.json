@@ -1,8 +1,8 @@
 {
   "id": "tabbed-settings",
   "name": "Tabbed Settings",
-  "intents": ["tabs", "navigation", "layout", "surface", "form-field", "toggle-state", "primary-action"],
-  "description": "A settings view split across tabs so related configuration stays grouped without overwhelming the page.",
-  "requiredComponents": ["aihio-tabs", "aihio-card", "aihio-input", "aihio-toggle", "aihio-button"],
+  "intents": ["tabs", "navigation", "layout", "surface", "form-field", "text-entry", "toggle-state", "primary-action"],
+  "description": "A settings view split across tabs so related configuration stays grouped without overwhelming the page. Each panel is its own form with its own Save.",
+  "requiredComponents": ["aihio-tabs", "aihio-card", "aihio-field", "aihio-input", "aihio-switch", "aihio-button", "aihio-stack", "aihio-cluster"],
   "variations": []
 }
