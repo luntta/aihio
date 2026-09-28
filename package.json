@@ -74,6 +74,10 @@
       "types": "./dist/stack.d.ts",
       "default": "./dist/stack.js"
     },
+    "./switch": {
+      "types": "./dist/switch.d.ts",
+      "default": "./dist/switch.js"
+    },
     "./tabs": {
       "types": "./dist/tabs.d.ts",
       "default": "./dist/tabs.js"

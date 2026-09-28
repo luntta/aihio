@@ -92,7 +92,7 @@ the platform's own. Ordered by how often the gap bites generated markup.
 - [x] `aihio-toggle` delegates to a real `<button aria-pressed>`, as `aihio-button` does
 - [x] Dialog: initial focus honours `autofocus` and lands on a rendered tab stop (it picked an unselected tab and ignored `autofocus`); the Tab wrap uses the same tab stops
 - [x] Dropdown: Tab closes the menu, typeahead moves to the matching item, and an item whose child is `<a href>` is a real link menuitem (the documented "wrap links in an item" shape never reached the link on Enter)
-- [ ] Form controls: styled native `textarea` / `select` / checkbox / radio, and an `aihio-switch` for on/off settings
+- [x] Form controls: `aihio-switch` for on/off settings (a real `role="switch"` checkbox; a row inside `aihio-field`), native `textarea` / `select` drawn like `aihio-input` inside a field, and `accent-color` for native checkboxes and radios
 - [ ] Patterns rebuilt on `aihio-field` / `aihio-stack` / `aihio-cluster`, inside forms with names; settings use switches, not toggles named after their state; destructive confirmation has a trigger and a Cancel that closes
 - [x] Linter: `unknown-attribute`, and a `suggestion` on enum, unknown-component, attribute, and command issues so an agent can fix in one round trip
 - [x] MCP: `find` (free text or intent), `list_components`, `list_patterns`, `get_pattern`, and the prompt fragment as the MCP prompt `aihio-authoring`; component descriptions now say when to use each one

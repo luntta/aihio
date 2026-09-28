@@ -56,7 +56,7 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 14);
+  assert.equal(components.length, 15);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
 
@@ -314,7 +314,7 @@ test('schema content pass keeps a11y guidance and counterexamples populated for 
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 14);
+  assert.equal(minified.components.length, 15);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
   assert.equal(minified.patterns.length, 8);
 

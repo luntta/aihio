@@ -4,7 +4,7 @@ let fieldInstanceId = 0;
 
 // Aihio controls come first in document order, ahead of the native inputs
 // they render inside themselves, so the host is the control that is found.
-const CONTROL_SELECTOR = 'aihio-input, aihio-combobox, input, select, textarea';
+const CONTROL_SELECTOR = 'aihio-input, aihio-combobox, aihio-switch, input, select, textarea';
 
 // Hosts that take the error state as an attribute and restate it on the
 // control they render.
@@ -12,7 +12,7 @@ const ERROR_ATTRIBUTE_HOSTS = new Set(['AIHIO-INPUT', 'AIHIO-COMBOBOX']);
 
 export class AihioField extends AihioElement {
   static tag = 'aihio-field';
-  static schemaVersion = '1.2.0';
+  static schemaVersion = '1.3.0';
   static observedAttributes = ['error'];
 
   setup() {

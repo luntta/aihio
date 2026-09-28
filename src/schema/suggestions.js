@@ -86,6 +86,7 @@ const COMPONENT_SYNONYMS = {
   'aihio-inline': 'aihio-cluster',
   'aihio-button-group': 'aihio-cluster',
   'aihio-toggle-button': 'aihio-toggle',
+  'aihio-toggle-switch': 'aihio-switch',
   'aihio-icon-button': 'aihio-button',
   'aihio-link-button': 'aihio-button',
   'aihio-textarea': '<textarea>',

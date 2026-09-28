@@ -119,6 +119,14 @@ const fixtures = [
       { ruleId: 'unknown-attribute', component: 'aihio-button' },
     ],
   },
+  {
+    // A visible label beside the switch is not a label unless it is
+    // associated, which is exactly the settings-row shape a model writes.
+    file: 'switch-without-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-switch' },
+    ],
+  },
 ];
 
 test('known-bad markup fixtures are caught by the built linter', async () => {

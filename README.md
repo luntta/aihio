@@ -54,7 +54,7 @@ if (!customElements.get(AihioButton.tag)) {
 }
 ```
 
-The same form is available for all 14 top-level components. Import
+The same form is available for all 15 top-level components. Import
 `aihio/runtime` when schema inspection is needed without importing component
 implementations.
 
@@ -161,6 +161,7 @@ The prompt fragment is served as the MCP prompt `aihio-authoring`.
 | `aihio-field` | Form field wrapper that lays out label, control, description, and error, and wires the ARIA between them |
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
 | `aihio-input` | Text input with size variants and error state |
+| `aihio-switch` | On/off setting (a real `<input type="checkbox" role="switch">`) that submits with its form |
 | `aihio-combobox` | Filterable single-select field with keyboard navigation, async options, and optional free text |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
 | `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
@@ -229,6 +230,29 @@ other:
   `aria-describedby`, pointing the description at the error message while the
   field is erroring. Clicking either a native `<label>` or other
   `slot="label"` content focuses the delegated input.
+
+### Switches and native controls
+
+`aihio-switch` is the on/off setting: a real `<input type="checkbox"
+role="switch">` that submits `name=value` when on and nothing when off. Inside
+`aihio-field` it lays out as a row, the switch beside its label:
+
+```html
+<aihio-field>
+  <label slot="label">Email notifications</label>
+  <aihio-switch name="email-notifications" checked></aihio-switch>
+  <span slot="description">A digest of activity, sent weekly.</span>
+</aihio-field>
+```
+
+As with a native checkbox, the `checked` attribute is the reset default and
+the `checked` property is live state. Use `aihio-toggle` for a pressed state
+that does not submit, such as Bold in a toolbar.
+
+Aihio leaves `<textarea>`, `<select>`, checkboxes, and radios to the platform.
+Inside `aihio-field` a `<textarea>` or `<select>` is wired and drawn like
+`aihio-input`, and `accent-color` puts native checkboxes, radios, and range
+inputs in the theme.
 
 ### Combobox
 
@@ -328,6 +352,7 @@ Every event a component dispatches carries an `aihio-` prefix:
 | `aihio-input` | `aihio-input` | `{ value }` |
 | `aihio-change` | `aihio-input` | `{ value }` |
 | `aihio-change` | `aihio-combobox` | `{ value, label }` |
+| `aihio-change` | `aihio-switch` | `{ checked }` |
 | `aihio-search` | `aihio-combobox` | `{ query }` |
 | `aihio-toggle` | `aihio-toggle` | `{ pressed }` |
 | `aihio-open`, `aihio-close` | `aihio-dialog`, `aihio-dropdown` | — |
@@ -385,7 +410,7 @@ and `onInput={handler}` therefore work as expected.
 
 ### Wrapped native controls
 
-`aihio-button`, `aihio-toggle`, and `aihio-input` render a real control in
+`aihio-button`, `aihio-toggle`, `aihio-input`, and `aihio-switch` render a real control in
 their own light DOM rather than emulating one, because that is the only way a
 component participates in a form the way the platform does. For the buttons
 that means the children they are given are moved into the `<button>` when the

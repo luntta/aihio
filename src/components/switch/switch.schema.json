@@ -1,0 +1,161 @@
+{
+  "$component": "aihio-switch",
+  "version": "1.0.0",
+  "description": "An on/off setting that submits with its form, such as Email notifications on a settings page. Renders a real <input type=\"checkbox\" role=\"switch\">. Put it inside aihio-field for a label and description; for a pressed state in a toolbar (Bold, Italic) use aihio-toggle instead.",
+  "intents": [
+    "form-field",
+    "toggle-state"
+  ],
+  "attributes": {
+    "checked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the switch starts on. Like a native checkbox's checked attribute, this is the reset default; the checked property is live state."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the switch"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false,
+      "description": "The form cannot submit until the switch is on"
+    },
+    "name": {
+      "type": "string",
+      "description": "Form field name. The switch submits name=value when on and nothing when off."
+    },
+    "value": {
+      "type": "string",
+      "default": "on",
+      "description": "Value submitted when the switch is on"
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the switch"
+    }
+  },
+  "events": {
+    "aihio-change": {
+      "description": "Fired when the user turns the switch on or off. The native change and input events also bubble from the inner checkbox.",
+      "detail": {
+        "checked": "boolean"
+      }
+    }
+  },
+  "properties": {
+    "checked": {
+      "type": "boolean",
+      "description": "Live on/off state"
+    },
+    "defaultChecked": {
+      "type": "boolean",
+      "description": "Reset state; reflects the checked attribute"
+    },
+    "control": {
+      "type": "HTMLInputElement | null",
+      "readonly": true,
+      "description": "The native checkbox the component delegates to"
+    },
+    "form": {
+      "type": "HTMLFormElement | null",
+      "readonly": true,
+      "description": "The owning form, or null outside one"
+    },
+    "validity": {
+      "type": "ValidityState | null",
+      "readonly": true,
+      "description": "Native constraint validation state"
+    },
+    "validationMessage": {
+      "type": "string",
+      "readonly": true,
+      "description": "Native validation message"
+    },
+    "willValidate": {
+      "type": "boolean",
+      "readonly": true,
+      "description": "Whether the switch takes part in constraint validation"
+    }
+  },
+  "methods": {
+    "click()": {
+      "description": "Flips the switch, as a click on it would.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the native checkbox.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    },
+    "checkValidity()": {
+      "description": "Runs native constraint validation.",
+      "returns": "boolean"
+    },
+    "reportValidity()": {
+      "description": "Runs native constraint validation and shows the browser's message.",
+      "returns": "boolean"
+    },
+    "setCustomValidity()": {
+      "description": "Sets a custom validation message; an empty string clears it.",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "The component renders a real <input type=\"checkbox\" role=\"switch\">, so Space toggles it, it is announced as a switch that is on or off, and focus and disabled semantics are native",
+      "Form participation is native: it submits name=value when on, resets with its form, and <fieldset disabled> disables it",
+      "aria-label, aria-labelledby, aria-describedby, and aria-invalid set on the host are forwarded to the checkbox",
+      "Inside aihio-field the label, description, and error are wired to the checkbox, and the field lays out as a row with the switch beside its label",
+      "On and off stay distinguishable under forced colours: the track keeps a border and the on state uses Highlight"
+    ],
+    "required": [
+      {
+        "when": "the switch has no label",
+        "requirement": "Name the switch after the setting it controls: put it in aihio-field with a <label slot=\"label\">, wrap it in a <label>, or give it aria-label. Never label it with its state (\"On\", \"Enabled\").",
+        "severity": "error",
+        "rule": "switch-label"
+      },
+      {
+        "when": "the switch is inside a <form> and its state should be submitted",
+        "requirement": "Set name. A switch without a name is omitted from FormData entirely.",
+        "severity": "warn",
+        "rule": "switch-form-name"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<span>Email notifications</span>\n<aihio-switch name=\"email-notifications\"></aihio-switch>",
+      "reason": "The visible text is not associated with the switch, so it is announced as an unnamed switch. Use aihio-field with <label slot=\"label\">, or wrap both in a <label>."
+    },
+    {
+      "markup": "<aihio-switch aria-label=\"On\" checked></aihio-switch>",
+      "reason": "A switch named by its state is announced as \"On, switch, on\". Name it after the setting it controls."
+    },
+    {
+      "markup": "<aihio-switch checked=\"false\" aria-label=\"Weekly summary\"></aihio-switch>",
+      "reason": "Boolean attributes are on by presence. checked=\"false\" starts the switch on; omit the attribute for off."
+    }
+  ],
+  "examples": [
+    "<aihio-field>\n  <label slot=\"label\">Email notifications</label>\n  <aihio-switch name=\"email-notifications\" checked></aihio-switch>\n  <span slot=\"description\">A digest of activity, sent weekly.</span>\n</aihio-field>",
+    "<label>\n  <aihio-switch name=\"remember\"></aihio-switch>\n  Remember this device\n</label>"
+  ]
+}

@@ -27,6 +27,7 @@ import {
 import { AihioField } from './field/field.js';
 import { AihioInput } from './input/input.js';
 import { AihioStack } from './stack/stack.js';
+import { AihioSwitch } from './switch/switch.js';
 import {
   AihioTab,
   AihioTabList,
@@ -64,6 +65,7 @@ export { AihioCombobox, AihioOption };
 export { AihioField };
 export { AihioInput };
 export { AihioStack };
+export { AihioSwitch };
 export {
   AihioTab,
   AihioTabList,

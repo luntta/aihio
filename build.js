@@ -16,6 +16,7 @@ const componentNames = [
   'field',
   'input',
   'stack',
+  'switch',
   'tabs',
   'toggle',
 ];

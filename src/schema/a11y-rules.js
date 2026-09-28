@@ -13,6 +13,8 @@ export const A11Y_RULE_IDS = new Set([
   'input-label',
   'input-error-description',
   'input-form-name',
+  'switch-form-name',
+  'switch-label',
   'tabs-value-pairs',
   'toggle-accessible-name',
 ]);
@@ -85,7 +87,7 @@ const RULES = {
     const label = owned.find((child) => api.attr(child, 'slot') === 'label');
     if (label && hasContent(label, api)) return false;
     const control = owned.find((child) =>
-      ['aihio-input', 'aihio-combobox', 'input', 'select', 'textarea'].includes(api.tag(child))
+      ['aihio-input', 'aihio-combobox', 'aihio-switch', 'input', 'select', 'textarea'].includes(api.tag(child))
     );
     return !control || !hasNonEmptyAttribute(control, 'aria-label', api);
   },
@@ -97,6 +99,11 @@ const RULES = {
 
   'input-form-name': (node, api) =>
     api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
+
+  'switch-form-name': (node, api) =>
+    api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
+
+  'switch-label': (node, api) => !hasAssociatedLabel(node, api),
 
   'tabs-value-pairs': (node, api) => !hasExactTabValuePairs(node, api),
 

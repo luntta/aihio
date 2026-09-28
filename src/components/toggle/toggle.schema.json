@@ -73,7 +73,7 @@
       },
       {
         "when": "the toggle turns a setting on or off",
-        "requirement": "Name the toggle after what it controls (e.g. \"Bold\"), never after its state: a toggle labelled \"Enabled\" is announced as \"Enabled, toggle button, pressed\" and never says what is enabled.",
+        "requirement": "Name the toggle after what it controls (e.g. \"Bold\"), never after its state: a toggle labelled \"Enabled\" is announced as \"Enabled, toggle button, pressed\" and never says what is enabled. For an on/off setting in a form, use aihio-switch.",
         "severity": "warn"
       }
     ]
@@ -89,7 +89,7 @@
     },
     {
       "markup": "<span>Email notifications</span>\n<aihio-toggle pressed>Enabled</aihio-toggle>",
-      "reason": "The toggle is named by its state and the visible label is not associated with it, so assistive technology announces \"Enabled, toggle button, pressed\" with no idea what is enabled. Name the toggle after what it controls."
+      "reason": "The toggle is named by its state and the visible label is not associated with it, so assistive technology announces \"Enabled, toggle button, pressed\" with no idea what is enabled. An on/off setting is a switch: use aihio-switch in aihio-field, which also submits with the form."
     }
   ],
   "examples": [
