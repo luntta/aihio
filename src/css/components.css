@@ -52,9 +52,12 @@ aihio-alert {
       letter-spacing: var(--letterSpacing-intent-heading);
     }
 
+    /* No opacity to set the description back from the title: the contrast
+       contract holds the state text colours to 4.5:1 exactly as they are, and
+       the success green at 0.9 opacity measured 4.31:1. The title's weight
+       carries the hierarchy instead. */
     aihio-alert [slot="description"] {
       font-size: var(--fontSize-intent-body-sm);
-      opacity: 0.9;
     }
 
     /* Variant colour is discarded under forced colours. The border keeps the

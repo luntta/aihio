@@ -95,6 +95,7 @@ the platform's own. Ordered by how often the gap bites generated markup.
 - [x] Form controls: `aihio-switch` for on/off settings (a real `role="switch"` checkbox; a row inside `aihio-field`), native `textarea` / `select` drawn like `aihio-input` inside a field, and `accent-color` for native checkboxes and radios
 - [x] Patterns rebuilt on `aihio-field` / `aihio-stack` / `aihio-cluster`, inside forms with names; settings use switches (not toggles named after their state) and a native `<select>` (not a menu, whose choice never reached the form); destructive confirmation has a trigger and a Cancel that closes
 - [x] `aihio-grid`, so the data-card-grid pattern is a grid (it was an unspaced `<div>`)
+- [x] Every pattern and variation is rendered and checked with axe in both themes — which caught the alert description's `opacity: 0.9` taking success text to 4.31:1
 - [x] Linter: `unknown-attribute`, and a `suggestion` on enum, unknown-component, attribute, and command issues so an agent can fix in one round trip
 - [x] MCP: `find` (free text or intent), `list_components`, `list_patterns`, `get_pattern`, and the prompt fragment as the MCP prompt `aihio-authoring`; component descriptions now say when to use each one
 - [x] Bundle: light-DOM component CSS moves to `<name>.styles.js`, read only by the CSS build (it already shipped in `aihio.css`) — `dist/aihio.js` 136 → 98 KB minified, 28.6 → 23.7 KB gzip
