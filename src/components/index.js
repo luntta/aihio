@@ -25,6 +25,7 @@ import {
   AihioDropdownSeparator,
 } from './dropdown/dropdown.js';
 import { AihioField } from './field/field.js';
+import { AihioGrid } from './grid/grid.js';
 import { AihioInput } from './input/input.js';
 import { AihioStack } from './stack/stack.js';
 import { AihioSwitch } from './switch/switch.js';
@@ -63,6 +64,7 @@ export {
 export { AihioCluster };
 export { AihioCombobox, AihioOption };
 export { AihioField };
+export { AihioGrid };
 export { AihioInput };
 export { AihioStack };
 export { AihioSwitch };

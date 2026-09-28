@@ -158,6 +158,7 @@ The prompt fragment is served as the MCP prompt `aihio-authoring`.
 |-----------|-------------|
 | `aihio-stack` | Vertical layout primitive applying the system spacing scale |
 | `aihio-cluster` | Horizontal layout primitive for button rows, badge lists, and toolbars |
+| `aihio-grid` | Grid of equal columns, such as cards, that drops columns as it narrows |
 | `aihio-field` | Form field wrapper that lays out label, control, description, and error, and wires the ARIA between them |
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
 | `aihio-input` | Text input with size variants and error state |
@@ -331,14 +332,19 @@ A dialog opens and closes from markup, with no script, through the platform's
 
 ## Layout
 
-Three primitives keep page composition inside the token system instead of in
+Four primitives keep page composition inside the token system instead of in
 hand-written CSS:
 
 ```html
 <aihio-stack gap="lg">          <!-- vertical rhythm -->
 <aihio-cluster justify="end">   <!-- horizontal groups, wraps -->
+<aihio-grid columns="3">        <!-- equal columns, fewer as it narrows -->
 <aihio-field>                   <!-- label + control + message -->
 ```
+
+`aihio-grid` needs no breakpoints: its columns are never narrower than 16rem,
+so it drops one when it runs out of room, responding to its own width rather
+than the viewport's. `columns` caps how many there are.
 
 `aihio-cluster` is sized to its content, so add `grow` when you need `justify`
 to distribute across a row inside a flex parent such as a card footer.

@@ -79,6 +79,8 @@ const COMPONENT_SYNONYMS = {
   'aihio-tab-panels': 'aihio-tabs',
   'aihio-tabpanel': 'aihio-tab-panel',
   'aihio-panel': 'aihio-card',
+  'aihio-columns': 'aihio-grid',
+  'aihio-card-grid': 'aihio-grid',
   'aihio-vstack': 'aihio-stack',
   'aihio-column': 'aihio-stack',
   'aihio-hstack': 'aihio-cluster',

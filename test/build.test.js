@@ -56,13 +56,13 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 15);
+  assert.equal(components.length, 16);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
 
   // The layout tier: without these, composing a page means hand-rolled CSS
   // outside the system.
-  for (const layout of ['aihio-stack', 'aihio-cluster', 'aihio-field']) {
+  for (const layout of ['aihio-stack', 'aihio-cluster', 'aihio-grid', 'aihio-field']) {
     assert.ok(components.includes(layout), `${layout} is part of the system`);
   }
 });
@@ -314,7 +314,7 @@ test('schema content pass keeps a11y guidance and counterexamples populated for 
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 15);
+  assert.equal(minified.components.length, 16);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
   assert.equal(minified.patterns.length, 8);
 

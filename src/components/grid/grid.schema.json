@@ -1,0 +1,66 @@
+{
+  "$component": "aihio-grid",
+  "version": "1.0.0",
+  "description": "Layout primitive for a grid of equal columns, such as a grid of cards. Columns are never narrower than 16rem and drop away as the grid narrows, so it needs no breakpoints; columns caps how many there are.",
+  "intents": [
+    "layout",
+    "container"
+  ],
+  "attributes": {
+    "columns": {
+      "type": "enum",
+      "values": [
+        "2",
+        "3",
+        "4"
+      ],
+      "description": "The most columns to show. Without it, as many 16rem columns as fit."
+    },
+    "gap": {
+      "type": "enum",
+      "values": [
+        "tight",
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Spacing between rows and columns, from the intent spacing scale."
+    }
+  },
+  "slots": {
+    "default": {
+      "description": "The grid items, one per cell."
+    }
+  },
+  "composition": {
+    "allowedChildren": [
+      "*"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "Purely presentational: adds no role, no landmark, and no tab stop. Items keep source order, so reading and tab order match the visual order."
+    ],
+    "required": [
+      {
+        "when": "the grid is a list of like items, such as project cards",
+        "requirement": "Give it list semantics when the count matters to the reader: role=\"list\" on aihio-grid and role=\"listitem\" on each item.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-grid columns=\"6\"><aihio-card></aihio-card></aihio-grid>",
+      "reason": "columns takes 2, 3, or 4. Six 16rem columns do not fit a typical content width, and the grid would drop them anyway."
+    },
+    {
+      "markup": "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:16px\">…</div>",
+      "reason": "A hand-rolled grid ignores the spacing scale and squeezes its columns on narrow screens. Use aihio-grid."
+    }
+  ],
+  "examples": [
+    "<aihio-grid columns=\"3\">\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Customer portal</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Billing sync</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Ops migration</aihio-card-title></aihio-card-header>\n  </aihio-card>\n</aihio-grid>"
+  ]
+}

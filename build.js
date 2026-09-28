@@ -14,6 +14,7 @@ const componentNames = [
   'dialog',
   'dropdown',
   'field',
+  'grid',
   'input',
   'stack',
   'switch',

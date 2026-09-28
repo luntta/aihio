@@ -66,6 +66,10 @@
       "types": "./dist/field.d.ts",
       "default": "./dist/field.js"
     },
+    "./grid": {
+      "types": "./dist/grid.d.ts",
+      "default": "./dist/grid.js"
+    },
     "./input": {
       "types": "./dist/input.d.ts",
       "default": "./dist/input.js"
