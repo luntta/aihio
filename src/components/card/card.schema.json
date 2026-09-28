@@ -1,7 +1,7 @@
 {
   "$component": "aihio-card",
   "version": "1.0.0",
-  "description": "A container component for grouping related content.",
+  "description": "A bordered surface that groups related content, with an optional header (title and description), content area, and footer for actions, such as a settings section or an item in a grid.",
   "intents": [
     "container",
     "surface"

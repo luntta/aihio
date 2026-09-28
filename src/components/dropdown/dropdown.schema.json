@@ -1,7 +1,7 @@
 {
   "$component": "aihio-dropdown",
   "version": "1.2.0",
-  "description": "A dropdown menu with trigger, keyboard navigation, and click-outside to close.",
+  "description": "A menu of actions or links opened from a trigger button, such as an account menu or a row's More actions. Not for choosing a form value: use aihio-combobox for that.",
   "intents": [
     "menu",
     "overlay",

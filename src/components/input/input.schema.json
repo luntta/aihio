@@ -1,7 +1,7 @@
 {
   "$component": "aihio-input",
   "version": "1.2.0",
-  "description": "A text input component with size variants and error state.",
+  "description": "A single-line text field (text, email, password, number, search, and the other native types) that submits with its form. Put it inside aihio-field to get a label, description, and error message.",
   "intents": [
     "form-field",
     "text-entry"

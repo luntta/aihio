@@ -151,7 +151,7 @@ test('canonical prompt fragment is generated as markdown and as an importable mo
 
   assert.match(promptMarkdown, /^# Aihio Prompt Fragment/m);
   assert.match(promptMarkdown, /^## Component Inventory/m);
-  assert.match(promptMarkdown, /`aihio-button` - A button component with multiple visual variants and sizes\./);
+  assert.match(promptMarkdown, /`aihio-button` - An action the user takes: submit a form, open a dialog, run a command\./);
   assert.match(promptMarkdown, /^## Pattern Inventory/m);
   assert.match(promptMarkdown, /`auth-form` -/);
   assert.match(promptMarkdown, /^## Hard Rules from Counterexamples/m);

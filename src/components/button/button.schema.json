@@ -1,7 +1,7 @@
 {
   "$component": "aihio-button",
   "version": "1.4.0",
-  "description": "A button component with multiple visual variants and sizes.",
+  "description": "An action the user takes: submit a form, open a dialog, run a command. Renders a real <button>; variant=\"default\" is the primary style and variant=\"destructive\" marks an irreversible action. It does not navigate: for a link to another page use <a href>.",
   "intents": [
     "action",
     "primary-action",

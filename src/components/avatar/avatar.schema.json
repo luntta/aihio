@@ -1,7 +1,7 @@
 {
   "$component": "aihio-avatar",
   "version": "1.0.0",
-  "description": "An avatar component that shows an image or text fallback.",
+  "description": "A round picture of a person or entity, such as the account owner in a header, falling back to initials when there is no image or it fails to load.",
   "intents": [
     "identity",
     "labeling"

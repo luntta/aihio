@@ -1,7 +1,7 @@
 {
   "$component": "aihio-tabs",
   "version": "1.1.0",
-  "description": "A tabbed interface component with keyboard navigation.",
+  "description": "Switches between sibling panels of content with a row of tabs, such as the sections of a settings page. Arrow keys move between tabs.",
   "intents": [
     "tabs",
     "navigation",

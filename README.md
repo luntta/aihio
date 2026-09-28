@@ -129,7 +129,18 @@ lintMarkup('<aihio-modal></aihio-modal>').issues[0].suggestion;
 // '<aihio-dialog>'
 ```
 
-For MCP clients that launch local stdio servers, the package also ships `aihio-mcp` with two tools: `describe` and `lint`.
+For MCP clients that launch local stdio servers, the package also ships
+`aihio-mcp`. Its tools take an agent from a request to checked markup:
+
+| Tool | Returns |
+| --- | --- |
+| `find` | Components and patterns ranked against what the UI has to do (`"confirm before deleting a project"`) or an intent name |
+| `list_components`, `list_patterns` | The whole inventory, with each entry's purpose and intents |
+| `get_pattern` | A canonical pattern's lint-clean markup and variations |
+| `describe` | One component's full schema |
+| `lint` | Structured issues, with a `suggestion` where the fix is unambiguous |
+
+The prompt fragment is served as the MCP prompt `aihio-authoring`.
 
 ```json
 {

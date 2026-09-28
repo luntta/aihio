@@ -1,7 +1,7 @@
 {
   "$component": "aihio-combobox",
   "version": "1.0.0",
-  "description": "A text field that filters a list of options as you type and submits the chosen option's value. Use it when there are too many options to scan comfortably (roughly more than ten), or when the options come from a search.",
+  "description": "A text field for picking one option from a long list: typing filters the options, and the chosen option's value submits with the form. Use it when there are too many options to scan comfortably (roughly more than ten), or when the options come from a search.",
   "intents": [
     "form-field",
     "selection",

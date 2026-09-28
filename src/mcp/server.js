@@ -1,5 +1,6 @@
 import { lintMarkup } from '../lint/index.js';
 import { describe as describeComponent, runtimeSchema } from '../schema/runtime.js';
+import { authoringPrompt, find, getPattern, listComponents, listPatterns } from './catalog.js';
 
 const JSONRPC_VERSION = '2.0';
 const SUPPORTED_PROTOCOL_VERSIONS = [
@@ -11,7 +12,62 @@ const SUPPORTED_PROTOCOL_VERSIONS = [
 
 const KNOWN_COMPONENTS = runtimeSchema.components.map((component) => component.$component);
 
+const PROMPT_NAME = 'aihio-authoring';
+const PROMPT_DEFINITION = {
+  name: PROMPT_NAME,
+  title: 'Aihio authoring guide',
+  description:
+    'The canonical prompt fragment for generating Aihio markup: strategy, authoring rules, component inventory, intent map, pattern inventory, accessibility obligations, hard rules from counterexamples, and the intent-token vocabulary.',
+};
+
+const NO_ARGUMENTS = { type: 'object', properties: {}, additionalProperties: false };
+
 const TOOL_DEFINITIONS = [
+  {
+    name: 'find',
+    title: 'Find Aihio Components and Patterns',
+    description:
+      'Start here. Given what the UI has to do — free text such as "confirm before deleting a project", or an intent name such as "destructive-action" — return the best-matching components and canonical patterns. Adapt a returned pattern with get_pattern rather than composing from scratch.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'What the UI should do, in plain words, or one intent name from the vocabulary.',
+        },
+      },
+      required: ['query'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'list_components',
+    title: 'List Aihio Components',
+    description: 'List every top-level Aihio component with its one-line purpose, intents, commands, and subcomponents.',
+    inputSchema: NO_ARGUMENTS,
+  },
+  {
+    name: 'list_patterns',
+    title: 'List Aihio Patterns',
+    description: 'List the canonical multi-component patterns (auth form, settings section, destructive confirmation, ...) with their purpose and intents.',
+    inputSchema: NO_ARGUMENTS,
+  },
+  {
+    name: 'get_pattern',
+    title: 'Get Aihio Pattern',
+    description: 'Return a canonical pattern\'s complete, lint-clean markup and its variations. Adapt it instead of freehanding the structure.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'Pattern id, e.g. "destructive-confirmation". list_patterns returns them all.',
+        },
+      },
+      required: ['id'],
+      additionalProperties: false,
+    },
+  },
   {
     name: 'describe',
     title: 'Describe Aihio Component',
@@ -31,7 +87,7 @@ const TOOL_DEFINITIONS = [
   {
     name: 'lint',
     title: 'Lint Aihio Markup',
-    description: 'Validate markup against the Aihio schema and return structured issues.',
+    description: 'Validate markup against the Aihio schema and return structured issues. Run it on every snippet before returning it; an issue with a "suggestion" can be fixed by applying that replacement.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -196,6 +252,18 @@ function handleSingleMessage(message, state) {
       : null;
   }
 
+  if (message.method === 'prompts/list') {
+    return isRequest
+      ? createResultResponse(message.id, { prompts: [PROMPT_DEFINITION] })
+      : null;
+  }
+
+  if (message.method === 'prompts/get') {
+    return isRequest
+      ? createResultResponse(message.id, getPrompt(message.params))
+      : null;
+  }
+
   return isRequest
     ? createErrorResponse(message.id, -32601, `Method not found: ${message.method}`)
     : null;
@@ -213,15 +281,18 @@ function handleInitialize(message, state) {
       tools: {
         listChanged: false,
       },
+      prompts: {
+        listChanged: false,
+      },
     },
     serverInfo: {
       name: 'aihio',
       title: 'Aihio MCP Server',
       version: runtimeSchema.version,
-      description: 'Schema-backed Aihio component describe and lint tools.',
+      description: 'Schema-backed discovery, description, and linting for Aihio markup.',
     },
     instructions:
-      'Use the describe tool to fetch a component schema and the lint tool to validate Aihio markup against the shipped schema rules.',
+      'To build UI with Aihio: call find with what the UI has to do, start from a returned pattern (get_pattern) when one fits, check component APIs with describe, and run lint on every snippet before returning it, applying any issue\'s suggestion. The aihio-authoring prompt carries the full authoring rules.',
   });
 }
 
@@ -240,6 +311,22 @@ function callTool(params) {
 
   if (params.name === 'describe') {
     return describeTool(params.arguments);
+  }
+
+  if (params.name === 'find') {
+    return findTool(params.arguments);
+  }
+
+  if (params.name === 'list_components') {
+    return toolResult({ components: listComponents() });
+  }
+
+  if (params.name === 'list_patterns') {
+    return toolResult({ patterns: listPatterns() });
+  }
+
+  if (params.name === 'get_pattern') {
+    return getPatternTool(params.arguments);
   }
 
   if (params.name === 'lint') {
@@ -286,6 +373,64 @@ function describeTool(argumentsObject) {
     schema,
   };
 
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(structuredContent, null, 2),
+      },
+    ],
+    structuredContent,
+  };
+}
+
+function findTool(argumentsObject) {
+  if (!isPlainObject(argumentsObject) || typeof argumentsObject.query !== 'string' || !argumentsObject.query.trim()) {
+    return createToolError('The find tool requires a non-empty string "query" argument.');
+  }
+
+  const result = find(argumentsObject.query);
+  if (result.components.length === 0 && result.patterns.length === 0) {
+    return createToolError(
+      `Nothing matched "${result.query}". Try other words, an intent name, or list_components.`,
+      { ...result, intents: runtimeSchema.intents ?? [] }
+    );
+  }
+  return toolResult(result);
+}
+
+function getPatternTool(argumentsObject) {
+  const id = isPlainObject(argumentsObject) && typeof argumentsObject.id === 'string'
+    ? argumentsObject.id.trim()
+    : '';
+  const pattern = id ? getPattern(id) : null;
+
+  if (!pattern) {
+    return createToolError(
+      id ? `Unknown pattern "${id}".` : 'The get_pattern tool requires a string "id" argument.',
+      { knownPatterns: listPatterns().map((entry) => entry.id) }
+    );
+  }
+  return toolResult(pattern);
+}
+
+function getPrompt(params) {
+  if (!isPlainObject(params) || params.name !== PROMPT_NAME) {
+    throw createProtocolError(-32602, `Unknown prompt: ${params?.name}. Available: ${PROMPT_NAME}.`);
+  }
+
+  return {
+    description: PROMPT_DEFINITION.description,
+    messages: [
+      {
+        role: 'user',
+        content: { type: 'text', text: authoringPrompt },
+      },
+    ],
+  };
+}
+
+function toolResult(structuredContent) {
   return {
     content: [
       {

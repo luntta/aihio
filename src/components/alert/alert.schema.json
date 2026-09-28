@@ -1,7 +1,7 @@
 {
   "$component": "aihio-alert",
   "version": "1.1.0",
-  "description": "A callout component for important messages.",
+  "description": "A callout for a message the user should notice where it is shown: a failed save, a confirmation that something worked, a warning about a setting. Only the destructive variant interrupts a screen reader.",
   "intents": [
     "alert",
     "informational",

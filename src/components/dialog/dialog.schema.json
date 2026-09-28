@@ -1,7 +1,7 @@
 {
   "$component": "aihio-dialog",
   "version": "1.2.0",
-  "description": "A modal dialog with backdrop, focus trap, and ESC to close.",
+  "description": "A modal dialog for a focused task or a confirmation before an irreversible action, such as deleting a project. Opens and closes from markup: commandfor plus command=\"--open\" or command=\"--close\".",
   "intents": [
     "overlay",
     "modal",

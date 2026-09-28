@@ -1,7 +1,7 @@
 {
   "$component": "aihio-badge",
   "version": "1.1.0",
-  "description": "A small status indicator label.",
+  "description": "A small non-interactive label for a status, count, or category, such as Live, Beta, or 3 new.",
   "intents": [
     "status",
     "labeling",

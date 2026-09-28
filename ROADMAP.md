@@ -95,7 +95,7 @@ the platform's own. Ordered by how often the gap bites generated markup.
 - [ ] Form controls: styled native `textarea` / `select` / checkbox / radio, and an `aihio-switch` for on/off settings
 - [ ] Patterns rebuilt on `aihio-field` / `aihio-stack` / `aihio-cluster`, inside forms with names; settings use switches, not toggles named after their state; destructive confirmation has a trigger and a Cancel that closes
 - [x] Linter: `unknown-attribute`, and a `suggestion` on enum, unknown-component, attribute, and command issues so an agent can fix in one round trip
-- [ ] MCP: `list_components`, `find_by_intent`, `get_pattern`, and the prompt fragment as an MCP prompt
+- [x] MCP: `find` (free text or intent), `list_components`, `list_patterns`, `get_pattern`, and the prompt fragment as the MCP prompt `aihio-authoring`; component descriptions now say when to use each one
 - [x] Bundle: light-DOM component CSS moves to `<name>.styles.js`, read only by the CSS build (it already shipped in `aihio.css`) — `dist/aihio.js` 136 → 98 KB minified, 28.6 → 23.7 KB gzip
 - [ ] Bundle: the runtime schema (~41 KB of `dist/aihio.js`) leaves the default entry for `aihio/runtime` — breaking for `Aihio.describe()` from the root, so it waits for 3.0
 - [ ] `aihio-button` as a link: adopt an authored `<a href>` as its control, the way a dropdown item does, so a call-to-action that navigates does not need `href` on a `<button>`
