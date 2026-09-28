@@ -80,6 +80,7 @@
       "aria-describedby is wired to aihio-dialog-description when present",
       "Native modal dialog behavior makes the document outside the dialog inert and contains keyboard focus",
       "A trigger and a Cancel button work from markup alone: commandfor plus command=\"--open\" or command=\"--close\" needs no script",
+      "Opening focuses an authored autofocus element, otherwise the first rendered tab stop — never a hidden field or an unselected tab — and Tab wraps between the first and last rendered tab stops",
       "Escape closes the dialog",
       "Focus is restored to the trigger on close",
       "A shared overlay lock prevents concurrent dialogs from restoring page scroll too early"

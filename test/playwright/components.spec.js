@@ -272,6 +272,45 @@ test('stacked dialogs keep scroll locked and support cancelable close', async ({
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
 });
 
+test('dialog focus skips hidden and roving tab stops and honours autofocus', async ({ page }) => {
+  await page.goto('/test/playwright/fixture.html');
+  await page.locator('#fixture').evaluate((root) => {
+    root.innerHTML = `
+      <aihio-dialog id="tabs-dialog" aria-label="Settings">
+        <aihio-tabs value="two">
+          <aihio-tab-list>
+            <aihio-tab value="one">One</aihio-tab>
+            <aihio-tab value="two">Two</aihio-tab>
+          </aihio-tab-list>
+          <aihio-tab-panel value="one"><input aria-label="Hidden field"></aihio-tab-panel>
+          <aihio-tab-panel value="two">Two</aihio-tab-panel>
+        </aihio-tabs>
+        <button id="close-settings">Close</button>
+        <input aria-label="Hidden at the end" hidden>
+      </aihio-dialog>
+      <aihio-dialog id="autofocus-dialog" aria-label="Rename">
+        <aihio-button>Cancel</aihio-button>
+        <aihio-input aria-label="New name" autofocus></aihio-input>
+      </aihio-dialog>
+    `;
+  });
+
+  await page.locator('#tabs-dialog').evaluate((dialog) => dialog.open());
+  // The selected tab is the tab stop; the unselected one has tabindex="-1".
+  await expect(page.getByRole('tab', { name: 'Two' })).toBeFocused();
+
+  // The last *rendered* tab stop wraps to the first, past the hidden input.
+  await page.locator('#close-settings').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('tab', { name: 'Two' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.locator('#close-settings')).toBeFocused();
+  await page.locator('#tabs-dialog').evaluate((dialog) => dialog.close());
+
+  await page.locator('#autofocus-dialog').evaluate((dialog) => dialog.open());
+  await expect(page.getByRole('textbox', { name: 'New name' })).toBeFocused();
+});
+
 test('toggle is a native button: keyboard presses it and a disabled fieldset disables it', async ({ page }) => {
   await page.goto('/test/playwright/fixture.html');
   await page.locator('#fixture').evaluate((root) => {

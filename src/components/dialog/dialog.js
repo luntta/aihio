@@ -4,19 +4,22 @@ import { isTopOverlay, lockDocumentScroll, unlockDocumentScroll } from '../overl
 
 let dialogInstanceId = 0;
 
+// Everything that can take focus, before the checks a selector cannot make:
+// whether it is rendered, disabled, or taken out of the tab order. A roving
+// tabindex (tabs, menu items) sets tabindex="-1" on all but one element, so
+// the tabIndex check is what leaves only the selected tab in the sequence.
 const FOCUSABLE_SELECTOR = [
   'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-  // aihio-button and aihio-toggle are not listed: they delegate to a real
-  // <button>, which the native entry above already matches. Listing the host
-  // too would put the wrapper in the list at the same position as the control
-  // it wraps.
-  'aihio-dropdown-item:not([disabled])',
-  'aihio-tab:not([disabled])',
+  'button',
+  'input:not([type="hidden"])',
+  'select',
+  'textarea',
+  'summary',
+  'iframe',
+  'audio[controls]',
+  'video[controls]',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[tabindex]',
 ].join(', ');
 
 export class AihioDialog extends AihioElement {
@@ -224,12 +227,11 @@ export class AihioDialog extends AihioElement {
     this.emit('aihio-open');
 
     requestAnimationFrame(() => {
-      const focusable = this._getFocusableElements();
       // The panel is fixed-position and therefore already in view, so the
       // browser's scroll-into-view would only move the document behind the
       // backdrop — visibly, if the dialog opened while the page was scrolled
       // elsewhere.
-      (focusable[0] ?? this._panel)?.focus({ preventScroll: true });
+      this._initialFocusTarget().focus({ preventScroll: true });
     });
   }
 
@@ -249,12 +251,25 @@ export class AihioDialog extends AihioElement {
     this._closeReason = null;
   }
 
+  /** The dialog's tab stops, in order. */
   _getFocusableElements() {
-    return [...this.querySelectorAll(FOCUSABLE_SELECTOR)].filter((element) => {
-      if (element.hasAttribute?.('disabled')) return false;
-      if (element.getAttribute?.('aria-hidden') === 'true') return false;
-      return element.closest('aihio-dialog') === this;
-    });
+    return [...this.querySelectorAll(FOCUSABLE_SELECTOR)].filter(
+      (element) =>
+        element.closest('aihio-dialog') === this &&
+        element.tabIndex >= 0 &&
+        !element.matches(':disabled') &&
+        isRendered(element)
+    );
+  }
+
+  /* An authored autofocus wins, as it does in a native <dialog>; the
+     component's own rAF focus would otherwise override it. On an Aihio host
+     that delegates to a control, the control is what has a box. */
+  _initialFocusTarget() {
+    const autofocus = [...this.querySelectorAll('[autofocus]')].find(
+      (element) => element.closest('aihio-dialog') === this && isRendered(element.control ?? element)
+    );
+    return autofocus ?? this._getFocusableElements()[0] ?? this._panel;
   }
 
   _getOwnedPart(selector) {
@@ -298,4 +313,11 @@ export class AihioDialogDescription extends AihioElement {
 
 export class AihioDialogFooter extends AihioElement {
   static tag = 'aihio-dialog-footer';
+}
+
+function isRendered(element) {
+  if (typeof element.checkVisibility === 'function') {
+    return element.checkVisibility({ visibilityProperty: true });
+  }
+  return element.getClientRects().length > 0;
 }
