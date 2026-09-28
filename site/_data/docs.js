@@ -23,10 +23,11 @@ function tagToSlug(tag) {
 }
 
 /**
- * A dialog example carries no trigger, so the preview would render an empty
- * box unless it is opened for display. A dropdown example does carry its own
- * trigger button, so it is left closed and the reader opens it — the live
- * component demonstrates itself better than a frozen open state.
+ * A dialog snippet with no trigger would preview as an empty box, so one that
+ * starts at <aihio-dialog> is opened for display. Examples that carry their
+ * own trigger (commandfor + command="--open") start at the button and are
+ * left closed, like a dropdown, for the reader to open — the live component
+ * demonstrates itself better than a frozen open state.
  */
 function toPreviewMarkup(tag, markup) {
   const normalizedMarkup = String(markup ?? '');

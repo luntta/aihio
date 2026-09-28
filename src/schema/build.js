@@ -71,6 +71,14 @@ for (const dir of readdirSync(componentsDir, { withFileTypes: true })) {
     }
   }
 
+  // Only custom commands reach an element that is not a <dialog> or popover,
+  // and the platform defines a custom command as one that starts with --.
+  for (const name of Object.keys(schema.commands ?? {})) {
+    if (!/^--[a-z][a-z0-9-]*$/.test(name)) {
+      errors.push(`${schemaPath}/commands: ${JSON.stringify(name)} must be a --prefixed custom command`);
+    }
+  }
+
   for (const requirement of schema.a11yContract?.required ?? []) {
     if (requirement.severity === 'error' && !requirement.rule) {
       errors.push(`${schemaPath}/a11yContract/required: error-level obligation ${JSON.stringify(requirement.when)} requires a stable rule id`);
@@ -207,6 +215,7 @@ function stripComponent(component) {
       ...(returns ? { returns } : {}),
     }));
   }
+  if (component.commands) stripped.commands = Object.keys(component.commands);
   if (component.properties) {
     stripped.properties = mapEntries(component.properties, ({ type, readonly }) => ({
       type,
@@ -850,6 +859,9 @@ function buildPromptComponentInventory(doc) {
     lines.push(`  Attributes: ${formatAttributeSummary(component.attributes)}.`);
     lines.push(`  Slots: ${formatNamedKeys(component.slots)}.`);
     lines.push(`  Methods: ${formatMethodSummary(component.methods)}.`);
+    if (component.commands) {
+      lines.push(`  Commands: ${formatCommandSummary(component)}.`);
+    }
     lines.push(`  Requires: ${formatCompositionRequirements(component.composition)}.`);
     lines.push(`  Related: ${formatRelatedSummary(component.related)}.`);
     lines.push('');
@@ -1260,6 +1272,12 @@ function formatAttributeSummary(attributes) {
 function formatMethodSummary(methods) {
   const entries = Object.keys(methods ?? {});
   return entries.length > 0 ? entries.map((method) => `\`${method}\``).join(', ') : 'none';
+}
+
+function formatCommandSummary(component) {
+  return Object.entries(component.commands)
+    .map(([name, { description }]) => `\`${name}\` (${description.replace(/\.$/, '')})`)
+    .join(', ');
 }
 
 function formatEventSummary(events) {

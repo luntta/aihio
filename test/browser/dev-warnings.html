@@ -186,6 +186,28 @@
         assert(panel.getAttribute('aria-label') === 'Confirm archive', 'dialog host aria-label should sync to the panel');
         assert(warnings.length === 0, `valid markup should not warn, received: ${warnings.join('\n')}`);
       });
+
+      await runTest('an invoked command that its target ignores is reported', async () => {
+        sandbox.innerHTML = `
+          <aihio-button id="builtin" commandfor="confirm" command="show-modal">Built-in</aihio-button>
+          <aihio-button id="custom" commandfor="confirm" command="--open">Custom</aihio-button>
+          <aihio-dialog id="confirm" aria-label="Confirm"><p>Sure?</p></aihio-dialog>
+        `;
+        await nextFrame(2);
+        assert(warnings.length === 0, `commands should not warn before they are invoked, received: ${warnings.join('\n')}`);
+
+        document.querySelector('#builtin').click();
+        assert(
+          warnings.some((warning) => warning.includes('aihio-button') && warning.includes('built-in command "show-modal"')),
+          `a built-in command aimed at aihio-dialog should warn, received: ${warnings.join('\n')}`
+        );
+
+        warnings.length = 0;
+        document.querySelector('#custom').click();
+        await nextFrame(2);
+        assert(warnings.length === 0, `a declared command should not warn, received: ${warnings.join('\n')}`);
+        document.querySelector('#confirm').close();
+      });
     } finally {
       console.warn = originalWarn;
     }

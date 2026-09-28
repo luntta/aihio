@@ -17,7 +17,8 @@ export interface AihioLintIssue {
     | 'forbidden-descendant'
     | 'a11y-contract'
     | 'unknown-intent'
-    | 'intent-mismatch';
+    | 'intent-mismatch'
+    | 'invalid-command';
   severity: 'error' | 'warn';
   component: string | null;
   message: string;

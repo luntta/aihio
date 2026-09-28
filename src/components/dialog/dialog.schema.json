@@ -1,6 +1,6 @@
 {
   "$component": "aihio-dialog",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A modal dialog with backdrop, focus trap, and ESC to close.",
   "intents": [
     "overlay",
@@ -29,6 +29,17 @@
         }
       ],
       "returns": "void"
+    }
+  },
+  "commands": {
+    "--open": {
+      "description": "Opens the dialog modally. Focus returns to the invoking button when it closes."
+    },
+    "--close": {
+      "description": "Requests that the dialog close, with reason \"command\"; aihio-before-close can still cancel it."
+    },
+    "--toggle": {
+      "description": "Opens the dialog when it is closed and closes it when it is open."
     }
   },
   "events": {
@@ -68,6 +79,7 @@
       "aria-labelledby is wired to aihio-dialog-title when present",
       "aria-describedby is wired to aihio-dialog-description when present",
       "Native modal dialog behavior makes the document outside the dialog inert and contains keyboard focus",
+      "A trigger and a Cancel button work from markup alone: commandfor plus command=\"--open\" or command=\"--close\" needs no script",
       "Escape closes the dialog",
       "Focus is restored to the trigger on close",
       "A shared overlay lock prevents concurrent dialogs from restoring page scroll too early"
@@ -94,6 +106,10 @@
     {
       "markup": "<aihio-dialog><aihio-dialog><p>Nested</p></aihio-dialog></aihio-dialog>",
       "reason": "Dialogs must not be nested. Close the current dialog before opening another."
+    },
+    {
+      "markup": "<aihio-button commandfor=\"confirm\" command=\"show-modal\">Delete</aihio-button>\n<aihio-dialog id=\"confirm\" aria-label=\"Confirm delete\"></aihio-dialog>",
+      "reason": "Built-in commands such as show-modal only act on a native <dialog>, and this one is inside the component's shadow root, so nothing happens. Use command=\"--open\"."
     }
   ],
   "related": [
@@ -115,6 +131,6 @@
     }
   ],
   "examples": [
-    "<aihio-dialog>\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>"
+    "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>"
   ]
 }

@@ -102,6 +102,15 @@ const fixtures = [
       { ruleId: 'intent-mismatch', component: 'aihio-badge' },
     ],
   },
+  {
+    // show-modal is what a native <dialog> answers, and the natural thing to
+    // reach for. aihio-dialog's <dialog> is in its shadow root, so the button
+    // renders, activates, and nothing happens.
+    file: 'dialog-builtin-command.html',
+    expectedIssues: [
+      { ruleId: 'invalid-command', component: 'aihio-button' },
+    ],
+  },
 ];
 
 test('known-bad markup fixtures are caught by the built linter', async () => {

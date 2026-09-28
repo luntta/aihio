@@ -2,7 +2,7 @@
   "id": "destructive-confirmation",
   "name": "Destructive Confirmation",
   "intents": ["overlay", "modal", "destructive-action", "secondary-action", "dismissible"],
-  "description": "A modal confirmation flow for irreversible actions with cancel-first ordering.",
+  "description": "A modal confirmation flow for irreversible actions with cancel-first ordering. The trigger opens the dialog and Cancel closes it through Invoker Commands, and the confirm button submits the dialog's form, so the flow works without script.",
   "requiredComponents": ["aihio-dialog", "aihio-button"],
   "variations": []
 }

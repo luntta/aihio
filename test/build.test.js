@@ -115,6 +115,8 @@ test('generated TypeScript declarations snapshot the button API and JSX surface'
   formenctype?: AihioButtonFormenctype;
   formnovalidate?: boolean;
   formtarget?: string;
+  command?: string;
+  commandfor?: string;
 }
 export type AihioButtonProps = AihioIntrinsicElementProps & AihioButtonAttributes;
 
@@ -222,10 +224,10 @@ test('runtime bundle exposes Aihio.describe and schema-backed component versions
 
     assert.equal(globalThis.Aihio, Aihio, 'runtime bundle publishes Aihio globally');
     assert.equal(Aihio.describe, describe, 'named describe export matches the Aihio namespace');
-    assert.equal(Aihio.describe('aihio-button')?.version, '1.3.0', 'button schema is introspectable by tag');
+    assert.equal(Aihio.describe('aihio-button')?.version, '1.4.0', 'button schema is introspectable by tag');
     assert.equal(Aihio.describe({ tagName: 'AIHIO-DIALOG' })?.$component, 'aihio-dialog', 'describe accepts live-element-like objects');
-    assert.equal(AihioButton.schemaVersion, '1.3.0', 'button class carries schemaVersion');
-    assert.equal(AihioDialog.schemaVersion, '1.1.0', 'dialog class carries schemaVersion');
+    assert.equal(AihioButton.schemaVersion, '1.4.0', 'button class carries schemaVersion');
+    assert.equal(AihioDialog.schemaVersion, '1.2.0', 'dialog class carries schemaVersion');
     assert.equal(AihioInput.schemaVersion, '1.2.0', 'input class carries schemaVersion');
     for (const component of Object.values(componentModule)) {
       if (!component?.tag || !component.schemaVersion) continue;

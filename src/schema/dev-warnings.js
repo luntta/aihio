@@ -7,7 +7,8 @@
 // before or after components are imported.
 
 import { setDevHook } from '../components/dev-hook.js';
-import { collectDevWarnings, formatDevWarning } from './runtime.js';
+import { findCommandProblem } from './command-rules.js';
+import { collectDevWarnings, describe, formatDevWarning } from './runtime.js';
 
 // Per-element bookkeeping lives here rather than on AihioElement, so the
 // production build carries no trace of it.
@@ -31,6 +32,7 @@ export function installDevWarnings() {
   if (installed) return;
   installed = true;
   setDevHook(handleLifecycle);
+  globalThis.document?.addEventListener('click', checkInvokedCommand, true);
 }
 
 /** Turn warnings back off and release all per-element state. */
@@ -38,6 +40,7 @@ export function uninstallDevWarnings() {
   if (!installed) return;
   installed = false;
   setDevHook(null);
+  globalThis.document?.removeEventListener('click', checkInvokedCommand, true);
 }
 
 function handleLifecycle(element, phase) {
@@ -52,6 +55,30 @@ function handleLifecycle(element, phase) {
   }
 
   reportWarnings(element);
+}
+
+// A command is checked when it is invoked rather than when its button
+// connects: the dialog it names is often further down the page, not yet parsed
+// at that point, and a warning then would be a false alarm.
+function checkInvokedCommand(event) {
+  const source = event.composedPath().find(
+    (node) => node?.localName === 'button' && (node.hasAttribute('commandfor') || node.hasAttribute('command'))
+  );
+  if (!source) return;
+
+  const commandFor = source.getAttribute('commandfor');
+  const target = commandFor ? source.getRootNode().getElementById?.(commandFor) ?? null : null;
+  const problem = findCommandProblem({
+    sourceTag: 'button',
+    command: source.getAttribute('command'),
+    commandFor,
+    targetTag: target?.localName ?? null,
+    acceptedCommands: describe(target)?.commands ?? [],
+  });
+  if (!problem) return;
+
+  const reporter = source.closest('aihio-button') ?? source;
+  console.warn(formatDevWarning(reporter, problem));
 }
 
 function reportWarnings(element) {

@@ -1,5 +1,6 @@
 import { runtimeSchema } from '../schema/runtime.js';
 import { collectA11yRuleViolations } from '../schema/a11y-rules.js';
+import { findCommandProblem } from '../schema/command-rules.js';
 import { parseFragment } from 'parse5';
 
 const schemaByTag = new Map(
@@ -26,7 +27,15 @@ export function lintMarkup(markup, options = {}) {
   };
   const issues = [];
 
+  const elementsById = new Map();
   for (const node of elements) {
+    const id = getAttribute(node, 'id');
+    if (id && !elementsById.has(id)) elementsById.set(id, node);
+  }
+
+  for (const node of elements) {
+    issues.push(...collectCommandIssues(node, elementsById, context));
+
     if (!isAihioTag(node.tagName)) continue;
 
     if (!knownTags.has(node.tagName)) {
@@ -261,6 +270,23 @@ function collectIntentIssues(node, schema, context) {
   }
 
   return issues;
+}
+
+function collectCommandIssues(node, elementsById, context) {
+  const commandFor = getAttribute(node, 'commandfor');
+  const target = commandFor ? elementsById.get(commandFor) ?? null : null;
+  const problem = findCommandProblem({
+    sourceTag: node.tagName,
+    command: getAttribute(node, 'command'),
+    commandFor,
+    targetTag: target?.tagName ?? null,
+    acceptedCommands: schemaByTag.get(target?.tagName)?.commands ?? [],
+  });
+  if (!problem) return [];
+
+  return [
+    createIssue({ ruleId: 'invalid-command', severity: problem.severity, node, context, message: problem.message }),
+  ];
 }
 
 function createIssue({ ruleId, severity, node, context, message }) {

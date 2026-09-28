@@ -1,4 +1,5 @@
 import { AihioElement } from '../base.js';
+import { onCommand } from '../commands.js';
 import { isTopOverlay, lockDocumentScroll, unlockDocumentScroll } from '../overlay-stack.js';
 
 let dialogInstanceId = 0;
@@ -20,7 +21,7 @@ const FOCUSABLE_SELECTOR = [
 
 export class AihioDialog extends AihioElement {
   static tag = 'aihio-dialog';
-  static schemaVersion = '1.1.0';
+  static schemaVersion = '1.2.0';
   static shadow = true;
   static observedAttributes = ['open', 'aria-label'];
   static styles = `
@@ -133,6 +134,17 @@ export class AihioDialog extends AihioElement {
     this._panel.addEventListener('click', this._onPanelClick);
     this._panel.addEventListener('cancel', this._onCancel);
     this._slot.addEventListener('slotchange', this._onSlotChange);
+
+    // Markup opens and closes the dialog through Invoker Commands, so neither
+    // a trigger nor a Cancel button needs script.
+    onCommand(this, (command, source) => {
+      const isOpen = this.hasAttribute('open');
+      if (command === '--open' || (command === '--toggle' && !isOpen)) {
+        this._openFrom(source);
+      } else if (command === '--close' || (command === '--toggle' && isOpen)) {
+        this.close({ reason: 'command' });
+      }
+    });
   }
 
   disconnect() {
@@ -180,6 +192,15 @@ export class AihioDialog extends AihioElement {
     this.setAttribute('open', '');
   }
 
+  /* Focus returns to the invoking button rather than to whatever was active,
+     because engines that do not focus a clicked button leave the body active
+     at the moment the dialog opens. */
+  _openFrom(invoker) {
+    if (this.hasAttribute('open')) return;
+    this._invoker = invoker;
+    this.open();
+  }
+
   close({ restoreFocus = true, reason = 'api' } = {}) {
     if (!this.hasAttribute('open')) return;
     if (!this.emit('aihio-before-close', { reason }, { cancelable: true })) return;
@@ -191,7 +212,8 @@ export class AihioDialog extends AihioElement {
   _onOpen() {
     if (!this.isConnected) return;
     this._isOpen = true;
-    this._previousFocus = document.activeElement;
+    this._previousFocus = this._invoker ?? document.activeElement;
+    this._invoker = null;
     lockDocumentScroll(this);
     document.addEventListener('keydown', this._onDocumentKeyDown);
 

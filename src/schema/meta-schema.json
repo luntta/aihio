@@ -52,6 +52,11 @@
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/method" }
     },
+    "commands": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/command" },
+      "description": "Invoker Commands the component responds to, keyed by the --prefixed command name. Markup sends one with <button commandfor=\"<id>\" command=\"<name>\">."
+    },
     "properties": {
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/property" }
@@ -130,6 +135,14 @@
           "items": { "$ref": "#/$defs/parameter" }
         },
         "returns": { "type": "string", "minLength": 1 }
+      }
+    },
+    "command": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1 }
       }
     },
     "parameter": {

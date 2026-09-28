@@ -2,7 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioButton extends AihioElement {
   static tag = 'aihio-button';
-  static schemaVersion = '1.3.0';
+  static schemaVersion = '1.4.0';
   static observedAttributes = [
     'variant',
     'size',
@@ -17,6 +17,8 @@ export class AihioButton extends AihioElement {
     'formenctype',
     'formnovalidate',
     'formtarget',
+    'command',
+    'commandfor',
     'tabindex',
     'aria-label',
     'aria-labelledby',
@@ -222,6 +224,11 @@ const BUTTON_ATTRIBUTES = [
   'formenctype',
   'formnovalidate',
   'formtarget',
+  // Invoker Commands. commandfor is an IDREF resolved in the control's own
+  // tree, which is the author's light DOM, so it reaches the same ids the
+  // author can see.
+  'command',
+  'commandfor',
 ];
 
 function normalizeType(value, fallback) {

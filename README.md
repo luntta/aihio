@@ -64,7 +64,7 @@ The root bundle also exposes `Aihio.describe()` for runtime introspection:
 import { Aihio } from 'aihio';
 
 const buttonSchema = Aihio.describe('aihio-button');
-// { $component: 'aihio-button', version: '1.3.0', ... }
+// { $component: 'aihio-button', version: '1.4.0', ... }
 ```
 
 Schema-derived TypeScript declarations ship in `dist/aihio.d.ts`, including intent and variant unions plus JSX element typings:
@@ -239,6 +239,42 @@ Svelte own them: the framework adds and removes its own nodes, and the
 component re-renders the list from them. `host.replaceChildren(...options)`
 is fine too. The component puts back the input it would otherwise take with
 it, and focus with it, so typing is not interrupted.
+
+## Dialogs
+
+A dialog opens and closes from markup, with no script, through the platform's
+[Invoker Commands](https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API):
+
+```html
+<aihio-button commandfor="delete-project" command="--open" variant="destructive">
+  Delete project
+</aihio-button>
+
+<aihio-dialog id="delete-project">
+  <aihio-dialog-header>
+    <aihio-dialog-title>Delete project?</aihio-dialog-title>
+  </aihio-dialog-header>
+  <form method="post">
+    <aihio-dialog-footer>
+      <aihio-button commandfor="delete-project" command="--close" variant="outline">Cancel</aihio-button>
+      <aihio-button type="submit" variant="destructive">Delete project</aihio-button>
+    </aihio-dialog-footer>
+  </form>
+</aihio-dialog>
+```
+
+- `aihio-dialog` answers `--open`, `--close`, and `--toggle`. A `--close`
+  arrives as an `aihio-before-close` with reason `"command"`, so it can still
+  be refused, and focus goes back to the button that opened the dialog.
+- The commands are custom (`--`-prefixed) because the platform only delivers
+  built-in ones such as `show-modal` to a native `<dialog>`, and this one is
+  inside the component's shadow root. `command="show-modal"` renders, activates,
+  and does nothing; the linter reports it as `invalid-command`, and the dev
+  build warns when it is clicked.
+- `commandfor` and `command` work on `aihio-button` and on a plain `<button>`.
+  Engines without the API get the same behaviour from a small fallback.
+- The declared commands are part of the schema (`commands`), so
+  `Aihio.describe('aihio-dialog').commands` lists them.
 
 ## Layout
 
