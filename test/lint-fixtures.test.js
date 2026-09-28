@@ -111,6 +111,14 @@ const fixtures = [
       { ruleId: 'invalid-command', component: 'aihio-button' },
     ],
   },
+  {
+    // Invented attributes are the most common way generated markup goes
+    // wrong, and the browser never says so: nothing reads them.
+    file: 'invented-attributes.html',
+    expectedIssues: [
+      { ruleId: 'unknown-attribute', component: 'aihio-button' },
+    ],
+  },
 ];
 
 test('known-bad markup fixtures are caught by the built linter', async () => {
@@ -134,4 +142,43 @@ test('known-bad markup fixtures are caught by the built linter', async () => {
       );
     }
   }
+});
+
+test('issues carry a suggestion an agent can apply without reading the message', async () => {
+  const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
+  const { lintMarkup } = await import(lintUrl);
+  const suggestionFor = (markup, ruleId) =>
+    lintMarkup(markup).issues.find((issue) => issue.ruleId === ruleId)?.suggestion;
+
+  // Vocabulary carried over from other design systems.
+  assert.equal(suggestionFor('<aihio-button variant="primary">Save</aihio-button>', 'invalid-enum-attribute'), 'variant="default"');
+  assert.equal(suggestionFor('<aihio-badge variant="danger">Failed</aihio-badge>', 'invalid-enum-attribute'), 'variant="destructive"');
+  assert.equal(suggestionFor('<aihio-modal aria-label="x"></aihio-modal>', 'unknown-component'), '<aihio-dialog>');
+  assert.equal(suggestionFor('<aihio-textarea></aihio-textarea>', 'unknown-component'), '<textarea>');
+  assert.equal(suggestionFor('<aihio-stack spacing="lg"></aihio-stack>', 'unknown-attribute'), 'gap');
+  assert.equal(
+    suggestionFor('<aihio-button commandfor="d" command="show-modal">Open</aihio-button><aihio-dialog id="d" aria-label="D"></aihio-dialog>', 'invalid-command'),
+    'command="--open"'
+  );
+
+  // Typos.
+  assert.equal(suggestionFor('<aihio-button variant="outlin">Save</aihio-button>', 'invalid-enum-attribute'), 'variant="outline"');
+  assert.equal(suggestionFor('<aihio-dropdwon></aihio-dropdwon>', 'unknown-component'), '<aihio-dropdown>');
+
+  // No suggestion rather than a wrong one.
+  assert.equal(suggestionFor('<aihio-button icon="plus">Add</aihio-button>', 'unknown-attribute'), undefined);
+  assert.equal(suggestionFor('<aihio-button variant="gradient">Go</aihio-button>', 'invalid-enum-attribute'), undefined);
+});
+
+test('global, aria, data, event, and template attributes are never reported as unknown', async () => {
+  const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
+  const { lintMarkup } = await import(lintUrl);
+  const markup = `
+    <aihio-button id="save" class="wide" style="margin: 0" hidden title="Save" lang="en"
+      aria-describedby="save" data-track="save" onclick="save()"
+      @click="save" :disabled="busy" v-if="ready" x-on:click="save" key="save"
+    >Save</aihio-button>
+  `;
+  const unknown = lintMarkup(markup).issues.filter((issue) => issue.ruleId === 'unknown-attribute');
+  assert.deepEqual(unknown, []);
 });

@@ -228,7 +228,10 @@ function stripComponent(component) {
     stripped.counterExamples = component.counterExamples.map(({ markup }) => ({ markup }));
   }
   if (component.related) {
-    stripped.related = component.related.map((rel) => ({ $component: rel.$component }));
+    stripped.related = component.related.map((rel) => ({
+      $component: rel.$component,
+      ...(rel.attributes ? { attributes: mapEntries(rel.attributes, stripAttribute) } : {}),
+    }));
   }
   return stripped;
 }

@@ -6,7 +6,17 @@
 // common one is reaching for show-modal, which only a native <dialog> answers —
 // aihio-dialog keeps its <dialog> in a shadow root.
 
+import { suggestCommand } from './suggestions.js';
+
 const COMMAND_SOURCES = new Set(['button', 'aihio-button']);
+const BUILT_IN_COMMANDS = new Set([
+  'show-modal',
+  'close',
+  'request-close',
+  'show-popover',
+  'hide-popover',
+  'toggle-popover',
+]);
 
 /**
  * @param {object} command
@@ -15,7 +25,7 @@ const COMMAND_SOURCES = new Set(['button', 'aihio-button']);
  * @param {string|null} command.commandFor
  * @param {string|null} command.targetTag - tag of the element commandfor names, or null when none matches
  * @param {string[]} command.acceptedCommands - commands the target's schema declares
- * @returns {{ severity: 'error' | 'warn', message: string } | null}
+ * @returns {{ severity: 'error' | 'warn', message: string, suggestion?: string } | null}
  */
 export function findCommandProblem({ sourceTag, command, commandFor, targetTag, acceptedCommands }) {
   if (commandFor === null && command === null) return null;
@@ -44,9 +54,19 @@ export function findCommandProblem({ sourceTag, command, commandFor, targetTag, 
     return error(`<${targetTag}> does not respond to commands.`);
   }
 
-  const expected = `Use one of: ${acceptedCommands.join(', ')}.`;
-  if (!command.startsWith('--')) {
-    return error(`<${targetTag}> does not respond to the built-in command "${command}"; built-in commands only reach a native <dialog> or popover. ${expected}`);
+  const suggestion = suggestCommand(command, acceptedCommands);
+  const expected = suggestion
+    ? `Use command="${suggestion}".`
+    : `Use one of: ${acceptedCommands.join(', ')}.`;
+  let reason;
+  if (BUILT_IN_COMMANDS.has(command)) {
+    reason = `<${targetTag}> does not respond to the built-in command "${command}"; built-in commands only reach a native <dialog> or popover.`;
+  } else if (!command.startsWith('--')) {
+    reason = `command="${command}" is not a command the browser delivers: custom commands start with --.`;
+  } else {
+    reason = `<${targetTag}> has no command "${command}".`;
   }
-  return error(`<${targetTag}> has no command "${command}". ${expected}`);
+  const problem = error(`${reason} ${expected}`);
+  if (suggestion) problem.suggestion = `command="${suggestion}"`;
+  return problem;
 }

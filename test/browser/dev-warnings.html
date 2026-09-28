@@ -81,7 +81,7 @@
         await nextFrame(4);
 
         assert(
-          warnings.some((message) => message.includes('aihio-button') && message.includes('invalid variant="primary"')),
+          warnings.some((message) => message.includes('aihio-button') && message.includes('invalid variant="primary"') && message.includes('Use variant="default"')),
           'invalid enum warning should mention the button variant'
         );
         assert(

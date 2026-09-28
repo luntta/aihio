@@ -1,6 +1,7 @@
 import { runtimeSchema } from '../schema/runtime.js';
 import { collectA11yRuleViolations } from '../schema/a11y-rules.js';
 import { findCommandProblem } from '../schema/command-rules.js';
+import { suggestAttribute, suggestComponent, suggestEnumValue } from '../schema/suggestions.js';
 import { parseFragment } from 'parse5';
 
 const schemaByTag = new Map(
@@ -10,11 +11,59 @@ const schemaByTag = new Map(
 const intentVocabulary = new Set(runtimeSchema.intents ?? []);
 
 const knownTags = new Set(schemaByTag.keys());
+const declaredAttributesByTag = new Map();
 for (const component of runtimeSchema.components) {
+  declaredAttributesByTag.set(component.$component, Object.keys(component.attributes ?? {}));
   for (const related of component.related ?? []) {
     knownTags.add(related.$component);
+    declaredAttributesByTag.set(related.$component, Object.keys(related.attributes ?? {}));
   }
 }
+
+// Attributes any element may carry. Everything else on an Aihio element has to
+// be declared by its schema: an invented one is not an error the browser
+// reports, it is an attribute nothing reads.
+const GLOBAL_ATTRIBUTES = new Set([
+  'accesskey',
+  'autocapitalize',
+  'autocorrect',
+  'autofocus',
+  'class',
+  'contenteditable',
+  'dir',
+  'draggable',
+  'enterkeyhint',
+  'exportparts',
+  'hidden',
+  'id',
+  'inert',
+  'inputmode',
+  'is',
+  'itemid',
+  'itemprop',
+  'itemref',
+  'itemscope',
+  'itemtype',
+  'lang',
+  'nonce',
+  'part',
+  'popover',
+  'role',
+  'slot',
+  'spellcheck',
+  'style',
+  'tabindex',
+  'title',
+  'translate',
+  'writingsuggestions',
+]);
+
+// Template syntax that parses as an attribute. Names with :, @, ., or
+// brackets (Vue, Alpine, Svelte, Angular bindings) never reach the check,
+// because only plain attribute names are held to the schema.
+const FRAMEWORK_ATTRIBUTES = new Set(['key', 'ref']);
+const FRAMEWORK_PREFIXES = ['v-', 'x-', 'hx-', 'ng-'];
+const PLAIN_ATTRIBUTE_NAME = /^[a-z][a-z0-9-]*$/;
 
 export function lintMarkup(markup, options = {}) {
   const source = options.source ?? '<inline>';
@@ -39,17 +88,22 @@ export function lintMarkup(markup, options = {}) {
     if (!isAihioTag(node.tagName)) continue;
 
     if (!knownTags.has(node.tagName)) {
+      const match = suggestComponent(node.tagName, knownTags);
+      const suggestion = match && (match.startsWith('<') ? match : `<${match}>`);
       issues.push(
         createIssue({
           ruleId: 'unknown-component',
           severity: 'error',
           node,
           context,
-          message: `unknown Aihio component <${node.tagName}>.`,
+          message: `unknown Aihio component <${node.tagName}>.${suggestion ? ` Use ${suggestion} instead.` : ''}`,
+          suggestion,
         })
       );
       continue;
     }
+
+    issues.push(...collectUnknownAttributeIssues(node, context));
 
     const schema = schemaByTag.get(node.tagName);
 
@@ -83,13 +137,15 @@ function collectEnumIssues(node, schema, context) {
     const value = getAttribute(node, name);
     if (attr.values?.includes(value)) continue;
 
+    const suggestion = suggestEnumValue(value, attr.values);
     issues.push(
       createIssue({
         ruleId: 'invalid-enum-attribute',
         severity: 'error',
         node,
         context,
-        message: `invalid ${name}="${value}". Expected one of: ${attr.values.join(', ')}.`,
+        message: `invalid ${name}="${value}". ${suggestion ? `Use ${name}="${suggestion}". ` : ''}Expected one of: ${attr.values.join(', ')}.`,
+        suggestion: suggestion ? `${name}="${suggestion}"` : null,
       })
     );
   }
@@ -272,6 +328,38 @@ function collectIntentIssues(node, schema, context) {
   return issues;
 }
 
+function collectUnknownAttributeIssues(node, context) {
+  const declared = declaredAttributesByTag.get(node.tagName) ?? [];
+  const issues = [];
+
+  for (const name of Object.keys(node.attributes ?? {})) {
+    if (declared.includes(name) || isUniversalAttribute(name)) continue;
+
+    const suggestion = suggestAttribute(name, declared);
+    const accepts = declared.length > 0 ? `It accepts: ${declared.join(', ')}.` : 'It declares no attributes of its own.';
+    issues.push(
+      createIssue({
+        ruleId: 'unknown-attribute',
+        severity: 'error',
+        node,
+        context,
+        message: `<${node.tagName}> has no attribute "${name}".${suggestion ? ` Use ${suggestion} instead.` : ''} ${accepts}`,
+        suggestion,
+      })
+    );
+  }
+
+  return issues;
+}
+
+function isUniversalAttribute(name) {
+  if (!PLAIN_ATTRIBUTE_NAME.test(name)) return true;
+  if (GLOBAL_ATTRIBUTES.has(name) || FRAMEWORK_ATTRIBUTES.has(name)) return true;
+  if (name.startsWith('aria-') || name.startsWith('data-')) return true;
+  if (name.startsWith('on')) return true;
+  return FRAMEWORK_PREFIXES.some((prefix) => name.startsWith(prefix));
+}
+
 function collectCommandIssues(node, elementsById, context) {
   const commandFor = getAttribute(node, 'commandfor');
   const target = commandFor ? elementsById.get(commandFor) ?? null : null;
@@ -285,16 +373,29 @@ function collectCommandIssues(node, elementsById, context) {
   if (!problem) return [];
 
   return [
-    createIssue({ ruleId: 'invalid-command', severity: problem.severity, node, context, message: problem.message }),
+    createIssue({
+      ruleId: 'invalid-command',
+      severity: problem.severity,
+      node,
+      context,
+      message: problem.message,
+      suggestion: problem.suggestion,
+    }),
   ];
 }
 
-function createIssue({ ruleId, severity, node, context, message }) {
+/*
+ * `suggestion` is the replacement for the offending tag, attribute, or value,
+ * written as markup (`variant="default"`, `<aihio-dialog>`), present only when
+ * the fix is unambiguous enough to apply without reading the message.
+ */
+function createIssue({ ruleId, severity, node, context, message, suggestion = null }) {
   return {
     ruleId,
     severity,
     component: node?.tagName ?? null,
     message,
+    ...(suggestion ? { suggestion } : {}),
     path: node ? getNodePath(node) : 'root',
     location: node ? context.resolveLocation(node.start) : context.resolveLocation(0),
     source: context.source,

@@ -18,10 +18,13 @@ export interface AihioLintIssue {
     | 'a11y-contract'
     | 'unknown-intent'
     | 'intent-mismatch'
-    | 'invalid-command';
+    | 'invalid-command'
+    | 'unknown-attribute';
   severity: 'error' | 'warn';
   component: string | null;
   message: string;
+  /** Replacement for the offending tag, attribute, or value, as markup. Present only when the fix is unambiguous. */
+  suggestion?: string;
   path: string;
   location: AihioLintLocation;
   source: string;

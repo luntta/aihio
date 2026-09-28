@@ -111,6 +111,24 @@ $ aihio-lint badge.html
 but its schema declares status, labeling, metadata.
 ```
 
+`unknown-attribute` reports anything on an Aihio element that its schema does
+not declare — `href` or `icon` on a button, `spacing` on a stack — since the
+browser never will: nothing reads an invented attribute. Global HTML
+attributes, `aria-*`, `data-*`, event handlers, and template bindings
+(`@click`, `:value`, `v-if`) are left alone.
+
+Where the fix is unambiguous, an issue carries a `suggestion`: the replacement
+tag, attribute, or value, written as markup. It covers vocabulary carried over
+from other design systems as well as typos, so an agent can apply it without
+parsing the message:
+
+```js
+lintMarkup('<aihio-button variant="primary">Save</aihio-button>').issues[0].suggestion;
+// 'variant="default"'
+lintMarkup('<aihio-modal></aihio-modal>').issues[0].suggestion;
+// '<aihio-dialog>'
+```
+
 For MCP clients that launch local stdio servers, the package also ships `aihio-mcp` with two tools: `describe` and `lint`.
 
 ```json

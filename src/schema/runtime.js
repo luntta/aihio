@@ -1,5 +1,6 @@
 import runtimeSchemaDocument from './runtime-schema.js';
 import { collectA11yRuleViolations } from './a11y-rules.js';
+import { suggestEnumValue } from './suggestions.js';
 
 export const runtimeSchema = deepFreeze(runtimeSchemaDocument);
 
@@ -47,9 +48,10 @@ function collectEnumWarnings(element, schema) {
     if (attr.type !== 'enum' || !element.hasAttribute?.(name)) continue;
     const value = element.getAttribute(name);
     if (attr.values?.includes(value)) continue;
+    const suggestion = suggestEnumValue(value, attr.values);
     warnings.push({
       key: `enum:${name}:${value}`,
-      message: `invalid ${name}="${value}". Expected one of: ${attr.values.join(', ')}.`,
+      message: `invalid ${name}="${value}". ${suggestion ? `Use ${name}="${suggestion}". ` : ''}Expected one of: ${attr.values.join(', ')}.`,
     });
   }
   return warnings;
