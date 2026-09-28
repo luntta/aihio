@@ -81,6 +81,23 @@ Explicitly later. When it lands, reuses Phase 1's schema format, Phase 3's patte
 - [x] MCP server exposing `describe(component)` + `lint(markup)` over stdio
 - [x] Test suite of known-bad markup snippets the linter must catch
 
+## Phase 9 — Markup that works
+
+Phases 1–8 made generated markup *valid*. This phase makes it *work*: an agent
+that follows the schema, the patterns, and the linter should produce UI whose
+buttons do something, whose labels are true, and whose overlays behave like
+the platform's own. Ordered by how often the gap bites generated markup.
+
+- [ ] Declarative overlay commands: a `commands` key in the schema, `--open` / `--close` / `--toggle` on `aihio-dialog` through Invoker Commands (with a fallback for older engines), `command` / `commandfor` forwarded by `aihio-button`, an `invalid-command` lint rule, prompt + docs
+- [ ] `aihio-toggle` delegates to a real `<button aria-pressed>`, as `aihio-button` does
+- [ ] Dialog: drop the hand-written Tab trap that `showModal()` makes redundant; initial focus honours `autofocus` and skips hidden content
+- [ ] Dropdown: Tab closes the menu, typeahead moves to the matching item, `href` makes an item a real link
+- [ ] Form controls: styled native `textarea` / `select` / checkbox / radio, and an `aihio-switch` for on/off settings
+- [ ] Patterns rebuilt on `aihio-field` / `aihio-stack` / `aihio-cluster`, inside forms with names; settings use switches, not toggles named after their state; destructive confirmation has a trigger and a Cancel that closes
+- [ ] Linter: `unknown-attribute`, and a `suggestion` on enum, unknown-component, and command issues so an agent can fix in one round trip
+- [ ] MCP: `list_components`, `find_by_intent`, `get_pattern`, and the prompt fragment as an MCP prompt
+- [ ] Bundle: light-DOM component CSS stays out of the JS (it already ships in `aihio.css`); the runtime schema leaves the default entry (breaking — 3.0)
+
 ## Sequencing notes
 
 - Phase 1 is the keystone. Everything else depends on its format.
