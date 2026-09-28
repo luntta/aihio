@@ -1,0 +1,318 @@
+{
+  "$component": "aihio-combobox",
+  "version": "1.0.0",
+  "description": "A text field that filters a list of options as you type and submits the chosen option's value. Use it when there are too many options to scan comfortably (roughly more than ten), or when the options come from a search.",
+  "intents": [
+    "form-field",
+    "selection",
+    "text-entry"
+  ],
+  "attributes": {
+    "value": {
+      "type": "string",
+      "description": "Value of the initially chosen option, and the value a form reset returns to. The value property carries the live choice."
+    },
+    "name": {
+      "type": "string",
+      "description": "Form field name. The chosen option's value (not its label) is submitted under it. Without it the field submits nothing."
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the field."
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Placeholder text. It is not a label."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the field. A disabled field submits nothing."
+    },
+    "readonly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows the chosen option without letting it change. The value still submits."
+    },
+    "required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Requires a choice for native constraint validation."
+    },
+    "error": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows error styling and sets aria-invalid. aihio-field sets this from its error slot."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Field size, matching aihio-input."
+    },
+    "filter": {
+      "type": "enum",
+      "values": [
+        "contains",
+        "starts-with",
+        "none"
+      ],
+      "default": "contains",
+      "description": "How typing filters the options. contains ranks prefix matches first, then word-start matches, then any match. none shows every option as given, for lists filtered by a server."
+    },
+    "allow-custom": {
+      "type": "boolean",
+      "default": false,
+      "description": "Accepts typed text that matches no option; the text becomes the value. Without it, leaving the field reverts unmatched text to the chosen option."
+    },
+    "loading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows a loading row and marks the list busy while options are being fetched."
+    },
+    "empty-text": {
+      "type": "string",
+      "default": "No results",
+      "description": "Shown and announced when no option matches."
+    },
+    "loading-text": {
+      "type": "string",
+      "default": "Loading…",
+      "description": "Shown and announced while loading is set."
+    },
+    "results-text": {
+      "type": "string",
+      "description": "Result-count announcement with a {count} placeholder, for localisation (e.g. \"{count} tulosta\"). Defaults to \"1 result\" / \"N results\"."
+    },
+    "open": {
+      "type": "boolean",
+      "default": false,
+      "description": "Reflects whether the list is showing. Set or remove it to open or close the list."
+    }
+  },
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Get or set the chosen option's value (or the free text, with allow-custom). Setting it does not fire aihio-change."
+    },
+    "defaultValue": {
+      "type": "string",
+      "description": "Get or set the reset value reflected by the value attribute"
+    },
+    "selectedOption": {
+      "type": "HTMLElement | null",
+      "readonly": true,
+      "description": "The chosen aihio-option, or null"
+    },
+    "control": {
+      "type": "HTMLInputElement | null",
+      "readonly": true,
+      "description": "The native text input carrying role=\"combobox\""
+    },
+    "form": {
+      "type": "HTMLFormElement | null",
+      "readonly": true,
+      "description": "The owning form, or null outside one"
+    },
+    "validity": {
+      "type": "ValidityState | null",
+      "readonly": true,
+      "description": "Native constraint validation state"
+    },
+    "validationMessage": {
+      "type": "string",
+      "readonly": true,
+      "description": "Native validation message"
+    },
+    "willValidate": {
+      "type": "boolean",
+      "readonly": true,
+      "description": "Whether the field participates in constraint validation"
+    }
+  },
+  "methods": {
+    "open()": {
+      "description": "Opens the list showing every option, with the chosen one highlighted.",
+      "returns": "void"
+    },
+    "close()": {
+      "description": "Closes the list, reverting unconfirmed text to the chosen option.",
+      "returns": "void"
+    },
+    "toggle()": {
+      "description": "Opens or closes the list.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the text input.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    },
+    "checkValidity()": {
+      "description": "Runs native constraint validation and returns whether the field is valid.",
+      "returns": "boolean"
+    },
+    "reportValidity()": {
+      "description": "Runs native constraint validation and shows the browser message if invalid.",
+      "returns": "boolean"
+    },
+    "setCustomValidity()": {
+      "description": "Sets a custom validation message.",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "events": {
+    "aihio-change": {
+      "description": "Fired when the person commits a different choice, or when a form reset changes it. Not fired for programmatic value changes.",
+      "detail": {
+        "value": "string",
+        "label": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-search": {
+      "description": "Fired on every keystroke with the typed text. Use it to fetch options for filter=\"none\".",
+      "detail": {
+        "query": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-open": {
+      "description": "Fired after the list opens.",
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-close": {
+      "description": "Fired after the list closes.",
+      "detail": {
+        "reason": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "allowedChildren": [
+      "aihio-option"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "A real <input role=\"combobox\"> with aria-autocomplete=\"list\", aria-expanded, and aria-controls pointing at the listbox",
+      "DOM focus stays in the input; aria-activedescendant follows the highlighted option, in the same tree as the options it names",
+      "Options render as role=\"option\" inside role=\"listbox\"; the chosen option has aria-selected=\"true\" and a check mark, disabled options have aria-disabled",
+      "ArrowDown/ArrowUp open the list and move through enabled options (wrapping); Alt+ArrowDown opens without moving; Alt+ArrowUp accepts and closes; PageDown/PageUp jump ten",
+      "Enter chooses the highlighted option; Escape closes and reverts unconfirmed text, and is left alone when the list is closed so a surrounding dialog still closes",
+      "Tab accepts the highlighted option and moves on; leaving the field any other way keeps the previous choice unless the text matches an option exactly",
+      "Typing filters case- and accent-insensitively (\"aland\" finds \"Åland\"), ranks prefix matches first, highlights the first match, and sets the matched text in bold",
+      "A polite status region announces the result count, the empty message, or the loading message once typing pauses",
+      "The toggle button is out of the tab order, carries the field's label, and exposes aria-expanded",
+      "Keys pressed while an IME is composing are left to the IME",
+      "The chosen value submits through a hidden input under name; required, form reset, <fieldset disabled>, and the form attribute behave natively",
+      "The list renders in the top layer, flips above the field when there is more room there, and fits the visual viewport above an on-screen keyboard",
+      "Forced colours restate the highlighted and disabled states with system colours; reduced motion removes the open animation and spinner"
+    ],
+    "required": [
+      {
+        "when": "the combobox is not inside an aihio-field",
+        "requirement": "Label it with aria-labelledby pointing at visible text, or aria-label. Placeholder is not a label, and a wrapping <label> would fold the option text into the field's name.",
+        "severity": "error",
+        "rule": "combobox-label"
+      },
+      {
+        "when": "two aihio-option children share a value",
+        "requirement": "Give every option a distinct value; the value is how the chosen option is found again.",
+        "severity": "error",
+        "rule": "combobox-option-values"
+      },
+      {
+        "when": "the combobox is inside a <form> and its value should be submitted",
+        "requirement": "Set name. A combobox without a name is omitted from FormData.",
+        "severity": "warn",
+        "rule": "combobox-form-name"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-combobox placeholder=\"Country\">\n  <aihio-option value=\"fi\">Finland</aihio-option>\n</aihio-combobox>",
+      "reason": "Placeholder is not a label. Wrap it in aihio-field with a label slot, or add aria-labelledby or aria-label."
+    },
+    {
+      "markup": "<label>\n  Country\n  <aihio-combobox>\n    <aihio-option value=\"fi\">Finland</aihio-option>\n  </aihio-combobox>\n</label>",
+      "reason": "A wrapping <label> takes its name from all of its text, so an open list's options become part of the field's name. Use aihio-field instead."
+    },
+    {
+      "markup": "<aihio-combobox aria-label=\"Size\">\n  <option value=\"s\">Small</option>\n  <option value=\"m\">Medium</option>\n</aihio-combobox>",
+      "reason": "Native <option> elements are not read. Use aihio-option."
+    },
+    {
+      "markup": "<aihio-combobox aria-label=\"Plan\">\n  <aihio-option>Pro</aihio-option>\n  <aihio-option value=\"Pro\">Pro (annual)</aihio-option>\n</aihio-combobox>",
+      "reason": "An option without a value uses its label as its value, so both options have the value \"Pro\" and the second can never be told apart from the first."
+    }
+  ],
+  "related": [
+    {
+      "$component": "aihio-option",
+      "description": "One choice in an aihio-combobox. Its text (or label attribute) is what typing matches and what the field shows once chosen.",
+      "attributes": {
+        "value": {
+          "type": "string",
+          "description": "Submitted value. Defaults to the label."
+        },
+        "label": {
+          "type": "string",
+          "description": "Text matched against and shown in the field when the content is richer than a plain label (an icon, a secondary line)."
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Shown but cannot be chosen, and skipped by the arrow keys."
+        }
+      },
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "The value attribute, or the label when it is absent"
+        },
+        "label": {
+          "type": "string",
+          "description": "The label attribute, or the normalised text content"
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Reflects the disabled attribute"
+        },
+        "selected": {
+          "type": "boolean",
+          "readonly": true,
+          "description": "Whether the owning combobox has this option chosen"
+        }
+      }
+    }
+  ],
+  "examples": [
+    "<aihio-field>\n  <label slot=\"label\">Country</label>\n  <aihio-combobox name=\"country\" placeholder=\"Search countries\">\n    <aihio-option value=\"fi\">Finland</aihio-option>\n    <aihio-option value=\"fr\">France</aihio-option>\n    <aihio-option value=\"de\">Germany</aihio-option>\n    <aihio-option value=\"is\">Iceland</aihio-option>\n    <aihio-option value=\"no\">Norway</aihio-option>\n    <aihio-option value=\"se\">Sweden</aihio-option>\n    <aihio-option value=\"ax\">Åland Islands</aihio-option>\n  </aihio-combobox>\n  <span slot=\"description\">Type to filter. Accents are optional.</span>\n</aihio-field>",
+    "<aihio-field>\n  <label slot=\"label\">Assignee</label>\n  <aihio-combobox name=\"assignee\" value=\"ada\">\n    <aihio-option value=\"ada\" label=\"Ada Lovelace\">Ada Lovelace <small>Engineering</small></aihio-option>\n    <aihio-option value=\"grace\" label=\"Grace Hopper\">Grace Hopper <small>Compilers</small></aihio-option>\n    <aihio-option value=\"alan\" label=\"Alan Turing\" disabled>Alan Turing <small>On leave</small></aihio-option>\n  </aihio-combobox>\n</aihio-field>",
+    "<aihio-field>\n  <label slot=\"label\">Tag</label>\n  <aihio-combobox name=\"tag\" allow-custom placeholder=\"Pick or type a tag\">\n    <aihio-option>bug</aihio-option>\n    <aihio-option>design</aihio-option>\n    <aihio-option>documentation</aihio-option>\n  </aihio-combobox>\n</aihio-field>",
+    "<aihio-combobox aria-label=\"Search users\" name=\"user\" filter=\"none\" empty-text=\"Type to search\"></aihio-combobox>"
+  ]
+}

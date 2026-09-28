@@ -55,6 +55,20 @@ const fixtures = [
     ],
   },
   {
+    file: 'combobox-missing-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-combobox' },
+    ],
+  },
+  {
+    // The second option has no distinct value, so it can never be told apart
+    // from the first once chosen.
+    file: 'combobox-duplicate-values.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-combobox' },
+    ],
+  },
+  {
     file: 'dropdown-missing-trigger.html',
     expectedIssues: [
       { ruleId: 'missing-required-slot', component: 'aihio-dropdown' },

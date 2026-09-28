@@ -54,7 +54,7 @@ if (!customElements.get(AihioButton.tag)) {
 }
 ```
 
-The same form is available for all 13 top-level components. Import
+The same form is available for all 14 top-level components. Import
 `aihio/runtime` when schema inspection is needed without importing component
 implementations.
 
@@ -132,6 +132,7 @@ For MCP clients that launch local stdio servers, the package also ships `aihio-m
 | `aihio-field` | Form field wrapper that lays out label, control, description, and error, and wires the ARIA between them |
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
 | `aihio-input` | Text input with size variants and error state |
+| `aihio-combobox` | Filterable single-select field with keyboard navigation, async options, and optional free text |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
 | `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
 | `aihio-alert` | Callout with title/description slots and 4 variants; only `destructive` announces assertively |
@@ -200,6 +201,45 @@ other:
   field is erroring. Clicking either a native `<label>` or other
   `slot="label"` content focuses the delegated input.
 
+### Combobox
+
+`aihio-combobox` is the field for choosing one option from a list too long to
+scan, or from a search. It submits the chosen option's `value`, not the label
+on show:
+
+```html
+<aihio-field>
+  <label slot="label">Country</label>
+  <aihio-combobox name="country" value="fi" required>
+    <aihio-option value="fi">Finland</aihio-option>
+    <aihio-option value="se">Sweden</aihio-option>
+    <aihio-option value="ax">Åland Islands</aihio-option>
+  </aihio-combobox>
+</aihio-field>
+```
+
+- Typing filters without regard to case or accents (`aland` finds
+  `Åland Islands`), ranks prefix matches first, sets the matched text in bold,
+  and highlights the best match so Enter or Tab takes it.
+- The text can never disagree with the value. Leaving the field keeps an exact
+  match, and otherwise puts back the chosen option's label, so a field that
+  looks filled in is filled in. Add `allow-custom` to accept free text instead.
+- The keyboard follows the WAI-ARIA combobox pattern: arrows (with Alt),
+  PageUp/PageDown, Enter, Escape, and Tab. DOM focus never leaves the input.
+  Escape on a closed field is left alone, so it still closes a surrounding
+  dialog.
+- For options from a server, set `filter="none"`, listen for `aihio-search`,
+  and replace the `<aihio-option>` children, toggling `loading` while the
+  request is in flight. A polite status region announces the result count once
+  typing pauses; `results-text`, `empty-text`, and `loading-text` localise it.
+
+The `<aihio-option>` children are the data the list is rendered from, and
+they stay exactly where they were written. That is what lets React, Vue, or
+Svelte own them: the framework adds and removes its own nodes, and the
+component re-renders the list from them. `host.replaceChildren(...options)`
+is fine too. The component puts back the input it would otherwise take with
+it, and focus with it, so typing is not interrupted.
+
 ## Layout
 
 Three primitives keep page composition inside the token system instead of in
@@ -222,8 +262,12 @@ Every event a component dispatches carries an `aihio-` prefix:
 | --- | --- | --- |
 | `aihio-input` | `aihio-input` | `{ value }` |
 | `aihio-change` | `aihio-input` | `{ value }` |
+| `aihio-change` | `aihio-combobox` | `{ value, label }` |
+| `aihio-search` | `aihio-combobox` | `{ query }` |
 | `aihio-toggle` | `aihio-toggle` | `{ pressed }` |
 | `aihio-open`, `aihio-close` | `aihio-dialog`, `aihio-dropdown` | — |
+| `aihio-open` | `aihio-combobox` | — |
+| `aihio-close` | `aihio-combobox` | `{ reason }` |
 | `aihio-before-close` | `aihio-dialog`, `aihio-dropdown` | `{ reason }` |
 | `aihio-select` | `aihio-dropdown-item` | `{ value }` |
 | `aihio-tab-select` | `aihio-tab` | `{ value }` |
@@ -358,6 +402,11 @@ just separates the two.
 | `page-bg` | `zinc.0` (`#ffffff`) | `zinc.1000` (`#000000`) |
 | `surface-bg` | `zinc.50` (`#f5f5f7`) | `zinc.950` (`#161617`) |
 | `border-subtle` | `zinc.200` | `zinc.850` |
+| `overlay-highlight-bg` | `zinc.100` | `zinc.800` |
+
+`overlay-highlight-bg` marks the active item inside an overlay. It exists
+because `accent` and the overlay surface are the same `zinc.900` in the dark
+theme, so a highlight drawn with `accent` would be invisible there.
 
 Because the elevated surface differs from the canvas in both themes, cards,
 alerts, and dialogs read as raised without needing a shadow to prove it.
@@ -385,7 +434,7 @@ in the system shout. Field borders are covered, because on an empty input the
 border is the only thing marking the control.
 
 Add or change a pair in `CONTRAST_REQUIREMENTS` in `src/tokens/contrast.js`.
-It currently checks 15 pairs per theme, 30 in total.
+It currently checks 16 pairs per theme, 32 in total.
 
 ### State colours
 

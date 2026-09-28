@@ -133,6 +133,13 @@ export const CONTRAST_REQUIREMENTS = [
     note: 'Ghost and outline button labels on their hover fill.',
   },
   {
+    id: 'overlay-highlight',
+    foreground: 'popover-foreground',
+    background: 'popover-highlight',
+    min: 4.5,
+    note: 'The active combobox option or hovered dropdown item label on its highlight, inside an overlay.',
+  },
+  {
     id: 'muted-text-on-page',
     foreground: 'muted-foreground',
     background: 'background',

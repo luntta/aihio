@@ -128,6 +128,7 @@
   --card-foreground: var(--color-zinc-900);
   --popover: var(--color-zinc-0);
   --popover-foreground: var(--color-zinc-900);
+  --popover-highlight: var(--color-zinc-100);
   --primary: var(--color-zinc-900);
   --primary-foreground: var(--color-zinc-0);
   --secondary: var(--color-zinc-100);
@@ -203,6 +204,7 @@
   --color-intent-surface-fg: var(--card-foreground);
   --color-intent-overlay-bg: var(--popover);
   --color-intent-overlay-fg: var(--popover-foreground);
+  --color-intent-overlay-highlight-bg: var(--popover-highlight);
   --color-intent-surface-muted-bg: var(--muted);
   --color-intent-surface-muted-fg: var(--muted-foreground);
   --color-intent-action-primary-bg: var(--primary);
@@ -233,6 +235,7 @@
   --card-foreground: var(--color-zinc-50);
   --popover: var(--color-zinc-900);
   --popover-foreground: var(--color-zinc-50);
+  --popover-highlight: var(--color-zinc-800);
   --primary: var(--color-zinc-50);
   --primary-foreground: var(--color-zinc-1000);
   --secondary: var(--color-zinc-900);
@@ -261,6 +264,7 @@
   --color-intent-surface-fg: var(--card-foreground);
   --color-intent-overlay-bg: var(--popover);
   --color-intent-overlay-fg: var(--popover-foreground);
+  --color-intent-overlay-highlight-bg: var(--popover-highlight);
   --color-intent-surface-muted-bg: var(--muted);
   --color-intent-surface-muted-fg: var(--muted-foreground);
   --color-intent-action-primary-bg: var(--primary);
@@ -292,6 +296,7 @@
     --card-foreground: var(--color-zinc-50);
     --popover: var(--color-zinc-900);
     --popover-foreground: var(--color-zinc-50);
+    --popover-highlight: var(--color-zinc-800);
     --primary: var(--color-zinc-50);
     --primary-foreground: var(--color-zinc-1000);
     --secondary: var(--color-zinc-900);
@@ -320,6 +325,7 @@
     --color-intent-surface-fg: var(--card-foreground);
     --color-intent-overlay-bg: var(--popover);
     --color-intent-overlay-fg: var(--popover-foreground);
+    --color-intent-overlay-highlight-bg: var(--popover-highlight);
     --color-intent-surface-muted-bg: var(--muted);
     --color-intent-surface-muted-fg: var(--muted-foreground);
     --color-intent-action-primary-bg: var(--primary);

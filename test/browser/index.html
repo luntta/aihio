@@ -437,6 +437,82 @@
       );
     });
 
+    await runTest('combobox filters, navigates, commits, and submits the value', async () => {
+      sandbox.innerHTML = `
+        <form id="picker">
+          <aihio-field>
+            <label slot="label">Country</label>
+            <aihio-combobox id="country" name="country" value="fi">
+              <aihio-option value="fi">Finland</aihio-option>
+              <aihio-option value="se">Sweden</aihio-option>
+              <aihio-option value="no" disabled>Norway</aihio-option>
+              <aihio-option value="ax">Åland Islands</aihio-option>
+            </aihio-combobox>
+          </aihio-field>
+        </form>
+      `;
+      await nextFrame(2);
+
+      const form = sandbox.querySelector('#picker');
+      const combobox = sandbox.querySelector('#country');
+      const input = combobox.control;
+      const label = sandbox.querySelector('[slot="label"]');
+      const listbox = combobox.querySelector('[role="listbox"]');
+      const activeText = () =>
+        document.getElementById(input.getAttribute('aria-activedescendant') ?? '')?.textContent.trim() ?? null;
+      const visible = () =>
+        [...listbox.querySelectorAll('[role="option"]:not([hidden])')].map((option) => option.textContent.trim());
+
+      assert(input.getAttribute('role') === 'combobox', 'the text input should carry role="combobox"');
+      assert(input.value === 'Finland', 'the default value should show its option label');
+      assert(label.getAttribute('for') === input.id, 'the field label should point at the text input');
+      assert(input.getAttribute('aria-labelledby') === label.id, 'the input should be labelled by the field label');
+      assert(listbox.getAttribute('aria-labelledby') === label.id, 'the listbox should share the field label');
+      assert(input.getAttribute('aria-controls') === listbox.id, 'the input should control the listbox');
+      assert(combobox.querySelectorAll(':scope > aihio-option').length === 4, 'authored options should stay where they were written');
+
+      input.focus();
+      dispatchKey(input, 'ArrowDown');
+      await nextFrame();
+      assert(combobox.hasAttribute('open'), 'ArrowDown should open the list');
+      assert(input.getAttribute('aria-expanded') === 'true', 'aria-expanded should follow the list');
+      assert(activeText() === 'Finland', 'opening should highlight the chosen option');
+
+      dispatchKey(input, 'ArrowDown');
+      dispatchKey(input, 'ArrowDown');
+      assert(activeText() === 'Åland Islands', 'ArrowDown should skip the disabled option');
+
+      dispatchKey(input, 'Escape');
+      await nextFrame();
+      assert(!combobox.hasAttribute('open'), 'Escape should close the list');
+      assert(!input.hasAttribute('aria-activedescendant'), 'a closed list should have no active descendant');
+      assert(combobox.value === 'fi', 'Escape should not change the value');
+
+      let change = null;
+      combobox.addEventListener('aihio-change', (event) => {
+        change = event.detail;
+      });
+
+      input.value = 'ALAND';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await nextFrame();
+      assert(combobox.hasAttribute('open'), 'typing should open the list');
+      assert(visible().join('|') === 'Åland Islands', `matching should ignore case and accents, got ${visible().join('|')}`);
+      assert(activeText() === 'Åland Islands', 'typing should highlight the best match');
+
+      dispatchKey(input, 'Enter');
+      await nextFrame();
+      assert(combobox.value === 'ax', 'Enter should commit the highlighted option');
+      assert(input.value === 'Åland Islands', 'the field should show the chosen label');
+      assert(change?.value === 'ax' && change?.label === 'Åland Islands', 'aihio-change should carry value and label');
+      assert(new FormData(form).get('country') === 'ax', 'the form should submit the value, not the label');
+
+      form.reset();
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      assert(combobox.value === 'fi', 'reset should restore the default value');
+      assert(input.value === 'Finland', 'reset should restore the default label');
+    });
+
     const failed = results.some((result) => !result.pass);
     document.body.dataset.status = failed ? 'fail' : 'pass';
     resultsNode.textContent = JSON.stringify(results, null, 2);

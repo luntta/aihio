@@ -4,6 +4,9 @@ export const A11Y_RULE_IDS = new Set([
   'avatar-fallback',
   'button-accessible-name',
   'button-form-owner',
+  'combobox-form-name',
+  'combobox-label',
+  'combobox-option-values',
   'dialog-accessible-name',
   'dropdown-trigger-name',
   'field-label',
@@ -39,6 +42,29 @@ const RULES = {
     return !formId || api.tag(findById(node, formId, api)) !== 'form';
   },
 
+  'combobox-form-name': (node, api) =>
+    api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
+
+  // Deliberately stricter than input-label: a wrapping <label> takes its name
+  // from all of its text, which would include the options of an open list.
+  'combobox-label': (node, api) =>
+    !findAncestor(node, 'aihio-field', api) &&
+    !hasNonEmptyAttribute(node, 'aria-label', api) &&
+    !referencesExistingIds(node, 'aria-labelledby', api),
+
+  'combobox-option-values': (node, api) => {
+    const seen = new Set();
+    for (const option of api.children(node)) {
+      if (api.tag(option) !== 'aihio-option') continue;
+      const value = api.hasAttr(option, 'value')
+        ? api.attr(option, 'value')
+        : normalizeText(api.attr(option, 'label') ?? api.text(option));
+      if (seen.has(value)) return true;
+      seen.add(value);
+    }
+    return false;
+  },
+
   'dialog-accessible-name': (node, api) =>
     ownedDescendants(node, 'aihio-dialog-title', 'aihio-dialog', api).length === 0 &&
     !hasNonEmptyAttribute(node, 'aria-label', api),
@@ -59,7 +85,7 @@ const RULES = {
     const label = owned.find((child) => api.attr(child, 'slot') === 'label');
     if (label && hasContent(label, api)) return false;
     const control = owned.find((child) =>
-      ['aihio-input', 'input', 'select', 'textarea'].includes(api.tag(child))
+      ['aihio-input', 'aihio-combobox', 'input', 'select', 'textarea'].includes(api.tag(child))
     );
     return !control || !hasNonEmptyAttribute(control, 'aria-label', api);
   },
@@ -69,11 +95,8 @@ const RULES = {
   'input-error-description': (node, api) =>
     api.hasAttr(node, 'error') && !referencesExistingIds(node, 'aria-describedby', api),
 
-  'input-form-name': (node, api) => {
-    const formId = api.attr(node, 'form');
-    const owner = findAncestor(node, 'form', api) ?? (formId ? findById(node, formId, api) : null);
-    return api.tag(owner) === 'form' && !hasNonEmptyAttribute(node, 'name', api);
-  },
+  'input-form-name': (node, api) =>
+    api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
 
   'tabs-value-pairs': (node, api) => !hasExactTabValuePairs(node, api),
 
@@ -89,6 +112,11 @@ export function collectA11yRuleViolations(node, schema, api) {
     if (checker?.(node, api)) violations.push(requirement);
   }
   return violations;
+}
+
+function owningForm(node, api) {
+  const formId = api.attr(node, 'form');
+  return findAncestor(node, 'form', api) ?? (formId ? findById(node, formId, api) : null);
 }
 
 function hasAssociatedLabel(node, api) {

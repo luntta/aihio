@@ -73,6 +73,10 @@
             <aihio-tab-panel value="two">Panel</aihio-tab-panel>
           </aihio-tabs>
           <aihio-toggle id="bad-toggle"></aihio-toggle>
+          <aihio-combobox id="bad-combobox" placeholder="Plan">
+            <aihio-option>Pro</aihio-option>
+            <aihio-option value="Pro">Pro (annual)</aihio-option>
+          </aihio-combobox>
         `;
         await nextFrame(4);
 
@@ -116,6 +120,14 @@
           warnings.some((message) => message.includes('aihio-toggle') && message.includes('Provide aria-label describing what the toggle controls')),
           'toggle should warn when icon-only content has no accessible name'
         );
+        assert(
+          warnings.some((message) => message.includes('aihio-combobox') && message.includes('Label it with aria-labelledby')),
+          'combobox should warn when it has no label'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-combobox') && message.includes('distinct value')),
+          'combobox should warn when two options share a value'
+        );
       });
 
       await runTest('dev runtime introspection and aria sync remain available', async () => {
@@ -152,6 +164,14 @@
           </aihio-tabs>
 
           <aihio-toggle id="good-toggle" aria-label="Bold"></aihio-toggle>
+
+          <aihio-field>
+            <label slot="label">Country</label>
+            <aihio-combobox id="good-combobox" name="country">
+              <aihio-option value="fi">Finland</aihio-option>
+              <aihio-option value="se">Sweden</aihio-option>
+            </aihio-combobox>
+          </aihio-field>
         `;
         await nextFrame(4);
 

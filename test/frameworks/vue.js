@@ -24,6 +24,16 @@ createApp({
           document.body.dataset.clicked = 'true';
         },
       }, value.value === 'updated' ? 'Updated action' : 'Initial action'),
+      h('aihio-combobox', {
+        id: 'framework-combobox',
+        'aria-label': 'Fruit',
+        value: 'banana',
+        onAihioChange: (event) => {
+          document.body.dataset.comboboxValue = event.detail.value;
+        },
+      }, (value.value === 'updated' ? ['Banana', 'Cherry', 'Date'] : ['Apple', 'Banana']).map((fruit) =>
+        h('aihio-option', { key: fruit, value: fruit.toLowerCase() }, fruit)
+      )),
     ];
   },
 }).mount('#app');

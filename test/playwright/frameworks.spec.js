@@ -18,4 +18,21 @@ for (const framework of ['react', 'vue', 'svelte']) {
     await page.locator('#framework-button > button').click();
     await expect(page.locator('body')).toHaveAttribute('data-clicked', 'true');
   });
+
+  test(`${framework} owns combobox options while the component renders the list`, async ({ page }) => {
+    await page.goto(`/test/frameworks/framework.html?framework=${framework}`);
+    await expect(page.locator('body')).toHaveAttribute('data-status', 'ready');
+
+    const combobox = page.locator('#framework-combobox');
+    const input = combobox.locator('[role="combobox"]');
+    await expect(combobox).toHaveJSProperty('value', 'banana');
+    await expect(input).toHaveValue('Banana');
+    await expect(combobox.locator('[data-combobox-part="input"]')).toHaveCount(1);
+
+    await input.click();
+    await expect(combobox.locator('[role="option"]:not([hidden])')).toHaveText(['Banana', 'Cherry', 'Date']);
+    await combobox.locator('[role="option"]', { hasText: 'Cherry' }).click();
+    await expect(page.locator('body')).toHaveAttribute('data-combobox-value', 'cherry');
+    await expect(input).toHaveValue('Cherry');
+  });
 }

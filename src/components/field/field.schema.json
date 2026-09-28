@@ -1,6 +1,6 @@
 {
   "$component": "aihio-field",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Form field wrapper that lays out a label, control, description, and error message, and wires the accessibility relationships between them.",
   "intents": [
     "form-field",
@@ -24,9 +24,10 @@
       ]
     },
     "default": {
-      "description": "The control itself, normally aihio-input.",
+      "description": "The control itself, normally aihio-input or aihio-combobox.",
       "accepts": [
         "aihio-input",
+        "aihio-combobox",
         "input",
         "select",
         "textarea"
@@ -54,6 +55,7 @@
     ],
     "allowedChildren": [
       "aihio-input",
+      "aihio-combobox",
       "label",
       "span",
       "p",

@@ -300,6 +300,11 @@
           "$type": "color",
           "$description": "Foreground on transient overlays."
         },
+        "overlay-highlight-bg": {
+          "$value": "{semantic.light.popover-highlight}",
+          "$type": "color",
+          "$description": "The highlighted item inside an overlay: the active combobox option or a hovered dropdown item. It has to differ from overlay-bg, which accent does not in the dark theme."
+        },
         "surface-muted-bg": {
           "$value": "{semantic.light.muted}",
           "$type": "color",
@@ -435,6 +440,11 @@
           "$value": "{semantic.dark.popover-foreground}",
           "$type": "color",
           "$description": "Foreground on transient overlays."
+        },
+        "overlay-highlight-bg": {
+          "$value": "{semantic.dark.popover-highlight}",
+          "$type": "color",
+          "$description": "The highlighted item inside an overlay: the active combobox option or a hovered dropdown item. It has to differ from overlay-bg, which accent does not in the dark theme."
         },
         "surface-muted-bg": {
           "$value": "{semantic.dark.muted}",

@@ -153,6 +153,96 @@ test('dialog and dropdown use native top layers', async ({ page }) => {
   }
 });
 
+async function openDropdown(page, id) {
+  await page.locator(`#${id} [slot="trigger"]`).getByRole('button').click();
+  const content = page.locator(`#${id} .content`);
+  await expect(content).toBeVisible();
+  await content.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+  return content;
+}
+
+test('dropdown menu opens under its trigger, including display: contents triggers', async ({ page }) => {
+  await page.setViewportSize({ width: 800, height: 600 });
+  await page.goto('/test/playwright/fixture.html');
+  await page.locator('#fixture').evaluate((root) => {
+    root.innerHTML = `
+      <div style="padding: 10rem 20rem">
+        <aihio-dropdown id="button-menu">
+          <aihio-button slot="trigger">Menu</aihio-button>
+          <aihio-dropdown-item>Profile</aihio-dropdown-item>
+        </aihio-dropdown>
+        <aihio-dropdown id="contents-menu">
+          <span slot="trigger" style="display: contents"><button type="button">Other</button></span>
+          <aihio-dropdown-item>Settings</aihio-dropdown-item>
+        </aihio-dropdown>
+      </div>
+    `;
+  });
+
+  for (const id of ['button-menu', 'contents-menu']) {
+    const trigger = page.locator(`#${id} [slot="trigger"]`).getByRole('button');
+    const content = await openDropdown(page, id);
+    const [triggerBox, contentBox] = await Promise.all([trigger.boundingBox(), content.boundingBox()]);
+    expect(contentBox.y, id).toBeGreaterThanOrEqual(triggerBox.y + triggerBox.height);
+    expect(Math.abs(contentBox.x - triggerBox.x), id).toBeLessThanOrEqual(2);
+    await page.keyboard.press('Escape');
+    await expect(content).toBeHidden();
+  }
+});
+
+test('dropdown item hover reads against the overlay in the dark theme', async ({ page }) => {
+  await page.goto('/test/playwright/fixture.html');
+  await page.locator('#fixture').evaluate((root) => {
+    document.documentElement.dataset.theme = 'dark';
+    root.innerHTML = `
+      <aihio-dropdown id="menu">
+        <aihio-button slot="trigger">Menu</aihio-button>
+        <aihio-dropdown-item>Profile</aihio-dropdown-item>
+      </aihio-dropdown>
+    `;
+  });
+
+  const content = await openDropdown(page, 'menu');
+  const item = page.locator('aihio-dropdown-item');
+  await item.hover();
+  await item.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+
+  const [itemBackground, overlayBackground] = await Promise.all([
+    item.evaluate((element) => getComputedStyle(element).backgroundColor),
+    content.evaluate((element) => getComputedStyle(element).backgroundColor),
+  ]);
+  expect(itemBackground).not.toBe(overlayBackground);
+});
+
+test('a highlighted dropdown item keeps visible text in forced colors', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' });
+  await page.goto('/test/playwright/fixture.html');
+  test.skip(!(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)), 'forced colors emulation unsupported');
+  await page.locator('#fixture').evaluate((root) => {
+    root.innerHTML = `
+      <aihio-dropdown id="menu">
+        <aihio-button slot="trigger">Menu</aihio-button>
+        <aihio-dropdown-item>Profile <span>⌘P</span></aihio-dropdown-item>
+      </aihio-dropdown>
+    `;
+  });
+
+  await openDropdown(page, 'menu');
+  const item = page.locator('aihio-dropdown-item');
+  await item.hover();
+
+  // Without the opt-out, the UA draws a Canvas backplate behind the text and
+  // HighlightText on it disappears.
+  await expect(item).toHaveCSS('forced-color-adjust', 'none');
+  await expect(item.locator('span')).toHaveCSS('forced-color-adjust', 'none');
+  const { color, backgroundColor } = await item.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished));
+    const style = getComputedStyle(element);
+    return { color: style.color, backgroundColor: style.backgroundColor };
+  });
+  expect(color).not.toBe(backgroundColor);
+});
+
 test('stacked dialogs keep scroll locked and support cancelable close', async ({ page }) => {
   await page.goto('/test/playwright/fixture.html');
   await page.locator('#fixture').evaluate((root) => {

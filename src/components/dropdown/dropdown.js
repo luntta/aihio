@@ -288,7 +288,7 @@ export class AihioDropdown extends AihioElement {
 
     const edge = 8;
     const gap = 4;
-    const triggerRect = trigger.getBoundingClientRect();
+    const triggerRect = this._getTriggerRect(trigger);
     const contentRect = this._content.getBoundingClientRect();
     let left = this.attr('align', 'start') === 'end'
       ? triggerRect.right - contentRect.width
@@ -303,6 +303,19 @@ export class AihioDropdown extends AihioElement {
 
     this._content.style.left = `${Math.round(left)}px`;
     this._content.style.top = `${Math.round(top)}px`;
+  }
+
+  /* Measure the element that actually has a box. An upgraded aihio-button is
+     display: contents, so its own rect is all zeros; it delegates to the
+     native <button> exposed as .control. Any other display: contents trigger
+     falls back to its first child. */
+  _getTriggerRect(trigger) {
+    const anchor = trigger.control ?? trigger;
+    const rect = anchor.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0 && anchor.firstElementChild) {
+      return anchor.firstElementChild.getBoundingClientRect();
+    }
+    return rect;
   }
 }
 
@@ -324,10 +337,11 @@ export class AihioDropdownItem extends AihioElement {
                   color var(--duration-intent-feedback-fast) ease;
     }
 
+    /* Not accent: in the dark theme accent matches the overlay surface. */
     aihio-dropdown-item:hover,
     aihio-dropdown-item:focus-visible {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: oklch(var(--color-intent-overlay-highlight-bg));
+      color: oklch(var(--color-intent-overlay-fg));
     }
 
     aihio-dropdown-item[disabled] {
@@ -336,8 +350,12 @@ export class AihioDropdownItem extends AihioElement {
     }
 
     @media (forced-colors: active) {
+      /* Opt the highlighted item out of adjustment: otherwise the UA draws a
+         Canvas backplate behind its text, and HighlightText on Canvas is
+         invisible. The colours are stated explicitly instead. */
       aihio-dropdown-item:hover,
       aihio-dropdown-item:focus {
+        forced-color-adjust: none;
         background-color: Highlight;
         color: HighlightText;
       }

@@ -56,7 +56,7 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 13);
+  assert.equal(components.length, 14);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
 
@@ -250,7 +250,7 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
-  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'dialog', 'dropdown', 'field', 'input', 'stack', 'tabs', 'toggle']) {
+  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'combobox', 'dialog', 'dropdown', 'field', 'input', 'stack', 'tabs', 'toggle']) {
     assert.equal(pkg.exports[`./${component}`].types, `./dist/${component}.d.ts`);
     assert.equal(pkg.exports[`./${component}`].default, `./dist/${component}.js`);
   }
@@ -312,7 +312,7 @@ test('schema content pass keeps a11y guidance and counterexamples populated for 
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 13);
+  assert.equal(minified.components.length, 14);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
   assert.equal(minified.patterns.length, 8);
 

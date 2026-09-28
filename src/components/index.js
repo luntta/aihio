@@ -3,6 +3,7 @@ import { AihioAvatar } from './avatar/avatar.js';
 import { AihioBadge } from './badge/badge.js';
 import { AihioButton } from './button/button.js';
 import { AihioCluster } from './cluster/cluster.js';
+import { AihioCombobox, AihioOption } from './combobox/combobox.js';
 import {
   AihioCard,
   AihioCardContent,
@@ -59,6 +60,7 @@ export {
   AihioDropdownSeparator,
 };
 export { AihioCluster };
+export { AihioCombobox, AihioOption };
 export { AihioField };
 export { AihioInput };
 export { AihioStack };

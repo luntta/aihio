@@ -10,6 +10,7 @@ const componentNames = [
   'button',
   'card',
   'cluster',
+  'combobox',
   'dialog',
   'dropdown',
   'field',

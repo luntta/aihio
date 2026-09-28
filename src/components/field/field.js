@@ -2,11 +2,17 @@ import { AihioElement } from '../base.js';
 
 let fieldInstanceId = 0;
 
-const CONTROL_SELECTOR = 'aihio-input, input, select, textarea';
+// Aihio controls come first in document order, ahead of the native inputs
+// they render inside themselves, so the host is the control that is found.
+const CONTROL_SELECTOR = 'aihio-input, aihio-combobox, input, select, textarea';
+
+// Hosts that take the error state as an attribute and restate it on the
+// control they render.
+const ERROR_ATTRIBUTE_HOSTS = new Set(['AIHIO-INPUT', 'AIHIO-COMBOBOX']);
 
 export class AihioField extends AihioElement {
   static tag = 'aihio-field';
-  static schemaVersion = '1.1.0';
+  static schemaVersion = '1.2.0';
   static observedAttributes = ['error'];
   static styles = `
     aihio-field {
@@ -97,7 +103,7 @@ export class AihioField extends AihioElement {
     this._wireLabel(label, control);
     this._wireDescription({ control, description, error, hasError });
 
-    if ('error' in control || control.tagName === 'AIHIO-INPUT') {
+    if ('error' in control || ERROR_ATTRIBUTE_HOSTS.has(control.tagName)) {
       toggleAttr(control, 'error', hasError);
     } else {
       control.setAttribute('aria-invalid', String(hasError));

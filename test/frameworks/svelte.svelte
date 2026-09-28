@@ -9,6 +9,8 @@
     document.body.dataset.status = 'ready';
   });
 
+  $: fruits = value === 'updated' ? ['Banana', 'Cherry', 'Date'] : ['Apple', 'Banana'];
+
   function handleInput(event) {
     document.body.dataset.eventValue = event.target.value;
   }
@@ -18,3 +20,13 @@
 <aihio-button id="framework-button" onclick={() => document.body.dataset.clicked = 'true'}>
   {value === 'updated' ? 'Updated action' : 'Initial action'}
 </aihio-button>
+<aihio-combobox
+  id="framework-combobox"
+  aria-label="Fruit"
+  value="banana"
+  onaihio-change={(event) => document.body.dataset.comboboxValue = event.detail.value}
+>
+  {#each fruits as fruit (fruit)}
+    <aihio-option value={fruit.toLowerCase()}>{fruit}</aihio-option>
+  {/each}
+</aihio-combobox>

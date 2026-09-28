@@ -25,6 +25,7 @@ Theme-aware color intents used by components and page-level chrome.
 | `color.intent.focus-ring` | `--color-intent-focus-ring` | `semantic.ring` | Focus indication ring for keyboard interactions. |
 | `color.intent.overlay-bg` | `--color-intent-overlay-bg` | `semantic.popover` | Surface background for transient overlays such as dropdowns. |
 | `color.intent.overlay-fg` | `--color-intent-overlay-fg` | `semantic.popover-foreground` | Foreground on transient overlays. |
+| `color.intent.overlay-highlight-bg` | `--color-intent-overlay-highlight-bg` | `semantic.popover-highlight` | The highlighted item inside an overlay: the active combobox option or a hovered dropdown item. It has to differ from overlay-bg, which accent does not in the dark theme. |
 | `color.intent.overlay-scrim` | `--color-intent-overlay-scrim` | `0 0 0 / 0.8` | Modal backdrop scrim behind blocking overlays. |
 | `color.intent.page-bg` | `--color-intent-page-bg` | `semantic.background` | Default page canvas and neutral active backgrounds. |
 | `color.intent.page-fg` | `--color-intent-page-fg` | `semantic.foreground` | Primary foreground on the page canvas. |
