@@ -1073,17 +1073,27 @@ aihio-tab-panel {
     }
 
 /* aihio-toggle */
-aihio-toggle {
+aihio-toggle:defined {
+      display: contents;
+    }
+
+    aihio-toggle:not(:defined),
+    aihio-toggle > button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: var(--spacing-intent-control-gap);
+      white-space: nowrap;
       border-radius: var(--radius-intent-interactive);
+      font-family: inherit;
       font-size: var(--fontSize-intent-control);
       font-weight: var(--fontWeight-intent-control);
+      line-height: var(--lineHeight-intent-compact);
       height: var(--button-height-md);
+      margin: 0;
       padding-inline: var(--button-padding-x-md);
       border: 1px solid transparent;
+      appearance: none;
       cursor: pointer;
       user-select: none;
       background-color: transparent;
@@ -1092,45 +1102,56 @@ aihio-toggle {
                   color var(--duration-intent-feedback) ease;
     }
 
-    aihio-toggle:hover {
+    aihio-toggle:not(:defined):hover,
+    aihio-toggle > button:hover {
       background-color: oklch(var(--color-intent-surface-muted-bg));
       color: oklch(var(--color-intent-surface-muted-fg));
     }
 
-    aihio-toggle[pressed] {
+    aihio-toggle:not(:defined)[pressed],
+    aihio-toggle[pressed] > button {
       background-color: oklch(var(--color-intent-action-accent-bg));
       color: oklch(var(--color-intent-action-accent-fg));
     }
 
-    aihio-toggle[variant="outline"] {
+    aihio-toggle:not(:defined)[variant="outline"],
+    aihio-toggle[variant="outline"] > button {
       border-color: oklch(var(--color-intent-border-subtle));
     }
-    aihio-toggle[variant="outline"][pressed] {
+    aihio-toggle:not(:defined)[variant="outline"][pressed],
+    aihio-toggle[variant="outline"][pressed] > button {
       background-color: oklch(var(--color-intent-action-accent-bg));
     }
 
     /* Sizes */
-    aihio-toggle[size="sm"] {
+    aihio-toggle:not(:defined)[size="sm"],
+    aihio-toggle[size="sm"] > button {
       height: var(--button-height-sm);
       padding-inline: var(--button-padding-x-sm);
     }
-    aihio-toggle[size="lg"] {
+    aihio-toggle:not(:defined)[size="lg"],
+    aihio-toggle[size="lg"] > button {
       height: var(--button-height-lg);
       padding-inline: var(--button-padding-x-lg);
     }
 
-    aihio-toggle[disabled] {
+    /* :disabled rather than the host attribute, so <fieldset disabled> — which
+       disables the control and never touches the host — is drawn too. */
+    aihio-toggle:not(:defined)[disabled],
+    aihio-toggle > button:disabled {
       pointer-events: none;
       opacity: 0.5;
     }
 
-    aihio-toggle:focus-visible {
+    aihio-toggle:not(:defined):focus-visible,
+    aihio-toggle > button:focus-visible {
       outline: 2px solid oklch(var(--color-intent-focus-ring));
       outline-offset: 2px;
     }
 
     @media (forced-colors: active) {
-      aihio-toggle {
+      aihio-toggle:not(:defined),
+    aihio-toggle > button {
         background-color: ButtonFace;
         color: ButtonText;
         border: 1px solid ButtonBorder;
@@ -1139,19 +1160,22 @@ aihio-toggle {
       /* Pressed is a selected state, and Highlight/HighlightText is the system
          pair for selection — without it the only cue is a background colour
          that forced colours discards. */
-      aihio-toggle[pressed] {
+      aihio-toggle:not(:defined)[pressed],
+    aihio-toggle[pressed] > button {
         background-color: Highlight;
         color: HighlightText;
         border-color: Highlight;
       }
 
-      aihio-toggle[disabled] {
+      aihio-toggle:not(:defined)[disabled],
+      aihio-toggle > button:disabled {
         color: GrayText;
         border-color: GrayText;
         opacity: 1;
       }
 
-      aihio-toggle:focus-visible {
+      aihio-toggle:not(:defined):focus-visible,
+    aihio-toggle > button:focus-visible {
         outline-color: Highlight;
       }
     }

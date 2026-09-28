@@ -272,6 +272,27 @@ test('stacked dialogs keep scroll locked and support cancelable close', async ({
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
 });
 
+test('toggle is a native button: keyboard presses it and a disabled fieldset disables it', async ({ page }) => {
+  await page.goto('/test/playwright/fixture.html');
+  await page.locator('#fixture').evaluate((root) => {
+    root.innerHTML = `
+      <form><fieldset id="set"><aihio-toggle id="bold">Bold</aihio-toggle></fieldset></form>
+    `;
+  });
+  const toggle = page.getByRole('button', { name: 'Bold' });
+
+  await page.locator('#background').focus();
+  await page.keyboard.press('Tab');
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+  await page.locator('#set').evaluate((fieldset) => { fieldset.disabled = true; });
+  await expect(toggle).toBeDisabled();
+});
+
 test('representative components have no automated accessibility violations', async ({ page }) => {
   await page.goto('/test/playwright/fixture.html');
   await page.locator('#fixture').evaluate((root) => {
@@ -279,6 +300,7 @@ test('representative components have no automated accessibility violations', asy
       <aihio-field><label slot="label">Email</label><aihio-input name="email"></aihio-input></aihio-field>
       <aihio-button>Save</aihio-button>
       <aihio-alert><strong slot="title">Saved</strong></aihio-alert>
+      <aihio-toggle pressed>Bold</aihio-toggle>
     `;
   });
   const results = await new AxeBuilder({ page }).include('#fixture').analyze();

@@ -88,12 +88,24 @@
       await nextFrame();
       assert(clicks === 1, 'an enabled button should click through to the host');
 
-      assert(toggle.getAttribute('aria-pressed') === 'true', 'toggle should reflect pressed state');
+      assert(toggle.control instanceof HTMLButtonElement, 'the toggle should delegate to a native <button>');
+      assert(toggle.control.type === 'button', 'a toggle control never submits');
+      assert(toggle.control.getAttribute('aria-pressed') === 'true', 'toggle should reflect pressed state on its control');
+      assert(toggle.control.disabled, 'disabled should disable the toggle control natively');
+      toggle.click();
+      await nextFrame();
+      assert(toggle.hasAttribute('pressed'), 'a disabled toggle should not change state');
+
+      let toggleEvents = 0;
+      toggle.addEventListener('aihio-toggle', () => {
+        toggleEvents += 1;
+      });
       toggle.removeAttribute('disabled');
       await nextFrame();
       toggle.click();
       await nextFrame();
-      assert(toggle.getAttribute('aria-pressed') === 'false', 'toggle should sync aria-pressed after click');
+      assert(toggle.control.getAttribute('aria-pressed') === 'false', 'toggle should sync aria-pressed after click');
+      assert(!toggle.pressed && toggleEvents === 1, 'a click should unpress the toggle and emit aihio-toggle once');
     });
 
     await runTest('input and avatar resync after attribute changes', async () => {

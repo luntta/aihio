@@ -1,50 +1,45 @@
-import { AihioElement } from '../base.js';
+import { AihioButton } from '../button/button.js';
 
-export class AihioToggle extends AihioElement {
+/**
+ * A pressed/unpressed button. It is an aihio-button underneath — a real
+ * <button> with aria-pressed — so activation, focus, disabled semantics, and
+ * the forced-colours mapping are the platform's, not an emulation of them.
+ */
+export class AihioToggle extends AihioButton {
   static tag = 'aihio-toggle';
-  static schemaVersion = '1.0.0';
-  static observedAttributes = ['pressed', 'disabled', 'variant', 'size'];
+  static schemaVersion = '2.0.0';
+  static observedAttributes = [...AihioButton.observedAttributes, 'pressed'];
 
   setup() {
-    this._defaultTabIndex = this.getAttribute('tabindex') ?? '0';
+    super.setup();
 
-    this._onClickCapture = (e) => {
-      if (!this.boolAttr('disabled')) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
+    // A disabled <button> dispatches no click, so there is nothing to
+    // suppress; the check covers a click dispatched at the host directly.
+    this._onToggleClick = (event) => {
+      if (!event.composedPath().includes(this._button) || this._button.disabled) return;
+      this.pressed = !this.pressed;
+      this.emit('aihio-toggle', { pressed: this.pressed });
     };
-
-    this._onClick = () => {
-      if (this.hasAttribute('disabled')) return;
-      const pressed = this.boolAttr('pressed');
-      if (pressed) {
-        this.removeAttribute('pressed');
-      } else {
-        this.setAttribute('pressed', '');
-      }
-      this.emit('aihio-toggle', { pressed: !pressed });
-    };
-
-    this._onKeyDown = (e) => {
-      if (this.boolAttr('disabled')) return;
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.click();
-      }
-    };
-
-    this.addEventListener('click', this._onClickCapture, { capture: true });
-    this.addEventListener('click', this._onClick);
-    this.addEventListener('keydown', this._onKeyDown);
+    this.addEventListener('click', this._onToggleClick);
   }
 
   sync() {
-    const disabled = this.boolAttr('disabled');
-    const tabIndex = Number.parseInt(this._defaultTabIndex ?? '0', 10);
+    super.sync();
+    this._button?.setAttribute('aria-pressed', String(this.pressed));
+  }
 
-    this.setAttribute('role', 'button');
-    this.tabIndex = disabled ? -1 : Number.isNaN(tabIndex) ? 0 : tabIndex;
-    this.setAria('pressed', String(this.boolAttr('pressed')));
-    this.setAria('disabled', disabled ? 'true' : null);
+  /** A toggle never submits or resets a form, whatever its type says. */
+  get type() {
+    return 'button';
+  }
+
+  set type(_value) {}
+
+  get pressed() {
+    return this.hasAttribute('pressed');
+  }
+
+  set pressed(value) {
+    this.toggleAttribute('pressed', Boolean(value));
   }
 }

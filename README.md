@@ -137,7 +137,7 @@ For MCP clients that launch local stdio servers, the package also ships `aihio-m
 | `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
 | `aihio-alert` | Callout with title/description slots and 4 variants; only `destructive` announces assertively |
 | `aihio-avatar` | Image avatar with fallback initials |
-| `aihio-toggle` | Toggle button with pressed state |
+| `aihio-toggle` | Pressed/unpressed button (a real `<button aria-pressed>`), such as Bold in a toolbar |
 | `aihio-tabs` | Tabbed interface with keyboard navigation |
 | `aihio-dialog` | Modal dialog with focus trap, ESC to close, backdrop |
 | `aihio-dropdown` | Dropdown menu with keyboard navigation and click-outside |
@@ -356,10 +356,11 @@ and `onInput={handler}` therefore work as expected.
 
 ### Wrapped native controls
 
-`aihio-button` and `aihio-input` render a real control in their own light DOM
-rather than emulating one, because that is the only way a component
-participates in a form the way the platform does. For the button that means the
-children it is given are moved into the `<button>` when the element upgrades:
+`aihio-button`, `aihio-toggle`, and `aihio-input` render a real control in
+their own light DOM rather than emulating one, because that is the only way a
+component participates in a form the way the platform does. For the buttons
+that means the children they are given are moved into the `<button>` when the
+element upgrades:
 
 ```html
 <aihio-button>Save</aihio-button>

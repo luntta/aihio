@@ -1,7 +1,7 @@
 {
   "$component": "aihio-toggle",
-  "version": "1.0.0",
-  "description": "A toggle button that can be pressed or unpressed.",
+  "version": "2.0.0",
+  "description": "A button that stays pressed or unpressed, such as Bold in a text toolbar. It renders a real <button aria-pressed>.",
   "intents": [
     "toggle-state",
     "action"
@@ -59,11 +59,10 @@
   },
   "a11yContract": {
     "handled": [
-      "role=\"button\" is set",
-      "aria-pressed reflects the pressed state",
-      "aria-disabled reflects the disabled state",
-      "tabindex is removed when disabled",
-      "Enter and Space activate the toggle"
+      "The component renders a real <button> with aria-pressed, so the role, Enter and Space activation, focus behaviour, disabled semantics, and the forced-colours mapping are the platform's rather than an emulation of them",
+      "aria-pressed on that control reflects the pressed attribute",
+      "aria-* set on the host is mirrored onto the control",
+      "The control is always type=\"button\", so a toggle inside a form never submits it"
     ],
     "required": [
       {
@@ -71,21 +70,62 @@
         "requirement": "Provide aria-label describing what the toggle controls (e.g. aria-label=\"Bold\").",
         "severity": "error",
         "rule": "toggle-accessible-name"
+      },
+      {
+        "when": "the toggle turns a setting on or off",
+        "requirement": "Name the toggle after what it controls (e.g. \"Bold\"), never after its state: a toggle labelled \"Enabled\" is announced as \"Enabled, toggle button, pressed\" and never says what is enabled.",
+        "severity": "warn"
       }
     ]
   },
   "counterExamples": [
     {
       "markup": "<aihio-toggle><aihio-button>B</aihio-button></aihio-toggle>",
-      "reason": "Nested interactives. Use aihio-toggle alone — it already behaves like a button."
+      "reason": "Nested interactives. Use aihio-toggle alone — it already renders a button."
     },
     {
       "markup": "<aihio-toggle pressed=\"false\">Bold</aihio-toggle>",
       "reason": "Boolean attributes toggle on presence. Omit the attribute for unpressed; write `pressed` for pressed."
+    },
+    {
+      "markup": "<span>Email notifications</span>\n<aihio-toggle pressed>Enabled</aihio-toggle>",
+      "reason": "The toggle is named by its state and the visible label is not associated with it, so assistive technology announces \"Enabled, toggle button, pressed\" with no idea what is enabled. Name the toggle after what it controls."
     }
   ],
   "examples": [
     "<aihio-toggle>Bold</aihio-toggle>",
     "<aihio-toggle pressed variant=\"outline\">Italic</aihio-toggle>"
-  ]
+  ],
+  "properties": {
+    "control": {
+      "type": "HTMLButtonElement | null",
+      "readonly": true,
+      "description": "The native button delegated to by the component"
+    },
+    "pressed": {
+      "type": "boolean",
+      "description": "Whether the toggle is pressed; reflects the pressed attribute"
+    }
+  },
+  "methods": {
+    "click()": {
+      "description": "Activates the native button, toggling the pressed state.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the native button.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    },
+    "blur()": {
+      "description": "Removes focus from the native button.",
+      "returns": "void"
+    }
+  }
 }

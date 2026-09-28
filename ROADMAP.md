@@ -89,7 +89,7 @@ buttons do something, whose labels are true, and whose overlays behave like
 the platform's own. Ordered by how often the gap bites generated markup.
 
 - [x] Declarative overlay commands: a `commands` key in the schema, `--open` / `--close` / `--toggle` on `aihio-dialog` through Invoker Commands (with a fallback for older engines), `command` / `commandfor` forwarded by `aihio-button`, an `invalid-command` lint rule, prompt + docs
-- [ ] `aihio-toggle` delegates to a real `<button aria-pressed>`, as `aihio-button` does
+- [x] `aihio-toggle` delegates to a real `<button aria-pressed>`, as `aihio-button` does
 - [ ] Dialog: drop the hand-written Tab trap that `showModal()` makes redundant; initial focus honours `autofocus` and skips hidden content
 - [ ] Dropdown: Tab closes the menu, typeahead moves to the matching item, `href` makes an item a real link
 - [ ] Form controls: styled native `textarea` / `select` / checkbox / radio, and an `aihio-switch` for on/off settings
