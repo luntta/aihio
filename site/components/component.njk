@@ -119,70 +119,47 @@ eleventyComputed:
   </section>
 {% endif %}
 
-<section>
+<section id="accessibility">
   <div class="docs-section-heading">
     <div>
-      <h2>Accessibility contract</h2>
-      <p>The runtime already handles some semantics automatically; authors are still responsible for the rules listed here.</p>
+      <h2>Accessibility</h2>
+      <p>
+        What you have to provide, and what the component already does. The obligations with a rule are checked by
+        <code>aihio-lint</code> and by the dev build's console warnings.
+      </p>
     </div>
   </div>
 
-  <aihio-tabs value="handled">
-    <aihio-tab-list>
-      <aihio-tab value="handled">Handled for you</aihio-tab>
-      <aihio-tab value="required">Your obligations</aihio-tab>
-    </aihio-tab-list>
+  <h3 class="docs-api__heading">Your obligations</h3>
+  {% if component.requiredA11y.length %}
+    <ul class="docs-obligations">
+      {% for rule in component.requiredA11y %}
+        <li class="docs-obligations__item">
+          <p class="docs-obligations__when">
+            <aihio-badge variant="{% if rule.severity == 'error' %}destructive{% else %}warning{% endif %}">{{ rule.severity }}</aihio-badge>
+            When {{ rule.when }}
+          </p>
+          <p class="docs-obligations__requirement">{{ rule.requirement }}</p>
+          <p class="docs-obligations__rule">
+            {% if rule.rule %}Checked as <code>{{ rule.rule }}</code>{% else %}Not machine-checkable: a judgment for the author.{% endif %}
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="docs-muted">None beyond using the component as documented.</p>
+  {% endif %}
 
-    <aihio-tab-panel value="handled">
-      <div class="docs-surface-grid">
-        <aihio-card>
-          <aihio-card-header>
-            <aihio-card-title>Built-in behaviours</aihio-card-title>
-            <aihio-card-description>Semantics and keyboard behaviors the component applies for you.</aihio-card-description>
-          </aihio-card-header>
-          <aihio-card-content>
-            {% if component.handledA11y.length %}
-              <ul class="docs-list">
-                {% for item in component.handledA11y %}
-                  <li>{{ item }}</li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p class="docs-muted">No automatic a11y behaviors documented.</p>
-            {% endif %}
-          </aihio-card-content>
-        </aihio-card>
-      </div>
-    </aihio-tab-panel>
-
-    <aihio-tab-panel value="required">
-      <div class="docs-surface-grid">
-        <aihio-card>
-          <aihio-card-header>
-            <aihio-card-title>Your obligations</aihio-card-title>
-            <aihio-card-description>These are the conditions that warnings and lint rules surface back to authors.</aihio-card-description>
-          </aihio-card-header>
-          <aihio-card-content>
-            {% if component.requiredA11y.length %}
-              <ul class="docs-rule-list">
-                {% for rule in component.requiredA11y %}
-                  <li>
-                    <div class="docs-rule-list__meta">
-                      <aihio-badge variant="{% if rule.severity == 'error' %}destructive{% else %}outline{% endif %}">{{ rule.severity }}</aihio-badge>
-                      <code>{{ rule.when }}</code>
-                    </div>
-                    <p>{{ rule.requirement }}</p>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p class="docs-muted">No additional authoring rules documented.</p>
-            {% endif %}
-          </aihio-card-content>
-        </aihio-card>
-      </div>
-    </aihio-tab-panel>
-  </aihio-tabs>
+  <h3 class="docs-api__heading">Handled for you</h3>
+  {% if component.handledA11y.length %}
+    <ul class="docs-handled">
+      {% for item in component.handledA11y %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="docs-muted">No automatic behaviour documented.</p>
+  {% endif %}
 </section>
 
 {% if component.patternsUsing.length %}

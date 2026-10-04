@@ -1133,6 +1133,51 @@ a {
   }
 }
 
+/* Accessibility ------------------------------------------------------------ */
+
+.docs-obligations,
+.docs-handled {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-obligations__item,
+.docs-handled li {
+  padding-block: var(--aihio-spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-obligations__item p {
+  max-width: 48rem;
+  margin: 0;
+}
+
+.docs-obligations__when {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--aihio-spacing-2);
+  font-weight: var(--aihio-font-weight-medium);
+}
+
+.docs-obligations__requirement {
+  margin-top: var(--aihio-spacing-1) !important;
+}
+
+.docs-obligations__rule {
+  margin-top: var(--aihio-spacing-1) !important;
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-handled li {
+  color: var(--aihio-color-muted-fg);
+}
+
 /* Intents ---------------------------------------------------------------- */
 
 /* A glossary, not a card wall: each intent, what it means, and what serves
