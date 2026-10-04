@@ -777,22 +777,29 @@ a {
   font-size: var(--aihio-font-size-xs);
 }
 
-/* A pattern drawn at half size: laid out at full width, then zoomed, so the
-   thumbnail is the pattern itself rather than a picture of it. */
+/* A pattern drawn at half size: laid out at twice the card's width, then
+   scaled, so the thumbnail is the pattern itself rather than a picture of
+   it. A transform rather than zoom, which WebKit applies to the width too,
+   so its grid laid out at the card's own width, one column. */
 .docs-component-grid--wide {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
 }
 
 .docs-pattern-card__preview {
   display: block;
+  /* The component card centres its preview; engines that align block-level
+     children would centre the double-width layout and clip its left half. */
+  place-items: normal;
   height: 15rem;
   padding: var(--aihio-spacing-4);
   overflow: hidden;
 }
 
-.docs-pattern-card__scale {
-  width: calc(100% / 0.5);
-  zoom: 0.5;
+.docs-pattern-card__preview > .docs-pattern-card__scale {
+  width: 200%;
+  max-width: none;
+  transform: scale(0.5);
+  transform-origin: 0 0;
 }
 
 /* Variants: one cell per value, its attribute written under it. */
