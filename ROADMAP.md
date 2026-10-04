@@ -120,7 +120,8 @@ docs show what the schema knows.
 - [x] Docs: the full API including sub-components, variants drawn from the schema, Don't / Do mistakes with the linter's output, single-column example frames with copy buttons, the accessibility obligations out of their tab, live cards on the index, and pattern previews with a width switch
 - [x] Docs: an Intents page, Foundations pages for colour (with the contrast contract), type, space and shape, and motion, search ranked by the MCP `find` function (now `src/schema/find.js`), a rebuilt AI page, `llms.txt`, and every component page as markdown
 - [x] Docs checks: no broken link or fragment, no repeated id, no dialog rendered open, and the site's own markup lint-clean
-- [ ] Two dropdown browser tests (typeahead, link items) fail intermittently under a full parallel run; they pass alone and failed the same way before this phase
+- [x] The dropdown accessibility test waits for the menu's fade-in before axe measures it; mid-fade, partly transparent text failed contrast intermittently
+- [ ] Two dropdown browser tests (typeahead, link items) fail intermittently under a full parallel run, when a timer fires late; they pass alone and failed the same way before this phase
 
 ## Sequencing notes
 

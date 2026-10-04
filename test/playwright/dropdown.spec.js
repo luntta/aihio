@@ -97,6 +97,11 @@ test('an open menu of link items has no automated accessibility violations', asy
     </aihio-dropdown>
   `);
   await openWithKeyboard(page);
+  // The menu fades in. Measured mid-fade, its text is partly transparent and
+  // fails contrast, which a loaded test run caught intermittently.
+  await page.locator('#menu').evaluate((menu) =>
+    Promise.all(menu.shadowRoot.getAnimations().map((animation) => animation.finished))
+  );
   const results = await new AxeBuilder({ page }).include('#fixture').analyze();
   expect(results.violations).toEqual([]);
 });
