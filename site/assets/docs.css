@@ -789,6 +789,131 @@ a {
   border-bottom: 1px solid var(--docs-hairline);
 }
 
+/* Mistakes: the wrong markup as code, with the linter's verdict, beside the
+   fix rendered live. Side by side where the column allows; stacked, wrong
+   first, where it does not. */
+.docs-mistake {
+  min-width: 0;
+  scroll-margin-top: calc(var(--docs-topbar-height) + 1rem);
+}
+
+.docs-mistake__pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--aihio-spacing-4);
+  margin-top: var(--aihio-spacing-3);
+}
+
+.docs-mistake__side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.docs-mistake__label {
+  display: flex;
+  align-items: center;
+  gap: var(--aihio-spacing-1-5);
+  margin: 0 0 var(--aihio-spacing-2);
+  font-size: var(--aihio-font-size-xs);
+  font-weight: var(--aihio-font-weight-semibold);
+  letter-spacing: var(--aihio-letter-spacing-label);
+  text-transform: uppercase;
+}
+
+.docs-mistake__label::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--aihio-radius-pill);
+  background: currentColor;
+}
+
+.docs-mistake__side--dont .docs-mistake__label {
+  color: var(--aihio-color-destructive-text);
+}
+
+.docs-mistake__side--do .docs-mistake__label {
+  color: var(--aihio-color-success-text);
+}
+
+.docs-mistake__side--dont .docs-code {
+  margin: 0;
+  border-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 35%, transparent);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.docs-mistake__side .docs-codeblock {
+  flex: none;
+}
+
+/* The fix's frame matches the height of the mistake beside it; the preview
+   takes the slack, so the source stays at the foot of the frame. */
+.docs-mistake__side--do .docs-example__frame {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.docs-mistake__side--do .docs-example__preview {
+  flex: 1;
+}
+
+.docs-mistake__lint {
+  flex: 1;
+  padding: var(--aihio-spacing-3) var(--aihio-spacing-4);
+  border: 1px solid color-mix(in oklch, var(--aihio-color-destructive-bg) 35%, transparent);
+  border-top: 0;
+  border-radius: 0 0 var(--aihio-radius-surface) var(--aihio-radius-surface);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-mistake__lint-head {
+  margin: 0;
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-mistake__lint ul {
+  display: grid;
+  gap: var(--aihio-spacing-2);
+  margin: var(--aihio-spacing-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-mistake__lint li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-2);
+}
+
+.docs-mistake__severity {
+  font-size: var(--aihio-font-size-xs);
+  font-weight: var(--aihio-font-weight-semibold);
+}
+
+.docs-mistake__severity--error {
+  color: var(--aihio-color-destructive-text);
+}
+
+.docs-mistake__severity--warn {
+  color: var(--aihio-color-warning-text);
+}
+
+.docs-mistake__message {
+  flex-basis: 100%;
+  color: var(--aihio-color-muted-fg);
+}
+
+.docs-mistake__suggestion {
+  flex-basis: 100%;
+  font-size: var(--aihio-font-size-xs);
+}
+
 /* What an example form or link would have done, printed by assets/docs.js in
    place of the navigation it would have made. */
 .docs-result {

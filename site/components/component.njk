@@ -63,19 +63,16 @@ eleventyComputed:
     <div class="docs-section-heading">
       <div>
         <h2>Mistakes</h2>
-        <p>Markup the runtime warns about and the linter rejects, with the reason it is wrong.</p>
+        <p>
+          Each one beside its fix, with what <code>aihio-lint</code> says about it. The prompt fragment gives agents the
+          same pairs, and the build fails if the linter stops catching one or a fix stops passing.
+        </p>
       </div>
     </div>
 
     <div class="docs-examples">
-      {% for example in component.counterExamplesDetailed %}
-        {% set id = example.id %}
-        {% set title = example.title %}
-        {% set description = example.reason %}
-        {% set markup = example.previewMarkup %}
-        {% set source = example.markup %}
-        {% set level = 3 %}
-        {% include "partials/example-frame.njk" %}
+      {% for mistake in component.counterExamplesDetailed %}
+        {% include "partials/mistake.njk" %}
       {% endfor %}
     </div>
   </section>

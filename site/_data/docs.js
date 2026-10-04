@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { pathToFileURL } from 'node:url';
+
 import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
 
 const root = resolve(import.meta.dirname, '..', '..');
@@ -153,6 +155,15 @@ if (!existsSync(schemaPath)) {
 const schema = readJson(schemaPath);
 const pkg = readJson(packagePath);
 const tokens = readJson(tokensPath);
+// The linter the package ships, run over each counterexample at build time,
+// so the docs print exactly what an agent running aihio-lint would get.
+const { lintMarkup } = await import(pathToFileURL(resolve(root, 'dist/lint.js')).href);
+
+/** A reason's first sentence as a heading, the rest as its explanation. */
+function splitReason(reason) {
+  const [lead, ...rest] = String(reason).split(/(?<=\.)\s+(?=[A-Z<])/);
+  return { lead, rest: rest.join(' ') };
+}
 
 // Where each tag is documented: a component's own page, or a sub-component's
 // section on its parent's page.
@@ -241,10 +252,16 @@ const components = schema.components
         previewMarkup: toPreviewMarkup(example.markup, `${slug}-example-${index + 1}`),
       })),
       counterExamplesDetailed: (component.counterExamples ?? []).map((example, index) => ({
-        id: `${slug}-counter-example-${index + 1}`,
+        id: `${slug}-mistake-${index + 1}`,
         ...example,
-        previewMarkup: toPreviewMarkup(example.markup, `${slug}-counter-example-${index + 1}`),
-        title: example.rule ? `Caught as ${example.rule}` : "A judgment call the linter can't make",
+        ...splitReason(example.reason),
+        fixPreviewMarkup: toPreviewMarkup(example.fix, `${slug}-mistake-${index + 1}-fix`),
+        issues: lintMarkup(example.markup).issues.map((issue) => ({
+          rule: issue.contract ?? issue.ruleId,
+          severity: issue.severity,
+          message: issue.message,
+          suggestion: issue.suggestion ?? null,
+        })),
       })),
       handledA11y: component.a11yContract?.handled ?? [],
       requiredA11y: component.a11yContract?.required ?? [],

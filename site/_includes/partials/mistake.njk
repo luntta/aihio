@@ -1,0 +1,40 @@
+{#- One counterexample: the mistake as code with what aihio-lint says about
+    it, beside the fix rendered live. `mistake` is set by the caller. -#}
+<div class="docs-mistake" id="{{ mistake.id }}">
+  <h3 class="docs-example__title">{{ mistake.lead | prose | safe }}</h3>
+  {% if mistake.rest %}<p class="docs-example__description">{{ mistake.rest | prose | safe }}</p>{% endif %}
+
+  <div class="docs-mistake__pair">
+    <div class="docs-mistake__side docs-mistake__side--dont">
+      <p class="docs-mistake__label">Don't</p>
+      <pre class="docs-code"><code>{{ mistake.markup | highlightHtml | safe }}</code></pre>
+      <div class="docs-mistake__lint">
+        {% if mistake.issues.length %}
+          <p class="docs-mistake__lint-head">aihio-lint reports</p>
+          <ul>
+            {% for issue in mistake.issues %}
+              <li>
+                <code class="docs-mistake__rule">{{ issue.rule }}</code>
+                <span class="docs-mistake__severity docs-mistake__severity--{{ issue.severity }}">{{ issue.severity }}</span>
+                <span class="docs-mistake__message">{{ issue.message | prose | safe }}</span>
+                {% if issue.suggestion %}<span class="docs-mistake__suggestion">Suggests <code>{{ issue.suggestion }}</code></span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="docs-mistake__lint-head">aihio-lint passes this: it is a judgment the linter cannot make.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="docs-mistake__side docs-mistake__side--do">
+      <p class="docs-mistake__label">Do</p>
+      <div class="docs-example__frame">
+        <div class="docs-example__preview">
+          {{ mistake.fixPreviewMarkup | safe }}
+        </div>
+        <pre class="docs-code"><code>{{ mistake.fix | highlightHtml | safe }}</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
