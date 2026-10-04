@@ -15,6 +15,7 @@ Use this fragment when you want an AI system to generate Aihio UI quickly and co
 - Only use documented Aihio tags, related subcomponents, attributes, and pattern compositions.
 - Keep custom-element trees shallow and follow required slots, children, and parent relationships.
 - Treat boolean attributes as presence or absence, never stringified booleans.
+- A call to action that goes to another page is a link drawn as a button: `<aihio-button><a href="/pricing">See pricing</a></aihio-button>`. Never navigate from a click handler, and never put `href` on `aihio-button`.
 - Open and close overlays from markup: give the overlay an `id`, and put `commandfor="<id>"` plus one of its declared commands (such as `command="--open"`) on the `aihio-button` that controls it. Never use built-in commands like `show-modal` on an Aihio component.
 - When the request is ambiguous, choose the simplest accessible composition that satisfies the intent.
 - If a seeded pattern already fits, adapt that pattern instead of freehanding the structure.

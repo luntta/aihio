@@ -101,7 +101,7 @@ the platform's own. Ordered by how often the gap bites generated markup.
 - [x] Bundle: light-DOM component CSS moves to `<name>.styles.js`, read only by the CSS build (it already shipped in `aihio.css`) — `dist/aihio.js` 136 → 98 KB minified, 28.6 → 23.7 KB gzip
 - [ ] Bundle: the runtime schema (~41 KB of `dist/aihio.js`) leaves the default entry for `aihio/runtime` — breaking for `Aihio.describe()` from the root, so it waits for 3.0
 - [ ] Avatar fallback: its muted fill is nearly invisible on a card surface (both near zinc-50 in light)
-- [ ] `aihio-button` as a link: adopt an authored `<a href>` as its control, the way a dropdown item does, so a call-to-action that navigates does not need `href` on a `<button>`
+- [x] `aihio-button` as a link: adopt an authored `<a href>` as its control, the way a dropdown item does, so a call-to-action that navigates does not need `href` on a `<button>`
 
 ## Sequencing notes
 

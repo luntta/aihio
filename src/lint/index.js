@@ -328,12 +328,35 @@ function collectIntentIssues(node, schema, context) {
   return issues;
 }
 
+// Link attributes written on aihio-button, the shape other design systems use
+// for a button that navigates (<sl-button href>, <Button to>). One issue
+// covers all of them, and its suggestion is the link the button should wrap.
+const BUTTON_LINK_ATTRIBUTES = ['href', 'to', 'target', 'rel', 'download', 'hreflang', 'referrerpolicy'];
+
 function collectUnknownAttributeIssues(node, context) {
   const declared = declaredAttributesByTag.get(node.tagName) ?? [];
   const issues = [];
+  const linkTarget = node.tagName === 'aihio-button'
+    ? getAttribute(node, 'href') ?? getAttribute(node, 'to')
+    : null;
+
+  if (linkTarget !== null) {
+    const suggestion = toLinkButtonMarkup(node, linkTarget);
+    issues.push(
+      createIssue({
+        ruleId: 'unknown-attribute',
+        severity: 'error',
+        node,
+        context,
+        message: `<aihio-button> has no attribute "${hasAttribute(node, 'href') ? 'href' : 'to'}": a button does not navigate. Put the link inside it, and it becomes the control, styled as the button: ${suggestion}`,
+        suggestion,
+      })
+    );
+  }
 
   for (const name of Object.keys(node.attributes ?? {})) {
     if (declared.includes(name) || isUniversalAttribute(name)) continue;
+    if (linkTarget !== null && BUTTON_LINK_ATTRIBUTES.includes(name)) continue;
 
     const suggestion = suggestAttribute(name, declared);
     const accepts = declared.length > 0 ? `It accepts: ${declared.join(', ')}.` : 'It declares no attributes of its own.';
@@ -350,6 +373,23 @@ function collectUnknownAttributeIssues(node, context) {
   }
 
   return issues;
+}
+
+function toLinkButtonMarkup(node, href) {
+  const hostAttributes = [];
+  const linkAttributes = [`href="${escapeAttribute(href)}"`];
+  for (const [name, value] of Object.entries(node.attributes ?? {})) {
+    if (name === 'href' || name === 'to') continue;
+    const formatted = value === '' ? name : `${name}="${escapeAttribute(value)}"`;
+    if (BUTTON_LINK_ATTRIBUTES.includes(name)) linkAttributes.push(formatted);
+    else hostAttributes.push(formatted);
+  }
+  const host = ['aihio-button', ...hostAttributes].join(' ');
+  return `<${host}><a ${linkAttributes.join(' ')}>${normalizeText(getTextContent(node))}</a></aihio-button>`;
+}
+
+function escapeAttribute(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
 function isUniversalAttribute(name) {

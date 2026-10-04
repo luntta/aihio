@@ -64,7 +64,7 @@ The root bundle also exposes `Aihio.describe()` for runtime introspection:
 import { Aihio } from 'aihio';
 
 const buttonSchema = Aihio.describe('aihio-button');
-// { $component: 'aihio-button', version: '1.4.0', ... }
+// { $component: 'aihio-button', version: '1.5.0', ... }
 ```
 
 Schema-derived TypeScript declarations ship in `dist/aihio.d.ts`, including intent and variant unions plus JSX element typings:
@@ -160,7 +160,7 @@ The prompt fragment is served as the MCP prompt `aihio-authoring`.
 | `aihio-cluster` | Horizontal layout primitive for button rows, badge lists, and toolbars |
 | `aihio-grid` | Grid of equal columns, such as cards, that drops columns as it narrows |
 | `aihio-field` | Form field wrapper that lays out label, control, description, and error, and wires the ARIA between them |
-| `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes |
+| `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes; wraps an `<a href>` to draw a link as a button |
 | `aihio-input` | Text input with size variants and error state |
 | `aihio-switch` | On/off setting (a real `<input type="checkbox" role="switch">`) that submits with its form |
 | `aihio-combobox` | Filterable single-select field with keyboard navigation, async options, and optional free text |
@@ -439,6 +439,26 @@ should own the complete control subtree, author the native button explicitly:
 
 An authored `<button>` is adopted rather than duplicated, and keeps its own
 `type` unless the host states one.
+
+### Links that look like buttons
+
+A button does not navigate. For a call to action that goes to another page,
+put an `<a href>` inside `aihio-button`: the link becomes the control and takes
+the variant and size, and no `<button>` is created.
+
+```html
+<aihio-button variant="outline"><a href="/pricing">See pricing</a></aihio-button>
+```
+
+It stays a real link: announced as one, with its URL on hover, open-in-new-tab,
+and navigation before the module has loaded, since the stylesheet draws it as
+a button from the first paint. `disabled` and `loading` take it out of the tab
+order, set `aria-disabled="true"`, and cancel its clicks; the form and command
+attributes, which configure a `<button>`, are not forwarded to it.
+
+The linter steers the other shapes here. `href` (or a router's `to`) on
+`aihio-button` is reported with the wrapped link as its `suggestion`, and an
+`onclick` that sets `location` is an `a11y-contract` error.
 
 ### Server rendering
 

@@ -91,6 +91,8 @@ const COMPONENT_SYNONYMS = {
   'aihio-toggle-switch': 'aihio-switch',
   'aihio-icon-button': 'aihio-button',
   'aihio-link-button': 'aihio-button',
+  'aihio-link': '<a>',
+  'aihio-anchor': '<a>',
   'aihio-textarea': '<textarea>',
   'aihio-checkbox': '<input type="checkbox">',
   'aihio-radio': '<input type="radio">',

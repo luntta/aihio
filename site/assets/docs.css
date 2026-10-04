@@ -763,9 +763,9 @@ a {
   border-color: oklch(var(--color-intent-state-destructive-bg) / 0.35);
 }
 
-/* What an example form would have sent, printed by assets/docs.js in place
-   of the navigation a real submission makes. */
-.docs-submitted {
+/* What an example form or link would have done, printed by assets/docs.js in
+   place of the navigation it would have made. */
+.docs-result {
   display: grid;
   gap: var(--spacing-1);
   padding: var(--spacing-3) var(--spacing-4);
@@ -774,7 +774,7 @@ a {
   font-size: var(--fontSize-sm);
 }
 
-.docs-submitted__label {
+.docs-result__label {
   color: oklch(var(--color-intent-surface-muted-fg));
   font-size: var(--fontSize-xs);
   font-weight: var(--fontWeight-intent-control);
@@ -782,7 +782,7 @@ a {
   text-transform: uppercase;
 }
 
-.docs-content .docs-submitted code {
+.docs-content .docs-result code {
   padding: 0;
   background: none;
   font-family: var(--fontFamily-intent-code);

@@ -6,19 +6,29 @@
 
 /* Every rule is written for two shapes.
 
-   After upgrade the box is drawn on the inner <button>, which is the element
-   that actually carries the semantics. Before upgrade it is drawn on the host,
+   After upgrade the box is drawn on the inner control, which is the element
+   that actually carries the semantics: the <button> the component renders, or
+   a <button> or <a> the author wrote. Before upgrade it is drawn on the host,
    because server-rendered markup is live HTML long before this module runs and
    a button that renders as unstyled text until hydration is worse than one
-   that cannot be pressed yet. `box()` writes both selectors for one rule; the
-   upgraded host stops drawing entirely (display: contents), so the two shapes
-   never paint at the same time. */
-const box = (attrs = '', state = '') => `aihio-button:not(:defined)${attrs}${state},
-    aihio-button${attrs} > button${state}`;
+   that cannot be pressed yet. An authored control needs no upgrade to work (a
+   link navigates without any script), so it is drawn from the first paint and
+   the host steps aside then too. `box()` writes every selector for one rule;
+   a host that has stepped aside (display: contents) draws nothing, so two
+   shapes never paint at the same time.
+
+   :has() sits inside :is(), whose selector list is forgiving: an engine
+   without :has() drops that part and keeps the rest of the rule, so it falls
+   back to drawing on the host before upgrade. */
+const AUTHORED_CONTROL = ':is(:has(> button), :has(> a))';
+const box = (attrs = '', state = '') => `aihio-button:not(:defined):not(${AUTHORED_CONTROL})${attrs}${state},
+    aihio-button${attrs} > button${state},
+    aihio-button${attrs} > a${state}`;
 
 export default {
   'aihio-button': `
-    aihio-button:defined {
+    aihio-button:defined,
+    aihio-button${AUTHORED_CONTROL} {
       display: contents;
     }
 
@@ -128,7 +138,9 @@ export default {
        attribute, because <fieldset disabled> disables the control natively and
        never touches the host. */
     aihio-button:not(:defined)[disabled],
-    aihio-button > button:disabled {
+    aihio-button > button:disabled,
+    aihio-button[disabled] > a,
+    aihio-button > a[aria-disabled="true"] {
       pointer-events: none;
       opacity: 0.5;
     }
@@ -136,7 +148,8 @@ export default {
     /* Loading is disabled too, but it reads as busy rather than unavailable,
        so it keeps full opacity unless it is also explicitly disabled. */
     aihio-button:not(:defined)[loading],
-    aihio-button[loading]:not([disabled]) > button {
+    aihio-button[loading]:not([disabled]) > button,
+    aihio-button[loading]:not([disabled]) > a {
       pointer-events: none;
       opacity: 1;
     }
@@ -195,7 +208,9 @@ export default {
 
       aihio-button:not(:defined)[disabled],
       aihio-button:not(:defined)[loading],
-      aihio-button > button:disabled {
+      aihio-button > button:disabled,
+      aihio-button[disabled] > a,
+      aihio-button > a[aria-disabled="true"] {
         color: GrayText;
         border-color: GrayText;
         opacity: 1;

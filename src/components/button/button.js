@@ -2,7 +2,7 @@ import { AihioElement } from '../base.js';
 
 export class AihioButton extends AihioElement {
   static tag = 'aihio-button';
-  static schemaVersion = '1.4.0';
+  static schemaVersion = '1.5.0';
   static observedAttributes = [
     'variant',
     'size',
@@ -36,9 +36,14 @@ export class AihioButton extends AihioElement {
     // <fieldset disabled>, Enter and Space, the forced-colours mapping, and
     // the disabled semantics — none of which a role="button" custom element
     // reproduces, however much of it you hand-write.
-    const authoredButton = this.querySelector(':scope > button');
-    this._createdButton = !authoredButton;
-    this._button = authoredButton ?? document.createElement('button');
+    //
+    // An authored <a> is adopted the same way, for a call to action that goes
+    // to another page: the link keeps its role, its URL, open-in-new-tab, and
+    // works before (or without) this module, and only borrows the look.
+    const authoredControl = this.querySelector(':scope > button, :scope > a');
+    this._createdButton = !authoredControl;
+    this._button = authoredControl ?? document.createElement('button');
+    this._isLink = this._button.localName === 'a';
     this._authoredAttributes = new Map(
       BUTTON_ATTRIBUTES
         .filter((name) => this._button.hasAttribute(name))
@@ -50,7 +55,7 @@ export class AihioButton extends AihioElement {
         .map(({ name, value }) => [name, value])
     );
     this._authoredTabIndex = this._button.getAttribute('tabindex');
-    this._authoredDisabled = this._button.hasAttribute('disabled');
+    this._authoredDisabled = !this._isLink && this._button.hasAttribute('disabled');
     this._forwardedAria = new Set();
     this._forwardedAttributes = new Set();
     this._ownsTabIndex = false;
@@ -60,6 +65,16 @@ export class AihioButton extends AihioElement {
     // — the shape to render when a framework should own the whole subtree —
     // behaves as written.
     this._defaultType = normalizeType(this._button.getAttribute('type'), 'button');
+
+    // A link cannot be disabled natively, so a disabled or loading link is
+    // taken out of the tab order and its activation is cancelled here.
+    if (this._isLink) {
+      this.addEventListener('click', (event) => {
+        if (!this._isDisabledLike()) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
+    }
 
     // Virtual DOM renderers may replace host children during an update. Keep
     // the delegated control in place and move only those new direct children
@@ -112,15 +127,19 @@ export class AihioButton extends AihioElement {
     const button = this._button;
     if (!button) return;
 
-    button.type = this.type;
-    button.disabled = this._isDisabledLike();
-
+    // Form and command attributes mean nothing on a link, so a link control
+    // receives none of them.
     const forwardedAttributes = new Set();
-    for (const name of BUTTON_ATTRIBUTES) {
-      const value = this.getAttribute(name);
-      if (value === null) continue;
-      forwardedAttributes.add(name);
-      if (button.getAttribute(name) !== value) button.setAttribute(name, value);
+    if (!this._isLink) {
+      button.type = this.type;
+      button.disabled = this._isDisabledLike();
+
+      for (const name of BUTTON_ATTRIBUTES) {
+        const value = this.getAttribute(name);
+        if (value === null) continue;
+        forwardedAttributes.add(name);
+        if (button.getAttribute(name) !== value) button.setAttribute(name, value);
+      }
     }
     for (const name of this._forwardedAttributes) {
       if (forwardedAttributes.has(name)) continue;
@@ -152,9 +171,16 @@ export class AihioButton extends AihioElement {
       restoreAttribute(button, 'aria-busy', this._authoredAria);
     }
 
+    const inertLink = this._isLink && this._isDisabledLike();
+    if (inertLink) {
+      button.setAttribute('aria-disabled', 'true');
+    } else if (this._isLink && !this.hasAttribute('aria-disabled')) {
+      restoreAttribute(button, 'aria-disabled', this._authoredAria);
+    }
+
     // The host generates no box once upgraded, so a tabindex on it is inert;
     // the tab stop is the control.
-    const tabIndex = this.getAttribute('tabindex');
+    const tabIndex = inertLink ? '-1' : this.getAttribute('tabindex');
     if (tabIndex !== null) {
       button.setAttribute('tabindex', tabIndex);
       this._ownsTabIndex = true;
@@ -169,12 +195,12 @@ export class AihioButton extends AihioElement {
     return this._authoredDisabled || this.boolAttr('disabled') || this.boolAttr('loading');
   }
 
-  /** The native <button> this element delegates to. */
+  /** The native <button>, or authored <a>, this element delegates to. */
   get control() {
     return this._button ?? null;
   }
 
-  /** The form this button belongs to, or null when it is outside one. */
+  /** The form this button belongs to, or null when it is outside one or a link. */
   get form() {
     return this._button?.form ?? null;
   }

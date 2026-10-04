@@ -4,6 +4,9 @@ export const A11Y_RULE_IDS = new Set([
   'avatar-fallback',
   'button-accessible-name',
   'button-form-owner',
+  'button-link-attributes',
+  'button-link-href',
+  'button-link-navigation',
   'combobox-form-name',
   'combobox-label',
   'combobox-option-values',
@@ -43,6 +46,18 @@ const RULES = {
     const formId = api.attr(node, 'form');
     return !formId || api.tag(findById(node, formId, api)) !== 'form';
   },
+
+  'button-link-attributes': (node, api) =>
+    api.tag(buttonControl(node, api)) === 'a' &&
+    BUTTON_ONLY_ATTRIBUTES.some((name) => api.hasAttr(node, name)),
+
+  'button-link-href': (node, api) => {
+    const control = buttonControl(node, api);
+    return api.tag(control) === 'a' && !hasNonEmptyAttribute(control, 'href', api);
+  },
+
+  'button-link-navigation': (node, api) =>
+    NAVIGATION_HANDLER_ATTRIBUTES.some((name) => NAVIGATION_HANDLER.test(api.attr(node, name) ?? '')),
 
   'combobox-form-name': (node, api) =>
     api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
@@ -111,6 +126,28 @@ const RULES = {
     requiresExplicitAccessibleName(node, api) && !hasAccessibleName(node, api),
 };
 
+// Attributes that configure the <button> aihio-button renders. With an authored
+// <a> as the control they reach nothing.
+const BUTTON_ONLY_ATTRIBUTES = [
+  'type',
+  'name',
+  'value',
+  'form',
+  'formaction',
+  'formmethod',
+  'formenctype',
+  'formnovalidate',
+  'formtarget',
+  'command',
+  'commandfor',
+];
+
+// A click handler that changes the page: the shape of a link written as a
+// button. Template bindings parse as attributes too (@click, v-on:click).
+const NAVIGATION_HANDLER_ATTRIBUTES = ['onclick', '@click', 'v-on:click', 'x-on:click'];
+const NAVIGATION_HANDLER =
+  /\b(?:(?:window|document|self|top)\.)?location(?:\.href)?\s*=(?!=)|\blocation\.(?:assign|replace)\s*\(|\bwindow\.open\s*\(|\brouter\.push\s*\(|\bnavigate\s*\(\s*['"`]/;
+
 export function collectA11yRuleViolations(node, schema, api) {
   const violations = [];
   for (const requirement of schema.a11yContract?.required ?? []) {
@@ -119,6 +156,11 @@ export function collectA11yRuleViolations(node, schema, api) {
     if (checker?.(node, api)) violations.push(requirement);
   }
   return violations;
+}
+
+/** The control aihio-button delegates to: its first <button> or <a> child. */
+function buttonControl(node, api) {
+  return api.children(node).find((child) => ['button', 'a'].includes(api.tag(child))) ?? null;
 }
 
 function owningForm(node, api) {

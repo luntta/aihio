@@ -1,12 +1,13 @@
 {
   "$component": "aihio-button",
-  "version": "1.4.0",
-  "description": "An action the user takes: submit a form, open a dialog, run a command. Renders a real <button>; variant=\"default\" is the primary style and variant=\"destructive\" marks an irreversible action. It does not navigate: for a link to another page use <a href>.",
+  "version": "1.5.0",
+  "description": "An action the user takes: submit a form, open a dialog, run a command. Renders a real <button>; variant=\"default\" is the primary style and variant=\"destructive\" marks an irreversible action. To go to another page, put an <a href> inside it instead: the link becomes the control, styled as the button.",
   "intents": [
     "action",
     "primary-action",
     "secondary-action",
-    "destructive-action"
+    "destructive-action",
+    "navigation"
   ],
   "attributes": {
     "variant": {
@@ -125,7 +126,9 @@
   "a11yContract": {
     "handled": [
       "The component renders a real <button> and forwards its attributes to it, so the role, Enter and Space activation, focus behaviour, disabled semantics, and the forced-colours mapping are the platform's rather than an emulation of it",
+      "An authored <a> child becomes the control instead of a <button>, so a call to action that goes to another page is a real link: it is announced as one, shows its URL, opens in a new tab, and works before the module loads",
       "aria-* set on the host is mirrored onto that control",
+      "A disabled or loading link gets aria-disabled=\"true\", leaves the tab order, and its clicks are cancelled, since a link has no native disabled state",
       "aria-busy reflects loading state, which also disables the control",
       "Form participation is native: the button is a submitter of its owning form, so Enter in a field submits, SubmitEvent.submitter identifies it, and <fieldset disabled> disables it in both directions",
       "type=\"submit\" runs native constraint validation before the form submits"
@@ -142,6 +145,24 @@
         "requirement": "Set type=\"submit\" and either place the button inside its <form> or reference that form with the form attribute.",
         "severity": "warn",
         "rule": "button-form-owner"
+      },
+      {
+        "when": "the button goes to another page from a click handler (onclick sets location, or calls window.open or router.push)",
+        "requirement": "Put an <a href> inside aihio-button instead: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>. A button that navigates is announced as a button, shows no URL, cannot be opened in a new tab, and does nothing without script.",
+        "severity": "error",
+        "rule": "button-link-navigation"
+      },
+      {
+        "when": "the button wraps an <a>",
+        "requirement": "Give the <a> an href. Without one it is not a link: it has no role, takes no focus, and goes nowhere.",
+        "severity": "error",
+        "rule": "button-link-href"
+      },
+      {
+        "when": "the button wraps an <a>",
+        "requirement": "Leave type, name, value, form*, command, and commandfor off the host. They configure a <button>, so on a link they do nothing.",
+        "severity": "warn",
+        "rule": "button-link-attributes"
       }
     ]
   },
@@ -161,6 +182,14 @@
     {
       "markup": "<form>\n  <aihio-input name=\"email\" aria-label=\"Email\"></aihio-input>\n</form>\n<aihio-button type=\"submit\">Sign in</aihio-button>",
       "reason": "A submit button outside the <form> never submits it. Move the button inside the form element."
+    },
+    {
+      "markup": "<aihio-button onclick=\"location.href='/pricing'\">See pricing</aihio-button>",
+      "reason": "A button that navigates is announced as a button, shows no URL, cannot be opened in a new tab, and does nothing without script. Put a link inside it: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>."
+    },
+    {
+      "markup": "<aihio-button href=\"/pricing\">See pricing</aihio-button>",
+      "reason": "aihio-button has no href; nothing reads it. Put the link inside: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>."
     }
   ],
   "examples": [
@@ -168,19 +197,20 @@
     "<aihio-button variant=\"outline\" size=\"sm\">Cancel</aihio-button>",
     "<aihio-button variant=\"destructive\">Delete</aihio-button>",
     "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>",
+    "<aihio-button variant=\"outline\"><a href=\"/pricing\">See pricing</a></aihio-button>",
     "<form>\n  <label>\n    Email\n    <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  </label>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>",
     "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Delete project?</aihio-dialog-title>\n  </aihio-dialog-header>\n  <form method=\"post\">\n    <aihio-dialog-footer>\n      <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n      <aihio-button type=\"submit\" variant=\"destructive\">Delete project</aihio-button>\n    </aihio-dialog-footer>\n  </form>\n</aihio-dialog>"
   ],
   "properties": {
     "control": {
-      "type": "HTMLButtonElement | null",
+      "type": "HTMLButtonElement | HTMLAnchorElement | null",
       "readonly": true,
-      "description": "The native button delegated to by the component"
+      "description": "The native button the component delegates to, or the authored <a> when it wraps a link"
     },
     "form": {
       "type": "HTMLFormElement | null",
       "readonly": true,
-      "description": "The owning form, or null outside one"
+      "description": "The owning form, or null outside one or when the control is a link"
     },
     "type": {
       "type": "\"button\" | \"submit\" | \"reset\"",
