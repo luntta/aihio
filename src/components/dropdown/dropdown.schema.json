@@ -167,7 +167,14 @@
     }
   ],
   "examples": [
-    "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Open</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n  <aihio-dropdown-item>Settings</aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item>Logout</aihio-dropdown-item>\n</aihio-dropdown>",
-    "<aihio-dropdown align=\"end\">\n  <aihio-button slot=\"trigger\" variant=\"ghost\">Account</aihio-button>\n  <aihio-dropdown-item><a href=\"/profile\">Profile</a></aihio-dropdown-item>\n  <aihio-dropdown-item><a href=\"/settings\">Settings</a></aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item value=\"sign-out\">Sign out</aihio-dropdown-item>\n</aihio-dropdown>"
+    {
+      "title": "A menu of actions",
+      "markup": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Open</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n  <aihio-dropdown-item>Settings</aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item>Logout</aihio-dropdown-item>\n</aihio-dropdown>"
+    },
+    {
+      "title": "An account menu with links",
+      "description": "An item whose child is an <a href> is a real link.",
+      "markup": "<aihio-dropdown align=\"end\">\n  <aihio-button slot=\"trigger\" variant=\"ghost\">Account</aihio-button>\n  <aihio-dropdown-item><a href=\"/profile\">Profile</a></aihio-dropdown-item>\n  <aihio-dropdown-item><a href=\"/settings\">Settings</a></aihio-dropdown-item>\n  <aihio-dropdown-separator></aihio-dropdown-separator>\n  <aihio-dropdown-item value=\"sign-out\">Sign out</aihio-dropdown-item>\n</aihio-dropdown>"
+    }
   ]
 }

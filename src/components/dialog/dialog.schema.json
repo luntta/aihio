@@ -138,6 +138,10 @@
     }
   ],
   "examples": [
-    "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>"
+    {
+      "title": "Confirm a destructive action",
+      "description": "Opened and closed from markup. Submitting the form closes it.",
+      "markup": "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Are you sure?</aihio-dialog-title>\n    <aihio-dialog-description>This action cannot be undone.</aihio-dialog-description>\n  </aihio-dialog-header>\n  <form method=\"post\">\n    <aihio-dialog-footer>\n      <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n      <aihio-button type=\"submit\" variant=\"destructive\">Delete</aihio-button>\n    </aihio-dialog-footer>\n  </form>\n</aihio-dialog>"
+    }
   ]
 }

@@ -318,9 +318,25 @@
     }
   ],
   "examples": [
-    "<aihio-field>\n  <label slot=\"label\">Country</label>\n  <aihio-combobox name=\"country\" placeholder=\"Search countries\">\n    <aihio-option value=\"fi\">Finland</aihio-option>\n    <aihio-option value=\"fr\">France</aihio-option>\n    <aihio-option value=\"de\">Germany</aihio-option>\n    <aihio-option value=\"is\">Iceland</aihio-option>\n    <aihio-option value=\"no\">Norway</aihio-option>\n    <aihio-option value=\"se\">Sweden</aihio-option>\n    <aihio-option value=\"ax\">Åland Islands</aihio-option>\n  </aihio-combobox>\n  <span slot=\"description\">Type to filter. Accents are optional.</span>\n</aihio-field>",
-    "<aihio-field>\n  <label slot=\"label\">Assignee</label>\n  <aihio-combobox name=\"assignee\" value=\"ada\">\n    <aihio-option value=\"ada\" label=\"Ada Lovelace\">Ada Lovelace <small>Engineering</small></aihio-option>\n    <aihio-option value=\"grace\" label=\"Grace Hopper\">Grace Hopper <small>Compilers</small></aihio-option>\n    <aihio-option value=\"alan\" label=\"Alan Turing\" disabled>Alan Turing <small>On leave</small></aihio-option>\n  </aihio-combobox>\n</aihio-field>",
-    "<aihio-field>\n  <label slot=\"label\">Tag</label>\n  <aihio-combobox name=\"tag\" allow-custom placeholder=\"Pick or type a tag\">\n    <aihio-option>bug</aihio-option>\n    <aihio-option>design</aihio-option>\n    <aihio-option>documentation</aihio-option>\n  </aihio-combobox>\n</aihio-field>",
-    "<aihio-combobox aria-label=\"Search users\" name=\"user\" filter=\"none\" empty-text=\"Type to search\"></aihio-combobox>"
+    {
+      "title": "A searchable list",
+      "description": "Typing filters without regard to case or accents.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Country</label>\n  <aihio-combobox name=\"country\" placeholder=\"Search countries\">\n    <aihio-option value=\"fi\">Finland</aihio-option>\n    <aihio-option value=\"fr\">France</aihio-option>\n    <aihio-option value=\"de\">Germany</aihio-option>\n    <aihio-option value=\"is\">Iceland</aihio-option>\n    <aihio-option value=\"no\">Norway</aihio-option>\n    <aihio-option value=\"se\">Sweden</aihio-option>\n    <aihio-option value=\"ax\">Åland Islands</aihio-option>\n  </aihio-combobox>\n  <span slot=\"description\">Type to filter. Accents are optional.</span>\n</aihio-field>"
+    },
+    {
+      "title": "Rich options and a preset value",
+      "description": "label sets the text shown once an option is chosen; a disabled option cannot be.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Assignee</label>\n  <aihio-combobox name=\"assignee\" value=\"ada\">\n    <aihio-option value=\"ada\" label=\"Ada Lovelace\">Ada Lovelace <small>Engineering</small></aihio-option>\n    <aihio-option value=\"grace\" label=\"Grace Hopper\">Grace Hopper <small>Compilers</small></aihio-option>\n    <aihio-option value=\"alan\" label=\"Alan Turing\" disabled>Alan Turing <small>On leave</small></aihio-option>\n  </aihio-combobox>\n</aihio-field>"
+    },
+    {
+      "title": "Free text allowed",
+      "description": "allow-custom keeps text that matches no option.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Tag</label>\n  <aihio-combobox name=\"tag\" allow-custom placeholder=\"Pick or type a tag\">\n    <aihio-option>bug</aihio-option>\n    <aihio-option>design</aihio-option>\n    <aihio-option>documentation</aihio-option>\n  </aihio-combobox>\n</aihio-field>"
+    },
+    {
+      "title": "Options from a server",
+      "description": "filter=\"none\" leaves filtering to you: listen for aihio-search and replace the options.",
+      "markup": "<aihio-combobox aria-label=\"Search users\" name=\"user\" filter=\"none\" empty-text=\"Type to search\"></aihio-combobox>"
+    }
   ]
 }

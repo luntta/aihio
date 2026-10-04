@@ -167,7 +167,14 @@
     }
   ],
   "examples": [
-    "<aihio-field>\n  <label slot=\"label\">Email notifications</label>\n  <aihio-switch name=\"email-notifications\" checked></aihio-switch>\n  <span slot=\"description\">A digest of activity, sent weekly.</span>\n</aihio-field>",
-    "<label>\n  <aihio-switch name=\"remember\"></aihio-switch>\n  Remember this device\n</label>"
+    {
+      "title": "In a field",
+      "description": "Laid out as a row beside its label, with a description beneath.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Email notifications</label>\n  <aihio-switch name=\"email-notifications\" checked></aihio-switch>\n  <span slot=\"description\">A digest of activity, sent weekly.</span>\n</aihio-field>"
+    },
+    {
+      "title": "Wrapped in a label",
+      "markup": "<label>\n  <aihio-switch name=\"remember\"></aihio-switch>\n  Remember this device\n</label>"
+    }
   ]
 }

@@ -89,8 +89,18 @@
     }
   ],
   "examples": [
-    "<form>\n  <aihio-cluster justify=\"end\">\n    <aihio-button variant=\"outline\" type=\"reset\">Reset</aihio-button>\n    <aihio-button type=\"submit\">Save</aihio-button>\n  </aihio-cluster>\n</form>",
-    "<aihio-cluster gap=\"tight\">\n  <aihio-badge>Draft</aihio-badge>\n  <aihio-badge variant=\"secondary\">Internal</aihio-badge>\n</aihio-cluster>",
-    "<aihio-card>\n  <form>\n    <aihio-card-content>\n      <aihio-field>\n        <label slot=\"label\">Project name</label>\n        <aihio-input name=\"project\" value=\"Aihio\"></aihio-input>\n      </aihio-field>\n    </aihio-card-content>\n    <aihio-card-footer>\n      <aihio-cluster grow justify=\"end\">\n        <aihio-button variant=\"outline\" type=\"reset\">Reset</aihio-button>\n        <aihio-button type=\"submit\">Save</aihio-button>\n      </aihio-cluster>\n    </aihio-card-footer>\n  </form>\n</aihio-card>"
+    {
+      "title": "Form actions at the end of a row",
+      "markup": "<form>\n  <aihio-cluster justify=\"end\">\n    <aihio-button variant=\"outline\" type=\"reset\">Reset</aihio-button>\n    <aihio-button type=\"submit\">Save</aihio-button>\n  </aihio-cluster>\n</form>"
+    },
+    {
+      "title": "Badges, tightly spaced",
+      "markup": "<aihio-cluster gap=\"tight\">\n  <aihio-badge>Draft</aihio-badge>\n  <aihio-badge variant=\"secondary\">Internal</aihio-badge>\n</aihio-cluster>"
+    },
+    {
+      "title": "In a card footer",
+      "description": "A cluster in a footer has to grow to fill the row before justify has room to act.",
+      "markup": "<aihio-card>\n  <form>\n    <aihio-card-content>\n      <aihio-field>\n        <label slot=\"label\">Project name</label>\n        <aihio-input name=\"project\" value=\"Aihio\"></aihio-input>\n      </aihio-field>\n    </aihio-card-content>\n    <aihio-card-footer>\n      <aihio-cluster grow justify=\"end\">\n        <aihio-button variant=\"outline\" type=\"reset\">Reset</aihio-button>\n        <aihio-button type=\"submit\">Save</aihio-button>\n      </aihio-cluster>\n    </aihio-card-footer>\n  </form>\n</aihio-card>"
+    }
   ]
 }

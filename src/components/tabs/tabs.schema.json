@@ -94,6 +94,9 @@
     }
   ],
   "examples": [
-    "<aihio-tabs value=\"one\">\n  <aihio-tab-list>\n    <aihio-tab value=\"one\">Tab 1</aihio-tab>\n    <aihio-tab value=\"two\">Tab 2</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"one\">Content 1</aihio-tab-panel>\n  <aihio-tab-panel value=\"two\">Content 2</aihio-tab-panel>\n</aihio-tabs>"
+    {
+      "title": "Two panels",
+      "markup": "<aihio-tabs value=\"one\">\n  <aihio-tab-list>\n    <aihio-tab value=\"one\">Tab 1</aihio-tab>\n    <aihio-tab value=\"two\">Tab 2</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"one\">Content 1</aihio-tab-panel>\n  <aihio-tab-panel value=\"two\">Content 2</aihio-tab-panel>\n</aihio-tabs>"
+    }
   ]
 }

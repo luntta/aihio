@@ -65,6 +65,10 @@
     }
   ],
   "examples": [
-    "<aihio-grid columns=\"3\">\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Customer portal</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Billing sync</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Ops migration</aihio-card-title></aihio-card-header>\n  </aihio-card>\n</aihio-grid>"
+    {
+      "title": "Three columns of cards",
+      "description": "Columns drop away as the grid narrows, with no breakpoints.",
+      "markup": "<aihio-grid columns=\"3\">\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Customer portal</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Billing sync</aihio-card-title></aihio-card-header>\n  </aihio-card>\n  <aihio-card>\n    <aihio-card-header><aihio-card-title>Ops migration</aihio-card-title></aihio-card-header>\n  </aihio-card>\n</aihio-grid>"
+    }
   ]
 }

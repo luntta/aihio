@@ -189,9 +189,9 @@ async function validateCanonicalMarkup(canonicalComponents, canonicalPatterns) {
   }
   const candidates = [
     ...canonicalComponents.flatMap((component) =>
-      (component.examples ?? []).map((markup, index) => ({
+      (component.examples ?? []).map((example, index) => ({
         id: `${component.$component}/example-${index + 1}`,
-        markup,
+        markup: example.markup,
       }))
     ),
     ...canonicalPatterns.flatMap((pattern) => [

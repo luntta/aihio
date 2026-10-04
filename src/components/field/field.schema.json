@@ -105,7 +105,14 @@
     }
   ],
   "examples": [
-    "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  <span slot=\"description\">Use your work address.</span>\n</aihio-field>",
-    "<aihio-field>\n  <label slot=\"label\">Password</label>\n  <aihio-input type=\"password\" name=\"password\"></aihio-input>\n  <span slot=\"error\">Password must include at least 12 characters and one symbol.</span>\n</aihio-field>"
+    {
+      "title": "With a description",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  <span slot=\"description\">Use your work address.</span>\n</aihio-field>"
+    },
+    {
+      "title": "With an error",
+      "description": "Content in slot=\"error\" puts the field in its error state and is announced with it.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Password</label>\n  <aihio-input type=\"password\" name=\"password\"></aihio-input>\n  <span slot=\"error\">Password must include at least 12 characters and one symbol.</span>\n</aihio-field>"
+    }
   ]
 }

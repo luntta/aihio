@@ -205,13 +205,41 @@
     }
   ],
   "examples": [
-    "<aihio-button>Click me</aihio-button>",
-    "<aihio-button variant=\"outline\" size=\"sm\">Cancel</aihio-button>",
-    "<aihio-button variant=\"destructive\">Delete</aihio-button>",
-    "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>",
-    "<aihio-button variant=\"outline\"><a href=\"/pricing\">See pricing</a></aihio-button>",
-    "<form>\n  <label>\n    Email\n    <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  </label>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>",
-    "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Delete project?</aihio-dialog-title>\n  </aihio-dialog-header>\n  <form method=\"post\">\n    <aihio-dialog-footer>\n      <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n      <aihio-button type=\"submit\" variant=\"destructive\">Delete project</aihio-button>\n    </aihio-dialog-footer>\n  </form>\n</aihio-dialog>"
+    {
+      "title": "Primary action",
+      "description": "The default variant, for the main thing to do in a view.",
+      "markup": "<aihio-button>Click me</aihio-button>"
+    },
+    {
+      "title": "Small and outlined",
+      "description": "A lower-emphasis action beside a primary one.",
+      "markup": "<aihio-button variant=\"outline\" size=\"sm\">Cancel</aihio-button>"
+    },
+    {
+      "title": "Destructive",
+      "description": "For an action that deletes something or cannot be undone.",
+      "markup": "<aihio-button variant=\"destructive\">Delete</aihio-button>"
+    },
+    {
+      "title": "Icon only",
+      "description": "With no visible text, aria-label is its name.",
+      "markup": "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>"
+    },
+    {
+      "title": "A link drawn as a button",
+      "description": "A call to action that goes to another page wraps an <a href>.",
+      "markup": "<aihio-button variant=\"outline\"><a href=\"/pricing\">See pricing</a></aihio-button>"
+    },
+    {
+      "title": "Submits its form",
+      "description": "type=\"submit\" makes it the form's submitter, so Enter in a field submits too.",
+      "markup": "<form>\n  <label>\n    Email\n    <aihio-input type=\"email\" name=\"email\" required></aihio-input>\n  </label>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>"
+    },
+    {
+      "title": "Opens a dialog from markup",
+      "description": "commandfor names the dialog and command=\"--open\" opens it, with no script.",
+      "markup": "<aihio-button commandfor=\"confirm-delete\" command=\"--open\" variant=\"destructive\">Delete project</aihio-button>\n\n<aihio-dialog id=\"confirm-delete\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Delete project?</aihio-dialog-title>\n  </aihio-dialog-header>\n  <form method=\"post\">\n    <aihio-dialog-footer>\n      <aihio-button commandfor=\"confirm-delete\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n      <aihio-button type=\"submit\" variant=\"destructive\">Delete project</aihio-button>\n    </aihio-dialog-footer>\n  </form>\n</aihio-dialog>"
+    }
   ],
   "properties": {
     "control": {

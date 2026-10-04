@@ -80,6 +80,9 @@
     }
   ],
   "examples": [
-    "<aihio-card>\n  <aihio-card-header>\n    <aihio-card-title>Card Title</aihio-card-title>\n    <aihio-card-description>Card description.</aihio-card-description>\n  </aihio-card-header>\n  <aihio-card-content>\n    <p>Card content here.</p>\n  </aihio-card-content>\n  <aihio-card-footer>\n    <aihio-button>Action</aihio-button>\n  </aihio-card-footer>\n</aihio-card>"
+    {
+      "title": "Header, content, and footer",
+      "markup": "<aihio-card>\n  <aihio-card-header>\n    <aihio-card-title>Card Title</aihio-card-title>\n    <aihio-card-description>Card description.</aihio-card-description>\n  </aihio-card-header>\n  <aihio-card-content>\n    <p>Card content here.</p>\n  </aihio-card-content>\n  <aihio-card-footer>\n    <aihio-button>Action</aihio-button>\n  </aihio-card-footer>\n</aihio-card>"
+    }
   ]
 }

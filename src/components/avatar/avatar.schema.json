@@ -68,8 +68,20 @@
     }
   ],
   "examples": [
-    "<aihio-avatar src=\"/avatar.jpg\" alt=\"Jane Doe\"></aihio-avatar>",
-    "<aihio-avatar alt=\"Jane Doe\"></aihio-avatar>",
-    "<aihio-avatar fallback=\"JD\" size=\"lg\"></aihio-avatar>"
+    {
+      "title": "With an image",
+      "description": "alt names the person for screen readers.",
+      "markup": "<aihio-avatar src=\"/avatar.jpg\" alt=\"Jane Doe\"></aihio-avatar>"
+    },
+    {
+      "title": "Initials from the name",
+      "description": "With no src, the initials are taken from alt.",
+      "markup": "<aihio-avatar alt=\"Jane Doe\"></aihio-avatar>"
+    },
+    {
+      "title": "Explicit initials, large",
+      "description": "fallback sets the initials directly.",
+      "markup": "<aihio-avatar fallback=\"JD\" size=\"lg\"></aihio-avatar>"
+    }
   ]
 }

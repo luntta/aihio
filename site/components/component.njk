@@ -34,7 +34,7 @@ eleventyComputed:
       {% for example in component.examplesDetailed %}
         {% set label = "Example" %}
         {% set title = example.title %}
-        {% set description = null %}
+        {% set description = example.description %}
         {% set markup = example.previewMarkup %}
         {% set source = example.markup %}
         {% set tone = "default" %}

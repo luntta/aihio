@@ -100,8 +100,15 @@
     }
   ],
   "examples": [
-    "<aihio-toggle>Bold</aihio-toggle>",
-    "<aihio-toggle pressed variant=\"outline\">Italic</aihio-toggle>"
+    {
+      "title": "Unpressed",
+      "markup": "<aihio-toggle>Bold</aihio-toggle>"
+    },
+    {
+      "title": "Pressed and outlined",
+      "description": "pressed is a boolean attribute: present means on.",
+      "markup": "<aihio-toggle pressed variant=\"outline\">Italic</aihio-toggle>"
+    }
   ],
   "properties": {
     "control": {

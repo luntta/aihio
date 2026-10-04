@@ -233,11 +233,12 @@ const components = schema.components
         name: intent,
         description: schema.intents[intent] ?? '',
       })),
-      examplesDetailed: (component.examples ?? []).map((markup, index) => ({
+      examplesDetailed: (component.examples ?? []).map((example, index) => ({
         id: `${slug}-example-${index + 1}`,
-        markup,
-        previewMarkup: toPreviewMarkup(markup, `${slug}-example-${index + 1}`),
-        title: `Example ${index + 1}`,
+        title: example.title,
+        description: example.description ?? null,
+        markup: example.markup,
+        previewMarkup: toPreviewMarkup(example.markup, `${slug}-example-${index + 1}`),
       })),
       counterExamplesDetailed: (component.counterExamples ?? []).map((example, index) => ({
         id: `${slug}-counter-example-${index + 1}`,

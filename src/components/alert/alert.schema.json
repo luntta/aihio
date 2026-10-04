@@ -88,9 +88,25 @@
     }
   ],
   "examples": [
-    "<aihio-alert>\n  <div slot=\"title\">Heads up!</div>\n  <div slot=\"description\">You can add components to your app.</div>\n</aihio-alert>",
-    "<aihio-alert variant=\"destructive\">\n  <div slot=\"title\">Error</div>\n  <div slot=\"description\">Something went wrong.</div>\n</aihio-alert>",
-    "<aihio-alert variant=\"success\">\n  <div slot=\"title\">Changes saved</div>\n  <div slot=\"description\">Your profile is up to date.</div>\n</aihio-alert>",
-    "<aihio-alert variant=\"warning\">\n  <div slot=\"title\">Trial ends in 3 days</div>\n  <div slot=\"description\">Add a payment method to keep your workspace active.</div>\n</aihio-alert>"
+    {
+      "title": "Default",
+      "description": "Neutral information, announced politely as role=\"status\".",
+      "markup": "<aihio-alert>\n  <div slot=\"title\">Heads up!</div>\n  <div slot=\"description\">You can add components to your app.</div>\n</aihio-alert>"
+    },
+    {
+      "title": "Destructive",
+      "description": "A failure: the one variant announced assertively, as role=\"alert\".",
+      "markup": "<aihio-alert variant=\"destructive\">\n  <div slot=\"title\">Error</div>\n  <div slot=\"description\">Something went wrong.</div>\n</aihio-alert>"
+    },
+    {
+      "title": "Success",
+      "description": "A confirmation that something worked.",
+      "markup": "<aihio-alert variant=\"success\">\n  <div slot=\"title\">Changes saved</div>\n  <div slot=\"description\">Your profile is up to date.</div>\n</aihio-alert>"
+    },
+    {
+      "title": "Warning",
+      "description": "Something that needs attention but has not failed.",
+      "markup": "<aihio-alert variant=\"warning\">\n  <div slot=\"title\">Trial ends in 3 days</div>\n  <div slot=\"description\">Add a payment method to keep your workspace active.</div>\n</aihio-alert>"
+    }
   ]
 }

@@ -64,9 +64,21 @@
     }
   ],
   "examples": [
-    "<aihio-badge>New</aihio-badge>",
-    "<aihio-badge variant=\"secondary\">Draft</aihio-badge>",
-    "<aihio-badge variant=\"outline\">v2.0</aihio-badge>",
-    "<aihio-badge variant=\"destructive\">Error</aihio-badge>"
+    {
+      "title": "Default",
+      "markup": "<aihio-badge>New</aihio-badge>"
+    },
+    {
+      "title": "Secondary",
+      "markup": "<aihio-badge variant=\"secondary\">Draft</aihio-badge>"
+    },
+    {
+      "title": "Outline",
+      "markup": "<aihio-badge variant=\"outline\">v2.0</aihio-badge>"
+    },
+    {
+      "title": "Destructive",
+      "markup": "<aihio-badge variant=\"destructive\">Error</aihio-badge>"
+    }
   ]
 }

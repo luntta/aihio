@@ -67,7 +67,13 @@
     }
   ],
   "examples": [
-    "<aihio-stack>\n  <h2>Notifications</h2>\n  <p>Choose how you want to hear from us.</p>\n</aihio-stack>",
-    "<aihio-stack gap=\"lg\" align=\"center\">\n  <aihio-avatar alt=\"Jane Doe\"></aihio-avatar>\n  <aihio-button>Follow</aihio-button>\n</aihio-stack>"
+    {
+      "title": "A heading and its copy",
+      "markup": "<aihio-stack>\n  <h2>Notifications</h2>\n  <p>Choose how you want to hear from us.</p>\n</aihio-stack>"
+    },
+    {
+      "title": "Centered, with room between",
+      "markup": "<aihio-stack gap=\"lg\" align=\"center\">\n  <aihio-avatar alt=\"Jane Doe\"></aihio-avatar>\n  <aihio-button>Follow</aihio-button>\n</aihio-stack>"
+    }
   ]
 }

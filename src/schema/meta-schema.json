@@ -74,7 +74,7 @@
     "examples": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "$ref": "#/$defs/example" }
     }
   },
   "$defs": {
@@ -209,6 +209,16 @@
           "minLength": 1,
           "description": "Stable evaluator id when this obligation is machine-checkable. Error-level obligations must provide one."
         }
+      }
+    },
+    "example": {
+      "type": "object",
+      "required": ["title", "markup"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "description": "What the example shows, in a few words." },
+        "description": { "type": "string", "minLength": 1, "description": "Why it is written this way, when that is not obvious." },
+        "markup": { "type": "string", "minLength": 1 }
       }
     },
     "counterExample": {
