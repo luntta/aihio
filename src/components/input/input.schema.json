@@ -215,7 +215,7 @@
   "examples": [
     "<label>\n  Email\n  <aihio-input type=\"email\" placeholder=\"you@example.com\"></aihio-input>\n</label>",
     "<aihio-input aria-label=\"Search\" placeholder=\"Search…\"></aihio-input>",
-    "<aihio-input error aria-describedby=\"pw-error\" type=\"password\"></aihio-input>\n<p id=\"pw-error\">Password is too short.</p>"
+    "<aihio-field>\n  <label slot=\"label\">Password</label>\n  <aihio-input type=\"password\" name=\"password\" autocomplete=\"new-password\"></aihio-input>\n  <span slot=\"error\">Password is too short.</span>\n</aihio-field>"
   ],
   "methods": {
     "checkValidity()": {

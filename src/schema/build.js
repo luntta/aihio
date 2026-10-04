@@ -144,7 +144,7 @@ const promptMarkdown = toPromptMarkdown(merged);
 writeFileSync(promptMarkdownPath, promptMarkdown, 'utf8');
 writeFileSync(promptModulePath, toPromptModule(promptMarkdown), 'utf8');
 writeFileSync(promptTypesPath, toStringModuleTypes(), 'utf8');
-await validateCanonicalPatterns(patterns);
+await validateCanonicalMarkup(sorted, patterns);
 console.log(`schema → ${outPath} (${schemas.length} components, ${patterns.length} patterns)`);
 console.log(`schema → ${minPath} (agent-minified)`);
 console.log(`schema runtime → ${runtimePath}`);
@@ -153,29 +153,37 @@ console.log(`schema component types → ${componentTypesPath}`);
 console.log(`schema prompt → ${promptMarkdownPath}`);
 console.log(`schema prompt module → ${promptModulePath}`);
 
-async function validateCanonicalPatterns(canonicalPatterns) {
+// Component examples and patterns are the markup agents copy, so each one has
+// to be clean under the same linter they are told to run: an example that
+// trips a warning teaches the mistake it demonstrates.
+async function validateCanonicalMarkup(canonicalComponents, canonicalPatterns) {
   const { lintMarkup } = await import(`../lint/index.js?schema-build=${Date.now()}`);
   const failures = [];
-
-  for (const pattern of canonicalPatterns) {
-    const candidates = [
-      { id: pattern.id, markup: pattern.markup },
+  const candidates = [
+    ...canonicalComponents.flatMap((component) =>
+      (component.examples ?? []).map((markup, index) => ({
+        id: `${component.$component}/example-${index + 1}`,
+        markup,
+      }))
+    ),
+    ...canonicalPatterns.flatMap((pattern) => [
+      { id: `pattern:${pattern.id}`, markup: pattern.markup },
       ...(pattern.variations ?? []).map((variation) => ({
-        id: `${pattern.id}/${variation.id}`,
+        id: `pattern:${pattern.id}/${variation.id}`,
         markup: variation.markup,
       })),
-    ];
+    ]),
+  ];
 
-    for (const candidate of candidates) {
-      const result = lintMarkup(candidate.markup, { source: `pattern:${candidate.id}` });
-      for (const issue of result.issues) {
-        failures.push(`${candidate.id}: ${issue.ruleId} at ${issue.path}: ${issue.message}`);
-      }
+  for (const candidate of candidates) {
+    const result = lintMarkup(candidate.markup, { source: candidate.id });
+    for (const issue of result.issues) {
+      failures.push(`${candidate.id}: ${issue.ruleId} at ${issue.path}: ${issue.message}`);
     }
   }
 
   if (failures.length > 0) {
-    throw new Error(`canonical pattern lint failed:\n  ${failures.join('\n  ')}`);
+    throw new Error(`canonical markup lint failed:\n  ${failures.join('\n  ')}`);
   }
 }
 
