@@ -10,65 +10,69 @@ eleventyComputed:
   description: "{{ pattern.description }}"
 ---
 <section class="docs-page-intro">
-  <div class="docs-eyebrow">
-    <aihio-badge>{{ pattern.id }}</aihio-badge>
-    {% for intent in pattern.intentsDetailed %}
-      <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
-    {% endfor %}
-  </div>
+  <p class="docs-page-intro__meta">
+    <span>Pattern</span>
+    <code>{{ pattern.id }}</code>
+  </p>
   <h1>{{ pattern.name }}</h1>
   <p>{{ pattern.description | prose | safe }}</p>
+  <p class="docs-page-intro__intents">
+    <span>Uses</span>
+    {% for component in pattern.componentEntries %}
+      <a class="docs-code-link" href="{{ component.path | docsUrl(page.url) }}"><code>{{ component.tag }}</code></a>
+    {% endfor %}
+  </p>
+  <p class="docs-page-intro__intents">
+    <span>Intents</span>
+    {% for intent in pattern.intentsDetailed %}
+      <a class="docs-code-link" href="{{ ('/intents/#' + intent.name) | docsUrl(page.url) }}" title="{{ intent.description }}"><code>{{ intent.name }}</code></a>
+    {% endfor %}
+  </p>
 </section>
 
-<section class="docs-detail-grid">
-  <div class="docs-detail-grid__main">
-    <div class="docs-examples">
-      {% set id = pattern.id + '-base' %}
-      {% set title = "Base markup" %}
-      {% set description = null %}
-      {% set markup = pattern.previewMarkup %}
-      {% set source = pattern.markup %}
-      {% set level = 2 %}
-      {% include "partials/example-frame.njk" %}
+<section id="pattern">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Pattern</h2>
+      <p>
+        Live, over the markup an agent gets from the MCP server's <code>get_pattern</code>. Narrow the preview to see
+        the layout answer to its own width rather than the window's.
+      </p>
     </div>
-
-    {% if pattern.variationEntries.length %}
-      <section>
-        <div class="docs-section-heading">
-          <div>
-            <h2>Variations</h2>
-            <p>Alternative authored shapes shipped with the seeded pattern.</p>
-          </div>
-        </div>
-
-        <div class="docs-examples">
-          {% for variation in pattern.variationEntries %}
-            {% set id = variation.id %}
-            {% set title = variation.title %}
-            {% set description = variation.description %}
-            {% set markup = variation.previewMarkup %}
-            {% set source = variation.markup %}
-            {% set level = 3 %}
-            {% include "partials/example-frame.njk" %}
-          {% endfor %}
-        </div>
-      </section>
-    {% endif %}
   </div>
 
-  <aside class="docs-detail-grid__sidebar">
-    <aihio-card>
-      <aihio-card-header>
-        <aihio-card-title>Required components</aihio-card-title>
-        <aihio-card-description>Schema entries this composition depends on.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        <ul class="docs-link-list">
-          {% for component in pattern.componentEntries %}
-            <li><a class="docs-inline-link" href="{{ component.path | docsUrl(page.url) }}">{{ component.name }}</a></li>
-          {% endfor %}
-        </ul>
-      </aihio-card-content>
-    </aihio-card>
-  </aside>
+  <div class="docs-examples">
+    {% set id = pattern.id + '-base' %}
+    {% set title = pattern.name %}
+    {% set description = null %}
+    {% set markup = pattern.previewMarkup %}
+    {% set source = pattern.markup %}
+    {% set level = 3 %}
+    {% set resizable = true %}
+    {% include "partials/example-frame.njk" %}
+  </div>
 </section>
+
+{% if pattern.variationEntries.length %}
+  <section id="variations">
+    <div class="docs-section-heading">
+      <div>
+        <h2>Variations</h2>
+        <p>Other shapes of the same pattern, each as lint-clean as the first.</p>
+      </div>
+    </div>
+
+    <div class="docs-examples">
+      {% for variation in pattern.variationEntries %}
+        {% set id = variation.id %}
+        {% set title = variation.title %}
+        {% set description = variation.description %}
+        {% set markup = variation.previewMarkup %}
+        {% set source = variation.markup %}
+        {% set level = 3 %}
+        {% set resizable = true %}
+        {% include "partials/example-frame.njk" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

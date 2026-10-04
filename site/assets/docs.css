@@ -841,6 +841,24 @@ a {
   font-size: var(--aihio-font-size-xs);
 }
 
+/* A pattern drawn at half size: laid out at full width, then zoomed, so the
+   thumbnail is the pattern itself rather than a picture of it. */
+.docs-component-grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.docs-pattern-card__preview {
+  display: block;
+  height: 15rem;
+  padding: var(--aihio-spacing-4);
+  overflow: hidden;
+}
+
+.docs-pattern-card__scale {
+  width: calc(100% / 0.5);
+  zoom: 0.5;
+}
+
 /* Variants: one cell per value, its attribute written under it. */
 .docs-variants {
   display: flex;
@@ -961,6 +979,30 @@ a {
      which is a later sibling and would otherwise paint over them. */
   position: relative;
   z-index: 1;
+}
+
+/* The width switch on pattern previews. A narrowed preview keeps its frame
+   and shows its edges, so the width it has been given is visible. */
+.docs-example__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--aihio-spacing-2) var(--aihio-spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+}
+
+.docs-example__frame > .docs-example__preview {
+  max-width: var(--docs-preview-width, none);
+  margin-inline: auto;
+}
+
+/* A pattern stands in for a section of a page, so it fills the width it is
+   given, as it would in one; a grid needs that width to lay out its columns. */
+.docs-example__frame--section > .docs-example__preview {
+  justify-items: stretch;
+}
+
+.docs-example__frame[data-narrowed] > .docs-example__preview {
+  border-inline: 1px dashed var(--docs-hairline);
 }
 
 .docs-example__frame > .docs-code,

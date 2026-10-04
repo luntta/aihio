@@ -6,7 +6,16 @@
   <h{{ level or 3 }} class="docs-example__title">{{ title }}</h{{ level or 3 }}>
   {% if description %}<p class="docs-example__description">{{ description | prose | safe }}</p>{% endif %}
 
-  <div class="docs-example__frame">
+  <div class="docs-example__frame{% if resizable %} docs-example__frame--section{% endif %}">
+    {% if resizable %}
+      <div class="docs-example__toolbar">
+        <aihio-cluster gap="tight" role="group" aria-label="Preview width" data-preview-widths>
+          <aihio-toggle size="sm" variant="outline" pressed data-preview-width="">Full</aihio-toggle>
+          <aihio-toggle size="sm" variant="outline" data-preview-width="40rem">Tablet</aihio-toggle>
+          <aihio-toggle size="sm" variant="outline" data-preview-width="22rem">Phone</aihio-toggle>
+        </aihio-cluster>
+      </div>
+    {% endif %}
     <div class="docs-example__preview">
       {{ markup | safe }}
     </div>

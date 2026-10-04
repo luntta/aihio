@@ -4,10 +4,7 @@ title: Patterns
 description: Generated multi-component patterns for the Aihio design system.
 ---
 <section class="docs-page-intro">
-  <div class="docs-eyebrow">
-    <aihio-badge>Pattern library</aihio-badge>
-    <aihio-badge variant="outline">{{ docs.patternCount }} patterns</aihio-badge>
-  </div>
+  <p class="docs-page-intro__meta">{{ docs.patternCount }} patterns</p>
   <h1>Patterns</h1>
   <p>
     Patterns document a composition rather than a single component: which components take part, how they nest, and what
@@ -16,9 +13,12 @@ description: Generated multi-component patterns for the Aihio design system.
 </section>
 
 <section>
-  <div class="docs-component-grid">
+  <div class="docs-component-grid docs-component-grid--wide">
     {% for pattern in docs.patterns %}
-      <article class="docs-component-card">
+      <article class="docs-component-card docs-pattern-card">
+        <div class="docs-component-card__preview docs-pattern-card__preview" inert aria-hidden="true">
+          <div class="docs-pattern-card__scale">{{ pattern.previewMarkup | safe }}</div>
+        </div>
         <div class="docs-component-card__body">
           <h3 class="docs-component-card__title">
             <a href="{{ pattern.path | docsUrl(page.url) }}">{{ pattern.name }}</a>

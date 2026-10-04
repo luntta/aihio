@@ -113,3 +113,20 @@ document.addEventListener('click', async (event) => {
     copyStatus.textContent = '';
   }, 1600);
 });
+
+/* Pattern previews narrow to a tablet or phone width, so a layout can be seen
+   answering to its own width (aihio-grid drops columns) rather than the
+   window's. The toggles are aihio-toggles kept to one pressed at a time. */
+document.addEventListener('aihio-toggle', (event) => {
+  const toggle = event.target.closest?.('[data-preview-width]');
+  const group = toggle?.closest('[data-preview-widths]');
+  if (!group) return;
+
+  for (const option of group.querySelectorAll('[data-preview-width]')) {
+    option.toggleAttribute('pressed', option === toggle);
+  }
+  const frame = group.closest('.docs-example__frame');
+  const width = toggle.dataset.previewWidth;
+  frame.style.setProperty('--docs-preview-width', width || 'none');
+  frame.toggleAttribute('data-narrowed', Boolean(width));
+});
