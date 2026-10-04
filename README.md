@@ -7,14 +7,14 @@ Aihio is designed for AI agents to generate markup predictably — every compone
 ## Install
 
 ```bash
-npm install aihio
+npm install @luntta/aihio
 ```
 
 ## Usage
 
 ```html
-<link rel="stylesheet" href="node_modules/aihio/dist/aihio.css">
-<script type="module" src="node_modules/aihio/dist/aihio.js"></script>
+<link rel="stylesheet" href="node_modules/@luntta/aihio/dist/aihio.css">
+<script type="module" src="node_modules/@luntta/aihio/dist/aihio.js"></script>
 
 <aihio-button variant="outline">Click me</aihio-button>
 ```
@@ -22,8 +22,8 @@ npm install aihio
 Or import as a module:
 
 ```js
-import 'aihio/css';
-import 'aihio';
+import '@luntta/aihio/css';
+import '@luntta/aihio';
 ```
 
 That entrypoint auto-registers all custom elements.
@@ -32,22 +32,22 @@ During development, import the dev bundle instead to get schema-backed console
 warnings for invalid attributes and accessibility-contract violations:
 
 ```js
-import 'aihio/dev';   // same components, warnings installed
+import '@luntta/aihio/dev';   // same components, warnings installed
 ```
 
 The warnings are a separate module that the production bundle never imports, so
 `dist/aihio.js` carries none of that code. If you only want the classes without side effects:
 
 ```js
-import { AihioButton, AihioDialog } from 'aihio/components';
+import { AihioButton, AihioDialog } from '@luntta/aihio/components';
 ```
 
 Each component also has a focused, tree-shakeable entrypoint. These entrypoints
 export classes but do not register them for you:
 
 ```js
-import 'aihio/css';
-import { AihioButton } from 'aihio/button';
+import '@luntta/aihio/css';
+import { AihioButton } from '@luntta/aihio/button';
 
 if (!customElements.get(AihioButton.tag)) {
   customElements.define(AihioButton.tag, AihioButton);
@@ -61,7 +61,7 @@ implementations.
 The root bundle also exposes `Aihio.describe()` for runtime introspection:
 
 ```js
-import { Aihio } from 'aihio';
+import { Aihio } from '@luntta/aihio';
 
 const buttonSchema = Aihio.describe('aihio-button');
 // { $component: 'aihio-button', version: '1.5.0', ... }
@@ -70,7 +70,7 @@ const buttonSchema = Aihio.describe('aihio-button');
 Schema-derived TypeScript declarations ship in `dist/aihio.d.ts`, including intent and variant unions plus JSX element typings:
 
 ```tsx
-import type { AihioButtonVariant, AihioIntent } from 'aihio';
+import type { AihioButtonVariant, AihioIntent } from '@luntta/aihio';
 
 const variant: AihioButtonVariant = 'outline';
 const intent: AihioIntent = 'primary-action';
@@ -83,13 +83,13 @@ export function Toolbar() {
 The package also exports a canonical prompt fragment for AI systems:
 
 ```js
-import prompt from 'aihio/prompt';
+import prompt from '@luntta/aihio/prompt';
 ```
 
 Schema-backed markup linting is available both as a library and a CLI:
 
 ```js
-import { lintMarkup } from 'aihio/lint';
+import { lintMarkup } from '@luntta/aihio/lint';
 
 const result = lintMarkup('<aihio-button variant="primary"></aihio-button>');
 ```
@@ -186,7 +186,7 @@ The prompt fragment is served as the MCP prompt `aihio-authoring`.
 Every component ships a JSON schema describing its API — attributes, slots, events, example markup, and now a seeded patterns library for multi-component page sections. The merged schema is available at `dist/schema.json`.
 
 ```js
-const schema = await fetch('node_modules/aihio/dist/schema.json').then(r => r.json());
+const schema = await fetch('node_modules/@luntta/aihio/dist/schema.json').then(r => r.json());
 // { $schema: "aihio-design-system", version: "2.0.0", components: [...], patterns: [...] }
 ```
 

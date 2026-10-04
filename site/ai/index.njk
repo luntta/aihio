@@ -28,7 +28,7 @@ description: Connect an agent to Aihio through its MCP server, prompt fragment, 
     <div>
       <h2>Connect an agent</h2>
       <p>
-        <code>aihio-mcp</code> is a local stdio server that ships in the package. With <code>aihio</code> installed in
+        <code>aihio-mcp</code> is a local stdio server that ships in the package. With <code>@luntta/aihio</code> installed in
         the project, add it to the client that writes your UI.
       </p>
     </div>
@@ -56,8 +56,8 @@ description: Connect an agent to Aihio through its MCP server, prompt fragment, 
       <p class="docs-example__description">
         Put the prompt fragment in the system prompt or the project's instructions, and lint what comes back.
       </p>
-      <pre class="docs-code"><code>import prompt from 'aihio/prompt';
-import { lintMarkup } from 'aihio/lint';</code></pre>
+      <pre class="docs-code"><code>import prompt from '@luntta/aihio/prompt';
+import { lintMarkup } from '@luntta/aihio/lint';</code></pre>
     </div>
   </div>
 </section>

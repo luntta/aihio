@@ -1,5 +1,5 @@
-import type { AihioA11yRuleId, AihioButtonProps, AihioInput } from 'aihio';
-import { AihioDialog } from 'aihio/dialog';
+import type { AihioA11yRuleId, AihioButtonProps, AihioInput } from '@luntta/aihio';
+import { AihioDialog } from '@luntta/aihio/dialog';
 
 declare const input: AihioInput;
 

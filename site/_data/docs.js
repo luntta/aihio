@@ -224,12 +224,12 @@ const ai = {
     fixedIssues: lintMarkup(LINT_FIXED).issues.length,
   },
   artifacts: [
-    { path: 'dist/aihio.prompt.md', exportName: 'aihio/prompt.md', what: 'The prompt fragment: rules, every component, the intent map, patterns, obligations, and each mistake beside its fix.' },
-    { path: 'dist/schema.json', exportName: 'aihio/schema', what: 'The full schema: components, sub-components, intents, patterns, examples, and counterexamples.' },
-    { path: 'dist/schema.min.json', exportName: 'aihio/schema/min', what: 'The same, with the prose stripped, for a tight context budget.' },
-    { path: 'dist/semantic-tokens.md', exportName: 'aihio/tokens.md', what: 'Every semantic token, its source, and what it is for.' },
-    { path: 'dist/tokens.json', exportName: 'aihio/tokens', what: 'Every token in every tier, with resolved light and dark values and the contrast contract.' },
-    { path: 'dist/aihio.d.ts', exportName: 'aihio', what: 'Types generated from the schema, including JSX intrinsic elements.' },
+    { path: 'dist/aihio.prompt.md', exportName: '@luntta/aihio/prompt.md', what: 'The prompt fragment: rules, every component, the intent map, patterns, obligations, and each mistake beside its fix.' },
+    { path: 'dist/schema.json', exportName: '@luntta/aihio/schema', what: 'The full schema: components, sub-components, intents, patterns, examples, and counterexamples.' },
+    { path: 'dist/schema.min.json', exportName: '@luntta/aihio/schema/min', what: 'The same, with the prose stripped, for a tight context budget.' },
+    { path: 'dist/semantic-tokens.md', exportName: '@luntta/aihio/tokens.md', what: 'Every semantic token, its source, and what it is for.' },
+    { path: 'dist/tokens.json', exportName: '@luntta/aihio/tokens', what: 'Every token in every tier, with resolved light and dark values and the contrast contract.' },
+    { path: 'dist/aihio.d.ts', exportName: '@luntta/aihio', what: 'Types generated from the schema, including JSX intrinsic elements.' },
   ].map((artifact) => ({ ...artifact, size: fileSize(artifact.path) })),
 };
 
