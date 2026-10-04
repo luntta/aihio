@@ -974,42 +974,60 @@ a {
   flex-wrap: wrap;
 }
 
-/* Vocabulary ------------------------------------------------------------- */
+/* Intents ---------------------------------------------------------------- */
 
-/* A glossary, not a card wall: 26 same-size cards made the reader scroll past
-   decoration to reach 26 short definitions. */
-.docs-vocab {
+/* A glossary, not a card wall: each intent, what it means, and what serves
+   it, on one line where the column allows. */
+.docs-intents {
   margin: 0;
   border-top: 1px solid var(--docs-hairline);
 }
 
-.docs-vocab__row {
+.docs-intents__row {
   display: grid;
-  grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+  grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--aihio-spacing-4);
   padding-block: var(--aihio-spacing-3);
   border-bottom: 1px solid var(--docs-hairline);
+  scroll-margin-top: calc(var(--docs-topbar-height) + 1rem);
 }
 
-.docs-vocab dt {
+.docs-intents__row:target {
+  background: var(--aihio-color-control-highlight-bg);
+}
+
+.docs-intents dt,
+.docs-intents dd {
   margin: 0;
   min-width: 0;
-}
-
-.docs-vocab dt code {
-  font-size: var(--aihio-font-size-sm);
-}
-
-.docs-vocab dd {
-  margin: 0;
-  min-width: 0;
-  color: var(--aihio-color-muted-fg);
   font-size: var(--aihio-font-size-sm);
   line-height: var(--aihio-line-height-relaxed);
 }
 
-@container docs-main (max-width: 34rem) {
-  .docs-vocab__row {
+.docs-intents__meaning {
+  color: var(--aihio-color-muted-fg);
+}
+
+.docs-intents__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-intents__links--patterns {
+  margin-top: var(--aihio-spacing-1);
+}
+
+.docs-intents__links--patterns .docs-inline-link {
+  color: var(--aihio-color-muted-fg);
+  font-weight: var(--aihio-font-weight-normal);
+}
+
+@container docs-main (max-width: 40rem) {
+  .docs-intents__row {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--aihio-spacing-1);
   }

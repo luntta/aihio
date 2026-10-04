@@ -229,9 +229,17 @@ export default {
   featuredComponents: components.slice(0, 6),
   patterns,
   featuredPatterns: patterns.slice(0, 4),
+  // The intent vocabulary with what declares each intent: the map an agent
+  // reads from the prompt, as a page.
   intents: Object.entries(schema.intents ?? {}).map(([name, description]) => ({
     name,
     description,
+    components: components
+      .filter((component) => (component.intents ?? []).includes(name))
+      .map(({ tag, name: title, path }) => ({ tag, name: title, path })),
+    patterns: patterns
+      .filter((pattern) => (pattern.intents ?? []).includes(name))
+      .map(({ id, name: title, path }) => ({ id, name: title, path })),
   })),
   tokens,
   semanticTokenGroups,

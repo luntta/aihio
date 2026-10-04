@@ -1,0 +1,56 @@
+---
+layout: layouts/base.njk
+title: Intents
+description: The intent vocabulary, and the components and patterns that declare each intent.
+---
+<section class="docs-page-intro">
+  <div class="docs-eyebrow">
+    <aihio-badge variant="outline">{{ docs.intentCount }} intents</aihio-badge>
+  </div>
+  <h1>Intents</h1>
+  <p>
+    An intent names what a piece of UI is for: <code>primary-action</code>, <code>selection</code>,
+    <code>modal</code>. Every component and pattern declares the intents it serves, so a request can be matched to a
+    component by meaning before anything is said about how it looks. This is the map an agent reads from the prompt
+    fragment and the MCP server's <code>find</code> tool, as a page.
+  </p>
+</section>
+
+<section>
+  <div class="docs-section-heading">
+    <div>
+      <h2>From intent to component</h2>
+      <p>
+        Mark up an element with <code>data-aihio-intent</code> to say which one it serves. The linter checks the
+        annotation against the component's schema, so a claim it cannot back is an error.
+      </p>
+    </div>
+  </div>
+
+  <dl class="docs-intents">
+    {% for intent in docs.intents %}
+      <div class="docs-intents__row" id="{{ intent.name }}">
+        <dt><code>{{ intent.name }}</code></dt>
+        <dd class="docs-intents__meaning">{{ intent.description }}</dd>
+        <dd class="docs-intents__used">
+          {% if intent.components.length %}
+            <ul class="docs-intents__links" aria-label="Components">
+              {% for component in intent.components %}
+                <li><a class="docs-inline-link" href="{{ component.path | docsUrl(page.url) }}">{{ component.name }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="docs-muted">No component of its own: compose it.</span>
+          {% endif %}
+          {% if intent.patterns.length %}
+            <ul class="docs-intents__links docs-intents__links--patterns" aria-label="Patterns">
+              {% for pattern in intent.patterns %}
+                <li><a class="docs-inline-link" href="{{ pattern.path | docsUrl(page.url) }}">{{ pattern.name }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+</section>

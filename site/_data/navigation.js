@@ -15,6 +15,7 @@ const sections = [
     items: [
       { title: 'Overview', url: '/' },
       { title: 'AI & tooling', url: '/ai/' },
+      { title: 'Intents', url: '/intents/' },
     ],
   },
   {

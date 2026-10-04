@@ -17,24 +17,6 @@ description: The semantic design tokens Aihio components are styled with.
   </p>
 </section>
 
-<section>
-  <div class="docs-section-heading">
-    <div>
-      <h2>The intent vocabulary</h2>
-      <p>The {{ docs.intentCount }} named intents that the schema, the linter, and the prompt fragment all share.</p>
-    </div>
-  </div>
-
-  <dl class="docs-vocab">
-    {% for intent in docs.intents %}
-      <div class="docs-vocab__row">
-        <dt><code>{{ intent.name }}</code></dt>
-        <dd>{{ intent.description }}</dd>
-      </div>
-    {% endfor %}
-  </dl>
-</section>
-
 {% for group in docs.semanticTokenGroups %}
   <section>
     <div class="docs-section-heading">
