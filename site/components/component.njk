@@ -26,6 +26,7 @@ eleventyComputed:
 
 <nav class="docs-toc" aria-label="On this page">
   <ul>
+    {% if component.variantGroups.length %}<li><a href="#variants">Variants</a></li>{% endif %}
     {% if component.examplesDetailed.length %}<li><a href="#examples">Examples</a></li>{% endif %}
     {% if component.counterExamplesDetailed.length %}<li><a href="#mistakes">Mistakes</a></li>{% endif %}
     <li><a href="#api">API</a></li>
@@ -34,6 +35,30 @@ eleventyComputed:
     {% if component.patternsUsing.length %}<li><a href="#patterns">In patterns</a></li>{% endif %}
   </ul>
 </nav>
+
+{% if component.variantGroups.length %}
+  <section id="variants">
+    <div class="docs-section-heading">
+      <div>
+        <h2>Variants</h2>
+        <p>Every value of the attributes that change how it looks. The values come from the schema.</p>
+      </div>
+    </div>
+
+    {% for group in component.variantGroups %}
+      <h3 class="docs-api__heading"><code>{{ group.attribute }}</code></h3>
+      {% if group.description %}<p class="docs-api__intro">{{ group.description | prose | safe }}</p>{% endif %}
+      <div class="docs-variants docs-variants--{{ group.layout }}">
+        {% for cell in group.cells %}
+          <figure class="docs-variant">
+            <div class="docs-variant__preview">{{ cell.markup | safe }}</div>
+            <figcaption><code>{{ group.attribute }}="{{ cell.value }}"</code></figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+{% endif %}
 
 {% if component.examplesDetailed.length %}
   <section id="examples">

@@ -16,7 +16,7 @@
         "lg"
       ],
       "default": "sm",
-      "description": "Spacing between items, from the intent spacing scale."
+      "description": "Spacing between items, from the spacing tokens."
     },
     "align": {
       "type": "enum",

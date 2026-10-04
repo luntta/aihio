@@ -16,7 +16,7 @@
         "lg"
       ],
       "default": "md",
-      "description": "Vertical spacing between children, from the intent spacing scale."
+      "description": "Vertical spacing between children, from the spacing tokens."
     },
     "align": {
       "type": "enum",

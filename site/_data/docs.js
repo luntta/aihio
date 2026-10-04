@@ -5,6 +5,8 @@ import { pathToFileURL } from 'node:url';
 
 import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
 
+import showcase from './showcase.js';
+
 const root = resolve(import.meta.dirname, '..', '..');
 const schemaPath = resolve(root, 'dist/schema.json');
 const packagePath = resolve(root, 'package.json');
@@ -82,6 +84,18 @@ function hasAncestor(node, tagName) {
     if (current.tagName === tagName) return true;
   }
   return false;
+}
+
+/** Every value of each attribute that changes how a component looks, drawn by the showcase. */
+function toVariantGroups(component, spec = {}) {
+  return Object.entries(spec.variants ?? {})
+    .map(([attribute, render]) => ({
+      attribute,
+      description: component.attributes?.[attribute]?.description ?? '',
+      layout: spec.layout ?? 'row',
+      cells: (component.attributes?.[attribute]?.values ?? []).map((value) => ({ value, markup: render(value) })),
+    }))
+    .filter((group) => group.cells.length > 0);
 }
 
 /** Attributes, properties, methods, events, slots, and commands, as lists for the reference. */
@@ -230,6 +244,8 @@ const components = schema.components
       name,
       path: `/components/${slug}/`,
       ...toApiEntries(component, tag),
+      variantGroups: toVariantGroups(component, showcase[tag]),
+      thumbnail: showcase[tag]?.thumbnail ?? null,
       compositionEntries: toCompositionEntries(component.composition),
       // Sub-components (aihio-card-header, aihio-tab, aihio-option) are only
       // ever used inside their parent, so they are documented on its page,
@@ -290,7 +306,10 @@ export default {
   patternCount: patterns.length,
   intentCount: Object.keys(schema.intents ?? {}).length,
   components,
-  featuredComponents: components.slice(0, 6),
+  // The components that show the most of what the system does: forms that
+  // submit, a filtering field, overlays opened from markup, and tabs.
+  featuredComponents: ['aihio-button', 'aihio-field', 'aihio-combobox', 'aihio-dialog', 'aihio-dropdown', 'aihio-tabs']
+    .map((tag) => components.find((component) => component.tag === tag)),
   patterns,
   featuredPatterns: patterns.slice(0, 4),
   // The intent vocabulary with what declares each intent: the map an agent

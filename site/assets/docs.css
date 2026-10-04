@@ -654,50 +654,140 @@ a {
 }
 
 /* ==========================================================================
-   Component / pattern cards
+   Component cards and variants
    ========================================================================== */
 
-.docs-component-card__meta {
+/* A component, drawn live above its name. The preview is the point of the
+   card, so it gets the room; the facts are one line under it. */
+.docs-component-card {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--aihio-spacing-3);
-  flex-wrap: wrap;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--aihio-radius-surface);
+  background: var(--aihio-color-page-bg);
 }
 
-.docs-component-card__version {
-  color: var(--aihio-color-muted-fg);
-  font-size: var(--aihio-font-size-xs);
-  font-variant-numeric: tabular-nums;
-}
-
-.docs-component-card__intents {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--aihio-spacing-2);
-}
-
-.docs-component-card__facts {
+.docs-component-card__preview {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--aihio-spacing-3);
-  margin: var(--aihio-spacing-4) 0 0;
-  padding-top: var(--aihio-spacing-4);
-  border-top: 1px solid var(--docs-hairline);
+  place-items: center;
+  min-height: 9rem;
+  padding: var(--aihio-spacing-6) var(--aihio-spacing-5);
+  border-bottom: 1px solid var(--docs-hairline);
+  border-radius: var(--aihio-radius-surface) var(--aihio-radius-surface) 0 0;
+  background: var(--aihio-color-surface-bg);
 }
 
-.docs-component-card__facts dt {
-  margin: 0 0 0.125rem;
+.docs-component-card__preview > * {
+  max-width: 100%;
+}
+
+.docs-component-card__preview > :is(aihio-field, aihio-alert, aihio-card, aihio-tabs, aihio-stack, aihio-grid, aihio-combobox, aihio-input) {
+  width: 100%;
+}
+
+.docs-component-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--aihio-spacing-1-5);
+  padding: var(--aihio-spacing-4) var(--aihio-spacing-5) var(--aihio-spacing-5);
+}
+
+.docs-component-card__title {
+  margin: 0;
+  font-size: var(--aihio-font-size-base);
+  font-weight: var(--aihio-font-weight-semibold);
+  letter-spacing: var(--aihio-letter-spacing-heading);
+}
+
+.docs-component-card__title a {
+  text-decoration: none;
+}
+
+.docs-component-card__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.docs-component-card__description {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.docs-component-card__meta {
+  margin: auto 0 0;
+  padding-top: var(--aihio-spacing-2);
   color: var(--aihio-color-muted-fg);
   font-size: var(--aihio-font-size-xs);
 }
 
-.docs-component-card__facts dd {
+/* Variants: one cell per value, its attribute written under it. */
+.docs-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aihio-spacing-3);
+  margin-bottom: var(--aihio-spacing-4);
+}
+
+.docs-variants--stack {
+  flex-direction: column;
+}
+
+.docs-variants--wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.docs-variant {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   margin: 0;
-  font-size: var(--aihio-font-size-lg);
-  font-weight: var(--aihio-font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--aihio-letter-spacing-heading);
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--aihio-radius-surface);
+}
+
+.docs-variant__preview {
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 5.5rem;
+  padding: var(--aihio-spacing-5);
+}
+
+.docs-variants--stack .docs-variant__preview,
+.docs-variants--wide .docs-variant__preview {
+  place-items: stretch;
+}
+
+.docs-variant figcaption {
+  padding: var(--aihio-spacing-2) var(--aihio-spacing-3);
+  border-top: 1px solid var(--docs-hairline);
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-content .docs-variant figcaption code {
+  padding: 0;
+  background: none;
+}
+
+/* Stand-ins for content in layout previews: the gap is what is on show. */
+.docs-sample-box {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border: 1px dashed color-mix(in oklch, var(--aihio-color-field-border) 70%, transparent);
+  border-radius: var(--aihio-radius-interactive-compact);
+  background: var(--aihio-color-muted-bg);
 }
 
 /* ==========================================================================
@@ -1564,11 +1654,6 @@ a {
     padding-inline: 0.5rem;
   }
 
-  .docs-component-card__facts {
-    grid-template-columns: repeat(3, minmax(0, auto));
-    justify-content: start;
-    gap: var(--aihio-spacing-5);
-  }
 }
 
 /* ==========================================================================
