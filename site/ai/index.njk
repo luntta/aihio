@@ -1,50 +1,181 @@
 ---
 layout: layouts/base.njk
-title: AI & Tooling
-description: Schema, lint, prompt, and MCP tooling for Aihio.
+title: AI and tooling
+description: Connect an agent to Aihio through its MCP server, prompt fragment, linter, and schema.
 ---
 <section class="docs-page-intro">
-  <div class="docs-eyebrow">
-    <aihio-badge>AI-first tooling</aihio-badge>
-    <aihio-badge variant="outline">Schema · lint · prompt · MCP</aihio-badge>
-  </div>
-  <h1>Machine-readable surfaces for agents and authoring tools</h1>
+  <p class="docs-page-intro__meta">Start here</p>
+  <h1>Built to be written by agents</h1>
   <p>
-    Aihio’s docs are only one consumer of the generated schema. The same build also emits a prompt fragment,
-    a structured linter, and a local MCP server for component discovery and markup validation.
+    Every component has a machine-readable contract, and the same build turns it into a prompt fragment, a linter
+    that suggests fixes, an MCP server, types, and this site. They are generated from one schema, so they cannot
+    disagree: if the linter accepts markup, the prompt taught it and the docs show it.
   </p>
 </section>
 
-<section class="docs-feature-grid">
-  <div class="docs-feature-card">
-    <h3><code>dist/schema.json</code></h3>
-    <p>Human-readable schema bundle containing components, intents, patterns, a11y contracts, examples, and counterexamples.</p>
-    <pre class="docs-code"><code>import schema from 'aihio/schema';</code></pre>
+<nav class="docs-toc" aria-label="On this page">
+  <ul>
+    <li><a href="#connect">Connect an agent</a></li>
+    <li><a href="#tools">MCP tools</a></li>
+    <li><a href="#loop">The lint loop</a></li>
+    <li><a href="#files">Files to read</a></li>
+    <li><a href="#runtime">In the browser</a></li>
+  </ul>
+</nav>
+
+<section id="connect">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Connect an agent</h2>
+      <p>
+        <code>aihio-mcp</code> is a local stdio server that ships in the package. With <code>aihio</code> installed in
+        the project, add it to the client that writes your UI.
+      </p>
+    </div>
   </div>
 
-  <div class="docs-feature-card">
-    <h3><code>aihio/lint</code></h3>
-    <p>Structured schema-backed HTML validation that returns machine-consumable issues.</p>
-    <pre class="docs-code"><code>import { lintMarkup } from 'aihio/lint';
-
-const result = lintMarkup('&lt;aihio-button size="icon"&gt;&lt;/aihio-button&gt;');</code></pre>
-  </div>
-
-  <div class="docs-feature-card">
-    <h3><code>aihio/prompt</code></h3>
-    <p>Canonical prompt fragment summarizing components, patterns, hard rules, and the token vocabulary.</p>
-    <pre class="docs-code"><code>import prompt from 'aihio/prompt';</code></pre>
-  </div>
-
-  <div class="docs-feature-card">
-    <h3><code>aihio-mcp</code></h3>
-    <p>Local stdio MCP server exposing <code>describe</code> and <code>lint</code> tools for clients that can launch subprocesses.</p>
-    <pre class="docs-code"><code>{
+  <div class="docs-examples">
+    <div class="docs-example">
+      <h3 class="docs-example__title">Claude Code</h3>
+      <pre class="docs-code"><code>claude mcp add aihio -- npx aihio-mcp</code></pre>
+    </div>
+    <div class="docs-example">
+      <h3 class="docs-example__title">Any client with a JSON config</h3>
+      <p class="docs-example__description">Claude Desktop, Cursor, VS Code, and other MCP clients take the same entry.</p>
+      <pre class="docs-code"><code>{
   "mcpServers": {
     "aihio": {
-      "command": "aihio-mcp"
+      "command": "npx",
+      "args": ["aihio-mcp"]
     }
   }
 }</code></pre>
+    </div>
+    <div class="docs-example">
+      <h3 class="docs-example__title">Without MCP</h3>
+      <p class="docs-example__description">
+        Put the prompt fragment in the system prompt or the project's instructions, and lint what comes back.
+      </p>
+      <pre class="docs-code"><code>import prompt from 'aihio/prompt';
+import { lintMarkup } from 'aihio/lint';</code></pre>
+    </div>
   </div>
+</section>
+
+<section id="tools">
+  <div class="docs-section-heading">
+    <div>
+      <h2>MCP tools</h2>
+      <p>Read from the server itself. It also serves the prompt fragment as the prompt <code>{{ docs.ai.prompt.name }}</code>.</p>
+    </div>
+  </div>
+
+  <dl class="docs-api">
+    {% for tool in docs.ai.tools %}
+      <div class="docs-api__row">
+        <dt><code>{{ tool.name }}</code></dt>
+        {% if tool.parameters.length %}
+          <dd class="docs-api__type">
+            {% for parameter in tool.parameters %}<code>{{ parameter.name }}{% if not parameter.required %}?{% endif %}</code>{% endfor %}
+          </dd>
+        {% endif %}
+        <dd class="docs-api__description">{{ tool.description | prose | safe }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+
+  <div class="docs-example docs-ai-sample">
+    <h3 class="docs-example__title">What <code>find</code> returns</h3>
+    <p class="docs-example__description">Run at build time, for <code>"{{ docs.ai.find.query }}"</code>. Scores are trimmed from the full entries.</p>
+    <pre class="docs-code"><code>{{ docs.ai.find.result | escape }}</code></pre>
+  </div>
+</section>
+
+<section id="loop">
+  <div class="docs-section-heading">
+    <div>
+      <h2>The lint loop</h2>
+      <p>
+        Lint every snippet before returning it. An issue with a <code>suggestion</code> is fixed by applying the
+        suggestion, so a model needs one round trip, not a reading of the docs. This is the linter's real output.
+      </p>
+    </div>
+  </div>
+
+  <div class="docs-examples">
+    <div class="docs-example">
+      <h3 class="docs-example__title">1. Markup in the shape of other design systems</h3>
+      <pre class="docs-code"><code>{{ docs.ai.lint.markup | highlightHtml | safe }}</code></pre>
+    </div>
+    <div class="docs-example">
+      <h3 class="docs-example__title">2. <code>lintMarkup()</code> returns</h3>
+      <pre class="docs-code"><code>{{ docs.ai.lint.result | escape }}</code></pre>
+    </div>
+    <div class="docs-example">
+      <h3 class="docs-example__title">3. Both suggestions applied</h3>
+      <p class="docs-example__description">{{ docs.ai.lint.fixedIssues }} issues. The link is a real link, drawn as the button.</p>
+      <pre class="docs-code"><code>{{ docs.ai.lint.fixed | highlightHtml | safe }}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="files">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Files to read</h2>
+      <p>
+        Everything ships in the package. This site also serves <a class="docs-inline-link" href="{{ '/llms.txt' | docsUrl(page.url) }}">llms.txt</a>,
+        <a class="docs-inline-link" href="{{ '/llms-full.txt' | docsUrl(page.url) }}">llms-full.txt</a>, and every
+        component page as markdown (<a class="docs-inline-link" href="{{ '/components/button/index.md' | docsUrl(page.url) }}">components/button/index.md</a>),
+        which the "Copy for agent" button on each component page copies.
+      </p>
+    </div>
+  </div>
+
+  <dl class="docs-api">
+    {% for artifact in docs.ai.artifacts %}
+      <div class="docs-api__row">
+        <dt><a class="docs-code-link" href="{{ ('/' + artifact.path) | docsUrl(page.url) }}"><code>{{ artifact.path }}</code></a></dt>
+        <dd class="docs-api__type">
+          <span class="docs-api__kind">import</span><code>{{ artifact.exportName }}</code>
+          <span class="docs-api__default">{{ artifact.size }}</span>
+        </dd>
+        <dd class="docs-api__description">{{ artifact.what }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+</section>
+
+<section id="runtime">
+  <div class="docs-section-heading">
+    <div>
+      <h2>In the browser</h2>
+      <p>The rules an agent reads are the ones the page enforces while you build.</p>
+    </div>
+  </div>
+
+  <dl class="docs-api">
+    <div class="docs-api__row">
+      <dt><code>aihio/dev</code></dt>
+      <dd class="docs-api__description">
+        The same components, with console warnings for invalid attribute values and broken accessibility
+        obligations, checked by the same rules as the linter. The production bundle carries none of it.
+      </dd>
+    </div>
+    <div class="docs-api__row">
+      <dt><code>Aihio.describe(tag)</code></dt>
+      <dd class="docs-api__description">A component's schema at runtime, for tools that inspect a live page.</dd>
+    </div>
+    <div class="docs-api__row">
+      <dt><code>data-aihio-intent</code></dt>
+      <dd class="docs-api__description">
+        Says what an element is for, from the <a class="docs-inline-link" href="{{ '/intents/' | docsUrl(page.url) }}">intent vocabulary</a>.
+        Optional, but the linter rejects an annotation the component's schema does not back.
+      </dd>
+    </div>
+    <div class="docs-api__row">
+      <dt><code>dist/aihio.d.ts</code></dt>
+      <dd class="docs-api__description">Types generated from the schema: attribute unions, intents, and JSX intrinsic elements.</dd>
+    </div>
+  </dl>
 </section>

@@ -80,11 +80,24 @@ for (const block of document.querySelectorAll('pre.docs-code')) {
   wrapper.append(button);
 }
 
+/* "Copy for agent": the page's markdown, which is what an agent should be
+   given in place of the page. */
+for (const source of document.querySelectorAll('[data-copy-source]')) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'docs-copy docs-copy--inline';
+  button.textContent = 'Copy for agent';
+  button.dataset.copyUrl = source.href;
+  source.after(button);
+}
+
 document.addEventListener('click', async (event) => {
   const button = event.target.closest?.('.docs-copy');
   if (!button) return;
 
-  const code = button.parentElement.querySelector('code')?.textContent ?? '';
+  const code = button.dataset.copyUrl
+    ? await fetch(button.dataset.copyUrl).then((response) => response.text())
+    : button.parentElement.querySelector('code')?.textContent ?? '';
   try {
     await navigator.clipboard.writeText(code);
     button.textContent = 'Copied';
@@ -95,7 +108,7 @@ document.addEventListener('click', async (event) => {
   }
   clearTimeout(button._reset);
   button._reset = setTimeout(() => {
-    button.textContent = 'Copy';
+    button.textContent = button.dataset.copyUrl ? 'Copy for agent' : 'Copy';
     button.removeAttribute('data-copied');
     copyStatus.textContent = '';
   }, 1600);

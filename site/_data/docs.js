@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { pathToFileURL } from 'node:url';
@@ -173,6 +173,133 @@ const tokens = readJson(tokensPath);
 // so the docs print exactly what an agent running aihio-lint would get.
 const { lintMarkup } = await import(pathToFileURL(resolve(root, 'dist/lint.js')).href);
 
+// What the MCP server offers, read from the server itself, and a real answer
+// from its find tool and from the linter, run at build time.
+const { TOOL_DEFINITIONS, PROMPT_DEFINITION } = await import(pathToFileURL(resolve(root, 'src/mcp/server.js')).href);
+const { find } = await import(pathToFileURL(resolve(root, 'src/mcp/catalog.js')).href);
+
+const FIND_QUERY = 'confirm before deleting a project';
+const LINT_SAMPLE = '<aihio-button variant="primary" href="/pricing">See pricing</aihio-button>';
+const LINT_FIXED = '<aihio-button variant="default"><a href="/pricing">See pricing</a></aihio-button>';
+
+function fileSize(path) {
+  const bytes = statSync(resolve(root, path)).size;
+  return bytes < 1024 ? `${bytes} B` : `${Math.round(bytes / 1024)} KB`;
+}
+
+const findResult = find(FIND_QUERY);
+const ai = {
+  tools: TOOL_DEFINITIONS.map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    parameters: Object.entries(tool.inputSchema.properties ?? {}).map(([name, property]) => ({
+      name,
+      required: (tool.inputSchema.required ?? []).includes(name),
+      description: property.description,
+    })),
+  })),
+  prompt: PROMPT_DEFINITION,
+  find: {
+    query: FIND_QUERY,
+    // One entry per line: the ranking is the point, not the indentation.
+    result: [
+      '{',
+      '  "components": [',
+      findResult.components.map(({ tag, score }) => `    ${JSON.stringify({ tag, score })}`).join(',\n'),
+      '  ],',
+      '  "patterns": [',
+      findResult.patterns.map(({ id, score }) => `    ${JSON.stringify({ id, score })}`).join(',\n'),
+      '  ]',
+      '}',
+    ].join('\n'),
+  },
+  lint: {
+    markup: LINT_SAMPLE,
+    result: JSON.stringify(
+      lintMarkup(LINT_SAMPLE).issues.map(({ ruleId, severity, message, suggestion }) => ({ ruleId, severity, message, suggestion })),
+      null,
+      2
+    ),
+    fixed: LINT_FIXED,
+    fixedIssues: lintMarkup(LINT_FIXED).issues.length,
+  },
+  artifacts: [
+    { path: 'dist/aihio.prompt.md', exportName: 'aihio/prompt.md', what: 'The prompt fragment: rules, every component, the intent map, patterns, obligations, and each mistake beside its fix.' },
+    { path: 'dist/schema.json', exportName: 'aihio/schema', what: 'The full schema: components, sub-components, intents, patterns, examples, and counterexamples.' },
+    { path: 'dist/schema.min.json', exportName: 'aihio/schema/min', what: 'The same, with the prose stripped, for a tight context budget.' },
+    { path: 'dist/semantic-tokens.md', exportName: 'aihio/tokens.md', what: 'Every semantic token, its source, and what it is for.' },
+    { path: 'dist/tokens.json', exportName: 'aihio/tokens', what: 'Every token in every tier, with resolved light and dark values and the contrast contract.' },
+    { path: 'dist/aihio.d.ts', exportName: 'aihio', what: 'Types generated from the schema, including JSX intrinsic elements.' },
+  ].map((artifact) => ({ ...artifact, size: fileSize(artifact.path) })),
+};
+
+/**
+ * A component as markdown, for an agent to read in place of the page: the
+ * same reference, examples, and mistakes, without the chrome. Served beside
+ * each component page as index.md, listed in /llms.txt, and copied by the
+ * page's "Copy for agent" button.
+ */
+function toComponentMarkdown(component) {
+  const sentence = (text) => (/[.!?]$/.test(String(text).trim()) ? String(text).trim() : `${String(text).trim()}.`);
+  const lines = [`# <${component.$component}>`, '', component.description, ''];
+  lines.push(`Intents: ${component.intents.map((intent) => `\`${intent}\``).join(', ')}.`, '');
+
+  const reference = (heading, definition, level = '##') => {
+    const attributes = Object.entries(definition.attributes ?? {});
+    if (attributes.length) {
+      lines.push(`${level} ${heading ? `${heading} attributes` : 'Attributes'}`, '');
+      for (const [name, attribute] of attributes) {
+        const type = attribute.type === 'enum' ? attribute.values.map((value) => `\`${value}\``).join(' | ') : attribute.type;
+        const fallback = attribute.default === undefined ? '' : ` Default: \`${attribute.default}\`.`;
+        lines.push(`- \`${name}\` (${type}): ${sentence(attribute.description)}${fallback}`);
+      }
+      lines.push('');
+    }
+    for (const [title, key, format] of [
+      ['Properties', 'properties', (name, entry) => `\`${name}\` (\`${entry.type}\`${entry.readonly ? ', read-only' : ''}): ${sentence(entry.description)}`],
+      ['Methods', 'methods', (name, entry) => `\`${name}\`: ${sentence(entry.description)}`],
+      ['Events', 'events', (name, entry) => `\`${name}\`${entry.detail ? ` (detail: ${Object.entries(entry.detail).map(([key2, type]) => `${key2}: ${type}`).join(', ')})` : ''}: ${sentence(entry.description)}`],
+      ['Slots', 'slots', (name, entry) => `\`${name}\`: ${sentence(entry.description)}`],
+      ['Commands', 'commands', (name, entry) => `\`${name}\`: ${sentence(entry.description)}`],
+    ]) {
+      const entries = Object.entries(definition[key] ?? {});
+      if (!entries.length) continue;
+      lines.push(`${level} ${title}`, '', ...entries.map(([name, entry]) => `- ${format(name, entry)}`), '');
+    }
+  };
+
+  reference('', component);
+  for (const related of component.related ?? []) {
+    lines.push(`## <${related.$component}>`, '', sentence(related.description), '');
+    reference(`<${related.$component}>`, related, '###');
+  }
+
+  const required = component.a11yContract?.required ?? [];
+  if (required.length) {
+    lines.push('## Accessibility obligations', '');
+    for (const rule of required) {
+      lines.push(`- (${rule.severity}${rule.rule ? `, ${rule.rule}` : ''}) When ${rule.when}: ${rule.requirement}`);
+    }
+    lines.push('');
+  }
+
+  lines.push('## Examples', '');
+  for (const example of component.examples ?? []) {
+    lines.push(`### ${example.title}`, '');
+    if (example.description) lines.push(example.description, '');
+    lines.push('```html', example.markup, '```', '');
+  }
+
+  lines.push('## Mistakes', '');
+  for (const mistake of component.counterExamples ?? []) {
+    lines.push(`### ${mistake.reason}`, '');
+    lines.push(`Don't${mistake.rule ? ` (aihio-lint: ${mistake.rule})` : ''}:`, '', '```html', mistake.markup, '```', '');
+    lines.push('Do:', '', '```html', mistake.fix, '```', '');
+  }
+
+  return `${lines.join('\n').trim()}\n`;
+}
+
 /** A reason's first sentence as a heading, the rest as its explanation. */
 function splitReason(reason) {
   const [lead, ...rest] = String(reason).split(/(?<=\.)\s+(?=[A-Z<])/);
@@ -314,6 +441,7 @@ const components = schema.components
       ...toApiEntries(component, tag),
       variantGroups: toVariantGroups(component, showcase[tag]),
       thumbnail: showcase[tag]?.thumbnail ?? null,
+      markdown: toComponentMarkdown(component),
       compositionEntries: toCompositionEntries(component.composition),
       // Sub-components (aihio-card-header, aihio-tab, aihio-option) are only
       // ever used inside their parent, so they are documented on its page,
@@ -394,6 +522,7 @@ export default {
   })),
   tokens,
   foundations,
+  ai,
   semanticTokenGroups,
   semanticTokenCount: semanticTokenGroups.reduce((count, group) => count + group.tokens.length, 0),
 };

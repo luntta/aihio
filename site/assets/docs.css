@@ -1217,6 +1217,11 @@ a {
   }
 }
 
+.docs-copy--inline {
+  position: static;
+  opacity: 1;
+}
+
 .docs-copy:hover {
   color: var(--aihio-color-page-fg);
 }
@@ -1609,6 +1614,11 @@ a {
 
 .docs-handled li {
   color: var(--aihio-color-muted-fg);
+}
+
+/* A worked sample under a reference list. */
+.docs-ai-sample {
+  margin-top: var(--aihio-spacing-8);
 }
 
 /* Intents ---------------------------------------------------------------- */

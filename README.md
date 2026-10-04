@@ -669,11 +669,20 @@ npm run docs:dev     # Watch dist/ + docs source and serve the Eleventy site
 
 The site uses Aihio components in the docs UI itself and currently includes:
 
-- Overview page
-- Generated component index and per-component reference pages
-- Pattern library
-- Token foundations page
-- AI and tooling overview
+- Overview, the intent vocabulary, and an AI and tooling guide (MCP setup, the
+  tools, the lint loop, and every file an agent can read)
+- A component index drawn live, and a page per component: variants, titled
+  examples, each mistake beside its fix with the linter's output, the full API
+  including sub-components, and the accessibility contract
+- The pattern library
+- Foundations: colour (with the contrast contract), typography, space and
+  shape, motion, and a token reference
+- Search, ranked by the same function as the MCP `find` tool
+- `llms.txt`, `llms-full.txt`, and every component page as markdown
+
+The docs checks fail on broken links or fragments, repeated ids, a dialog
+rendered open, and any markup outside an example preview that `aihio-lint`
+rejects.
 
 ## Development
 

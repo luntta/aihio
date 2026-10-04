@@ -13,7 +13,7 @@ const SUPPORTED_PROTOCOL_VERSIONS = [
 const KNOWN_COMPONENTS = runtimeSchema.components.map((component) => component.$component);
 
 const PROMPT_NAME = 'aihio-authoring';
-const PROMPT_DEFINITION = {
+export const PROMPT_DEFINITION = {
   name: PROMPT_NAME,
   title: 'Aihio authoring guide',
   description:
@@ -22,7 +22,7 @@ const PROMPT_DEFINITION = {
 
 const NO_ARGUMENTS = { type: 'object', properties: {}, additionalProperties: false };
 
-const TOOL_DEFINITIONS = [
+export const TOOL_DEFINITIONS = [
   {
     name: 'find',
     title: 'Find Aihio Components and Patterns',
