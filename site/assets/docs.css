@@ -1067,7 +1067,10 @@ a {
     position: fixed;
     inset: var(--docs-topbar-height) 0 0;
     z-index: 40;
-    background: oklch(var(--color-intent-overlay-scrim) / 0.4);
+    /* Lighter than the modal scrim, which already carries its own alpha
+       (0 0 0 / 0.8) and so cannot take a second one: oklch(… / 0.8 / 0.4) is
+       invalid and left the drawer with no scrim at all. */
+    background: oklch(var(--color-zinc-1000) / 0.32);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
   }
