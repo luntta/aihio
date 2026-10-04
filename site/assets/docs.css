@@ -424,6 +424,12 @@ a {
   min-width: 0;
 }
 
+/* The heading already ends in a hairline, so a list that starts with one
+   would draw it twice. */
+.docs-section-heading + :is(.docs-api, .docs-specimens, .docs-measures, .docs-durations, .docs-obligations, .docs-handled, .docs-intents) {
+  border-top: 0;
+}
+
 .docs-section-heading h1,
 .docs-section-heading h2 {
   margin: 0 0 var(--aihio-spacing-2);
@@ -1554,6 +1560,324 @@ a {
 
 @container docs-main (max-width: 40rem) {
   .docs-intents__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--aihio-spacing-1);
+  }
+}
+
+/* ==========================================================================
+   Foundations
+   ========================================================================== */
+
+/* Semantic colours: a light and a dark swatch, each drawn by the token inside
+   a data-theme subtree, beside its name, source, and purpose. */
+.docs-colors {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+  gap: 0 var(--aihio-spacing-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-color {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--aihio-spacing-4);
+  align-items: start;
+  padding-block: var(--aihio-spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+}
+
+.docs-color__swatches {
+  display: flex;
+}
+
+.docs-color__theme {
+  display: block;
+  padding: 0.375rem;
+  background: var(--aihio-color-page-bg);
+}
+
+.docs-color__theme:first-child {
+  border-radius: var(--aihio-radius-interactive) 0 0 var(--aihio-radius-interactive);
+}
+
+.docs-color__theme:last-child {
+  border-radius: 0 var(--aihio-radius-interactive) var(--aihio-radius-interactive) 0;
+}
+
+.docs-color__theme--both {
+  /* A translucent colour needs something behind it to show its alpha. */
+  background: repeating-conic-gradient(var(--aihio-color-zinc-200) 0 25%, var(--aihio-color-zinc-0) 0 50%) 0 0 / 0.75rem 0.75rem;
+}
+
+.docs-color__swatch {
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--aihio-radius-interactive-compact);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--aihio-color-page-fg) 14%, transparent);
+}
+
+.docs-color__text {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-color__text code {
+  overflow-wrap: anywhere;
+}
+
+.docs-color__source {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-color__text p {
+  margin: 0;
+  color: var(--aihio-color-muted-fg);
+}
+
+/* Contrast samples, drawn in their own theme. */
+.docs-contrast {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aihio-spacing-2);
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: var(--aihio-radius-interactive);
+  background: var(--aihio-color-page-bg);
+  color: var(--aihio-color-page-fg);
+  box-shadow: inset 0 0 0 1px var(--aihio-color-border-subtle);
+}
+
+.docs-contrast__sample {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--aihio-radius-interactive-compact);
+  font-weight: var(--aihio-font-weight-semibold);
+}
+
+.docs-contrast__sample--boundary {
+  border: 2px solid;
+}
+
+.docs-contrast__ratio {
+  font-size: var(--aihio-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.docs-table--contrast {
+  min-width: 36rem;
+}
+
+.docs-table--contrast td {
+  vertical-align: middle;
+}
+
+/* Primitive ramps. */
+.docs-ramp {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
+  gap: var(--aihio-spacing-1);
+  margin: 0 0 var(--aihio-spacing-4);
+  padding: 0;
+  list-style: none;
+}
+
+.docs-ramp__step {
+  display: grid;
+  gap: var(--aihio-spacing-1);
+}
+
+.docs-ramp__swatch {
+  display: block;
+  height: 3rem;
+  border-radius: var(--aihio-radius-interactive-compact);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--aihio-color-page-fg) 12%, transparent);
+}
+
+.docs-ramp__label {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Type specimens. */
+.docs-specimens {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-specimen {
+  padding-block: var(--aihio-spacing-4);
+  border-bottom: 1px solid var(--docs-hairline);
+}
+
+.docs-specimens--compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--aihio-spacing-8);
+  border-top: 0;
+}
+
+.docs-specimens--compact .docs-specimen {
+  border-bottom: 0;
+}
+
+.docs-specimen__sample {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.docs-specimen__sample--paragraph {
+  max-width: var(--docs-measure);
+  font-size: var(--aihio-font-size-sm);
+}
+
+.docs-specimen__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-2);
+  margin: var(--aihio-spacing-2) 0 0;
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+/* Spacing bars. */
+.docs-measures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-measure {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 18rem) minmax(0, 1fr);
+  gap: var(--aihio-spacing-4);
+  align-items: center;
+  padding-block: var(--aihio-spacing-2);
+  border-bottom: 1px solid var(--docs-hairline);
+  font-size: var(--aihio-font-size-sm);
+}
+
+.docs-measure__bar {
+  display: block;
+  min-width: 1px;
+  height: 0.75rem;
+  border-radius: 1px;
+  background: var(--aihio-color-primary-action-bg);
+}
+
+.docs-measure__text code {
+  overflow-wrap: anywhere;
+}
+
+.docs-measure__description {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+/* Radius and shadow samples. */
+.docs-shapes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--aihio-spacing-6) var(--aihio-spacing-4);
+  margin: 0 0 var(--aihio-spacing-4);
+  padding: 0;
+  list-style: none;
+}
+
+.docs-shapes--compact {
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+}
+
+.docs-shape {
+  display: grid;
+  gap: var(--aihio-spacing-1);
+  align-content: start;
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-shape__sample {
+  display: block;
+  height: 4.5rem;
+  margin-bottom: var(--aihio-spacing-2);
+  border: 1px solid var(--docs-hairline);
+  background: var(--aihio-color-surface-bg);
+}
+
+.docs-shape__sample--raised {
+  border-radius: var(--aihio-radius-surface);
+  background: var(--aihio-color-overlay-bg);
+}
+
+.docs-shape__description {
+  color: var(--aihio-color-muted-fg);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+/* Durations: the dot crosses its track at the token's pace on hover. */
+.docs-durations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-duration {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 18rem) minmax(0, 1fr);
+  gap: var(--aihio-spacing-4);
+  align-items: center;
+  padding-block: var(--aihio-spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+  font-size: var(--aihio-font-size-sm);
+}
+
+.docs-duration__track {
+  position: relative;
+  display: block;
+  height: 0.75rem;
+  border-radius: var(--aihio-radius-pill);
+  background: var(--aihio-color-muted-bg);
+}
+
+.docs-duration__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--aihio-radius-pill);
+  background: var(--aihio-color-primary-action-bg);
+  transition-property: left;
+  transition-timing-function: ease;
+}
+
+.docs-duration:hover .docs-duration__dot {
+  left: calc(100% - 0.75rem);
+}
+
+.docs-duration__description {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+@container docs-main (max-width: 40rem) {
+  .docs-measure,
+  .docs-duration {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--aihio-spacing-1);
   }

@@ -1,0 +1,43 @@
+---
+layout: layouts/base.njk
+title: Motion
+description: Aihio's motion durations and how they respond to reduced motion.
+---
+<section class="docs-page-intro">
+  <p class="docs-page-intro__meta">Foundations</p>
+  <h1>Motion</h1>
+  <p>
+    Motion is feedback, never decoration: a hover settles, a menu arrives. Every transition is timed from these tokens,
+    and under <code>prefers-reduced-motion: reduce</code> they collapse to 1ms in one place, with no
+    <code>!important</code> and nothing done to your own animation. Looping animation is switched off where it is
+    declared instead, since a 1ms infinite rotation is a strobe. A build test fails if a component adds an animation
+    without that guard.
+  </p>
+</section>
+
+<section id="durations">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Durations</h2>
+      <p>Point at a row to run its transition. With reduced motion on, they all jump, which is the point.</p>
+    </div>
+  </div>
+  <ul class="docs-durations">
+    {% for token in docs.foundations.duration.semantic %}
+      <li class="docs-duration">
+        <span class="docs-duration__track" aria-hidden="true">
+          <span class="docs-duration__dot" style="transition-duration: var({{ token.variable }})"></span>
+        </span>
+        <span class="docs-duration__text"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span></span>
+        <span class="docs-duration__description">{{ token.description | prose | safe }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="docs-api__heading">Scale</h3>
+  <ul class="docs-link-row">
+    {% for token in docs.foundations.duration.scale %}
+      <li><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span></li>
+    {% endfor %}
+  </ul>
+</section>

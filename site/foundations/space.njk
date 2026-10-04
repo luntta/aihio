@@ -1,0 +1,99 @@
+---
+layout: layouts/base.njk
+title: Space and shape
+description: Aihio's spacing, corner radius, and elevation tokens.
+---
+<section class="docs-page-intro">
+  <p class="docs-page-intro__meta">Foundations</p>
+  <h1>Space and shape</h1>
+  <p>
+    Spacing is named for the rhythm it sets, not for a step on the scale: a stack's gap, a field's padding. Corners
+    round less as controls get denser, and elevation is kept for things that float; a card reads as raised from its
+    fill alone.
+  </p>
+</section>
+
+<nav class="docs-toc" aria-label="On this page">
+  <ul>
+    <li><a href="#spacing">Spacing</a></li>
+    <li><a href="#radius">Radius</a></li>
+    <li><a href="#shadow">Shadow</a></li>
+  </ul>
+</nav>
+
+<section id="spacing">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Spacing</h2>
+      <p>What components read. <code>aihio-stack</code>, <code>aihio-cluster</code>, and <code>aihio-grid</code> take the same scale through their <code>gap</code> attribute.</p>
+    </div>
+  </div>
+  <ul class="docs-measures">
+    {% for token in docs.foundations.spacing.semantic %}
+      <li class="docs-measure">
+        <span class="docs-measure__bar" style="width: var({{ token.variable }})"></span>
+        <span class="docs-measure__text"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span></span>
+        <span class="docs-measure__description">{{ token.description | prose | safe }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="docs-api__heading">Scale</h3>
+  <p class="docs-api__intro">Steps of 0.25rem. Half steps are written with a hyphen: <code>--aihio-spacing-1-5</code> is 0.375rem.</p>
+  <ul class="docs-measures">
+    {% for token in docs.foundations.spacing.scale %}
+      <li class="docs-measure">
+        <span class="docs-measure__bar" style="width: var({{ token.variable }})"></span>
+        <span class="docs-measure__text"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span></span>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="radius">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Radius</h2>
+      <p>Every step is computed from <code>--aihio-radius-base</code>, so one override rounds the whole system.</p>
+    </div>
+  </div>
+  <ul class="docs-shapes">
+    {% for token in docs.foundations.radius.semantic %}
+      <li class="docs-shape">
+        <span class="docs-shape__sample" style="border-radius: var({{ token.variable }})"></span>
+        <code>{{ token.variable }}</code>
+        <span class="docs-muted">{{ token.value }}</span>
+        <span class="docs-shape__description">{{ token.description | prose | safe }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="docs-api__heading">Scale</h3>
+  <ul class="docs-shapes docs-shapes--compact">
+    {% for token in docs.foundations.radius.scale %}
+      <li class="docs-shape">
+        <span class="docs-shape__sample" style="border-radius: var({{ token.variable }})"></span>
+        <code>{{ token.variable }}</code>
+        <span class="docs-muted">{{ token.value }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="shadow">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Shadow</h2>
+      <p>Elevation for what floats above the page. Surfaces mostly do without: their fill already sets them apart.</p>
+    </div>
+  </div>
+  <ul class="docs-shapes">
+    {% for token in docs.foundations.shadow.semantic %}
+      <li class="docs-shape">
+        <span class="docs-shape__sample docs-shape__sample--raised" style="box-shadow: var({{ token.variable }})"></span>
+        <code>{{ token.variable }}</code>
+        <span class="docs-shape__description">{{ token.description | prose | safe }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

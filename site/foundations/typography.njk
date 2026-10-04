@@ -1,0 +1,121 @@
+---
+layout: layouts/base.njk
+title: Typography
+description: Aihio's type families, scale, weights, tracking, and line heights.
+---
+<section class="docs-page-intro">
+  <p class="docs-page-intro__meta">Foundations</p>
+  <h1>Typography</h1>
+  <p>
+    The type stack leads with the platform's own UI face, so text renders in the grey the OS already optimises for and
+    no webfont ships. Tracking tightens as type grows, because the same em value reads looser at larger sizes.
+  </p>
+</section>
+
+<nav class="docs-toc" aria-label="On this page">
+  <ul>
+    <li><a href="#families">Families</a></li>
+    <li><a href="#sizes">Sizes</a></li>
+    <li><a href="#weights">Weights</a></li>
+    <li><a href="#tracking">Tracking</a></li>
+    <li><a href="#line-height">Line height</a></li>
+  </ul>
+</nav>
+
+<section id="families">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Families</h2>
+      <p>Interface text and fixed-width data.</p>
+    </div>
+  </div>
+  <ul class="docs-specimens">
+    {% for token in docs.foundations['font-family'].semantic %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample" style="font-family: var({{ token.variable }}); font-size: var(--aihio-font-size-2xl)">
+          {% if token.name == 'code' %}&lt;aihio-button variant="outline"&gt;{% else %}Every label reads at a glance{% endif %}
+        </p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> {{ token.description | prose | safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="sizes">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Sizes</h2>
+      <p>What components read, then the scale beneath it.</p>
+    </div>
+  </div>
+  <ul class="docs-specimens">
+    {% for token in docs.foundations['font-size'].semantic %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample" style="font-size: var({{ token.variable }})">Settings saved for every workspace</p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span> {{ token.description | prose | safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="docs-api__heading">Scale</h3>
+  <ul class="docs-specimens docs-specimens--compact">
+    {% for token in docs.foundations['font-size'].scale %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample" style="font-size: var({{ token.variable }})">Aa</p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span></p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="weights">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Weights</h2>
+    </div>
+  </div>
+  <ul class="docs-specimens">
+    {% for token in docs.foundations['font-weight'].semantic %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample" style="font-weight: var({{ token.variable }}); font-size: var(--aihio-font-size-xl)">{{ token.name | capitalize }}</p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span> {{ token.description | prose | safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="tracking">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Tracking</h2>
+      <p>Letter spacing by role. <code>label</code> is the one positive value, for small capitalised labels.</p>
+    </div>
+  </div>
+  <ul class="docs-specimens">
+    {% for token in docs.foundations['letter-spacing'].semantic %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample" style="letter-spacing: var({{ token.variable }});{% if token.name == 'display' %} font-size: var(--aihio-font-size-4xl); font-weight: var(--aihio-font-weight-semibold);{% elif token.name == 'heading' %} font-size: var(--aihio-font-size-2xl); font-weight: var(--aihio-font-weight-semibold);{% elif token.name == 'label' %} font-size: var(--aihio-font-size-xs); font-weight: var(--aihio-font-weight-semibold); text-transform: uppercase;{% endif %}">{% if token.name == 'label' %}Components{% else %}Design that reads to people and agents{% endif %}</p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span> {{ token.description | prose | safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="line-height">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Line height</h2>
+    </div>
+  </div>
+  <ul class="docs-specimens">
+    {% for token in docs.foundations['line-height'].semantic %}
+      <li class="docs-specimen">
+        <p class="docs-specimen__sample docs-specimen__sample--paragraph" style="line-height: var({{ token.variable }})">
+          A form field collects one value from the person using it. Its label says what the value is, its description
+          says how to give it, and its error says what went wrong when it does.
+        </p>
+        <p class="docs-specimen__meta"><code>{{ token.variable }}</code> <span class="docs-muted">{{ token.value }}</span> {{ token.description | prose | safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

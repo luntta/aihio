@@ -1,14 +1,14 @@
 ---
 layout: layouts/base.njk
-title: Semantic tokens
-description: The semantic design tokens Aihio components are styled with.
+title: Token reference
+description: Every design token Aihio defines, by tier.
 ---
 <section class="docs-page-intro">
   <div class="docs-eyebrow">
     <aihio-badge>Foundations</aihio-badge>
     <aihio-badge variant="outline">{{ docs.semanticTokenCount }} semantic tokens</aihio-badge>
   </div>
-  <h1>Semantic tokens</h1>
+  <h1>Token reference</h1>
   <p>
     Primitive scales give values, semantic tokens give them a purpose, and components read only the purpose:
     <code>--aihio-color-surface-bg</code>, <code>--aihio-spacing-stack-md</code>, never a position on a scale. Every
@@ -55,6 +55,49 @@ description: The semantic design tokens Aihio components are styled with.
     </div>
   </section>
 {% endfor %}
+
+<section id="component-tokens">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Component tokens</h2>
+      <p>Sizes specific to one component, from <code>tokens/component.json</code>.</p>
+    </div>
+    <span class="docs-muted">{{ docs.foundations.component.length }} tokens</span>
+  </div>
+  <div class="docs-tablewrap">
+    <table class="docs-table docs-table--tokens">
+      <thead><tr><th>CSS variable</th><th>Value</th></tr></thead>
+      <tbody>
+        {% for token in docs.foundations.component %}
+          <tr><td><code>{{ token.variable }}</code></td><td><code class="docs-muted">{{ token.value }}</code></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="primitives">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Primitives</h2>
+      <p>The raw scales the semantic tokens resolve to, from <code>tokens/base.json</code>. Components never read them directly.</p>
+    </div>
+  </div>
+  {% for group in ['spacing', 'radius', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height', 'shadow', 'duration'] %}
+    <h3 class="docs-api__heading">{{ group }}</h3>
+    <div class="docs-tablewrap">
+      <table class="docs-table docs-table--tokens">
+        <thead><tr><th>CSS variable</th><th>Value</th></tr></thead>
+        <tbody>
+          {% for token in docs.foundations[group].scale %}
+            <tr><td><code>{{ token.variable }}</code></td><td><code class="docs-muted">{{ token.value }}</code></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+  <p class="docs-api__intro">The colour ramps are on <a class="docs-inline-link" href="{{ '/foundations/color/' | docsUrl(page.url) }}#palette">Color</a>.</p>
+</section>
 
 <section>
   <div class="docs-section-heading">

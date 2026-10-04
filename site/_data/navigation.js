@@ -21,7 +21,11 @@ const sections = [
   {
     title: 'Foundations',
     items: [
-      { title: 'Semantic tokens', url: '/foundations/tokens/' },
+      { title: 'Color', url: '/foundations/color/' },
+      { title: 'Typography', url: '/foundations/typography/' },
+      { title: 'Space and shape', url: '/foundations/space/' },
+      { title: 'Motion', url: '/foundations/motion/' },
+      { title: 'Token reference', url: '/foundations/tokens/' },
     ],
   },
   {

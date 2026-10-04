@@ -1,0 +1,131 @@
+---
+layout: layouts/base.njk
+title: Color
+description: Aihio's colour system, its two themes, and the contrast contract the build enforces.
+---
+<section class="docs-page-intro">
+  <p class="docs-page-intro__meta">Foundations</p>
+  <h1>Color</h1>
+  <p>
+    The neutral ramp is monochrome, and colour appears only where it carries state. Light and dark are built as mirror
+    images: a pure canvas, a surface one step off it, and a hairline that only just separates them. Every swatch on this
+    page is drawn with the token itself, inside a <code>data-theme</code> subtree, so both themes show at once.
+  </p>
+</section>
+
+<nav class="docs-toc" aria-label="On this page">
+  <ul>
+    <li><a href="#semantic">Semantic colours</a></li>
+    <li><a href="#contrast">Contrast contract</a></li>
+    <li><a href="#palette">Palette</a></li>
+  </ul>
+</nav>
+
+<section id="semantic">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Semantic colours</h2>
+      <p>What components read. Each is shown in light, then dark, with the primitive it resolves to.</p>
+    </div>
+  </div>
+
+  <ul class="docs-colors">
+    {% for color in docs.foundations.semanticColors %}
+      <li class="docs-color">
+        <div class="docs-color__swatches">
+          {% if color.themed %}
+            <span class="docs-color__theme" data-theme="light"><span class="docs-color__swatch" style="background: var({{ color.variable }})"></span></span>
+            <span class="docs-color__theme" data-theme="dark"><span class="docs-color__swatch" style="background: var({{ color.variable }})"></span></span>
+          {% else %}
+            <span class="docs-color__theme docs-color__theme--both"><span class="docs-color__swatch" style="background: var({{ color.variable }})"></span></span>
+          {% endif %}
+        </div>
+        <div class="docs-color__text">
+          <code>{{ color.variable }}</code>
+          <span class="docs-color__source">
+            {% if color.themed %}
+              {{ color.references.light | join(', ') | replace('--aihio-color-', '') }} · {{ color.references.dark | join(', ') | replace('--aihio-color-', '') }}
+            {% else %}
+              {{ color.value }}, both themes
+            {% endif %}
+          </span>
+          {% if color.description %}<p>{{ color.description | prose | safe }}</p>{% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="contrast">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Contrast contract</h2>
+      <p>
+        The pairs the token build measures in both themes, failing if any drops below its minimum: 4.5:1 for text,
+        3:1 for the boundary of a control. Card and alert borders are left out on purpose; they are framing, not the
+        kind of boundary WCAG 1.4.11 covers, and holding them to 3:1 would make every surface shout.
+      </p>
+    </div>
+  </div>
+
+  <div class="docs-tablewrap">
+    <table class="docs-table docs-table--contrast">
+      <thead>
+        <tr>
+          <th>Pair</th>
+          <th>Light</th>
+          <th>Dark</th>
+          <th>Minimum</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pair in docs.foundations.contrast %}
+          <tr>
+            <td>
+              <code>{{ pair.foregroundName }}</code> on <code>{{ pair.backgroundName }}</code>
+              <div class="docs-table__detail">{{ pair.note | prose | safe }}</div>
+            </td>
+            {% for theme in ['light', 'dark'] %}
+              <td>
+                <span class="docs-contrast" data-theme="{{ theme }}">
+                  {% if pair.kind == 'text' %}
+                    <span class="docs-contrast__sample" style="color: var({{ pair.foreground }}); background: var({{ pair.background }})">Aa</span>
+                  {% else %}
+                    <span class="docs-contrast__sample docs-contrast__sample--boundary" style="border-color: var({{ pair.foreground }}); background: var({{ pair.background }})"></span>
+                  {% endif %}
+                  <span class="docs-contrast__ratio">{{ pair.ratio[theme] }}:1</span>
+                </span>
+              </td>
+            {% endfor %}
+            <td>{{ pair.min }}:1</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="palette">
+  <div class="docs-section-heading">
+    <div>
+      <h2>Palette</h2>
+      <p>
+        The primitive ramps the semantic colours resolve to. Hue 286 at near-zero chroma reads as no colour at all, and
+        the ends are true white and true black, so a page canvas is untinted in both themes. Components never read
+        these directly.
+      </p>
+    </div>
+  </div>
+
+  {% for palette in docs.foundations.palettes %}
+    <h3 class="docs-api__heading">{{ palette.name }}</h3>
+    <ol class="docs-ramp">
+      {% for step in palette.steps %}
+        <li class="docs-ramp__step">
+          <span class="docs-ramp__swatch" style="background: var({{ step.variable }})" title="{{ step.variable }}: {{ step.value }}"></span>
+          <span class="docs-ramp__label">{{ step.step }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+  {% endfor %}
+</section>

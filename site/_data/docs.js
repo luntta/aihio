@@ -188,6 +188,74 @@ for (const component of schema.components) {
   for (const related of component.related ?? []) tagUrls.set(related.$component, `${url}#${related.$component}`);
 }
 
+// Foundations ----------------------------------------------------------------
+
+const tokensByName = new Map(tokens.tokens.map((token) => [token.name, token]));
+const tokensIn = (tier, group) => tokens.tokens.filter((token) => token.tier === tier && token.group === group);
+const shortName = (token, group) => token.name.replace(`--aihio-${group}-`, '');
+
+// The primitive colour ramps, one row of swatches per palette.
+const palettes = [];
+for (const token of tokensIn('primitive', 'color')) {
+  const [, palette, step] = token.name.match(/^--aihio-color-([a-z]+)-(\d+)$/);
+  let entry = palettes.find((candidate) => candidate.name === palette);
+  if (!entry) palettes.push((entry = { name: palette, steps: [] }));
+  entry.steps.push({ step, variable: token.name, value: token.value });
+}
+
+const foundations = {
+  palettes,
+  semanticColors: tokensIn('semantic', 'color').map((token) => ({
+    variable: token.name,
+    name: shortName(token, 'color'),
+    themed: typeof token.value === 'object',
+    value: token.value,
+    references: token.references,
+    description: token.description ?? '',
+  })),
+  contrast: tokens.contrast.map((pair) => ({
+    ...pair,
+    foregroundName: pair.foreground.replace('--aihio-color-', ''),
+    backgroundName: pair.background.replace('--aihio-color-', ''),
+    kind: pair.min >= 4.5 ? 'text' : 'boundary',
+  })),
+  // By value where the value is a length: JSON objects put integer keys ahead
+  // of every other key, so spacing's half steps (1-5) would come last.
+  scale: (group) => tokensIn('primitive', group)
+    .map((token) => ({
+      variable: token.name,
+      name: shortName(token, group),
+      value: token.value,
+      description: token.description ?? '',
+    }))
+    .sort((left, right) => (group === 'spacing' ? parseFloat(left.value) - parseFloat(right.value) : 0)),
+  // Largest first for type, smallest first for space; otherwise by name.
+  semantic: (group) => tokensIn('semantic', group)
+    .map((token) => ({
+      variable: token.name,
+      name: shortName(token, group),
+      value: token.value,
+      references: token.references,
+      description: token.description ?? '',
+    }))
+    .sort((left, right) => {
+      if (group === 'font-size') return parseFloat(right.value) - parseFloat(left.value);
+      if (group === 'spacing') return parseFloat(left.value) - parseFloat(right.value);
+      return 0;
+    }),
+  component: tokens.tokens.filter((token) => token.tier === 'component').map((token) => ({
+    variable: token.name,
+    value: token.value,
+    references: token.references,
+  })),
+};
+
+for (const group of ['spacing', 'radius', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height', 'shadow', 'duration']) {
+  foundations[group] = { scale: foundations.scale(group), semantic: foundations.semantic(group) };
+}
+delete foundations.scale;
+delete foundations.semantic;
+
 const semanticTokenGroups = Object.entries(tokens.groups)
   .map(([name, intro]) => ({
     name,
@@ -325,6 +393,7 @@ export default {
       .map(({ id, name: title, path }) => ({ id, name: title, path })),
   })),
   tokens,
+  foundations,
   semanticTokenGroups,
   semanticTokenCount: semanticTokenGroups.reduce((count, group) => count + group.tokens.length, 0),
 };
