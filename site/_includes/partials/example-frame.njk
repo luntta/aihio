@@ -1,17 +1,24 @@
-<figure class="docs-example{% if tone == 'warning' %} docs-example--warning{% endif %}">
-  <figcaption class="docs-example__head">
-    {% if tone == 'warning' %}
-      <aihio-badge variant="destructive">{{ title }}</aihio-badge>
+{#- One example: a heading, an optional description, and one frame holding the
+    live preview over its source. `id`, `title`, `description`, `markup`
+    (rendered), `source` (shown), and `level` (heading level) are set by the
+    caller. Source longer than a screenful is collapsed behind a toggle. -#}
+<div class="docs-example" id="{{ id }}">
+  <h{{ level or 3 }} class="docs-example__title">{{ title }}</h{{ level or 3 }}>
+  {% if description %}<p class="docs-example__description">{{ description | prose | safe }}</p>{% endif %}
+
+  <div class="docs-example__frame">
+    <div class="docs-example__preview">
+      {{ markup | safe }}
+    </div>
+
+    {% set lines = source | lineCount %}
+    {% if lines > 16 %}
+      <details class="docs-example__source">
+        <summary>Show code <span class="docs-muted">· {{ lines }} lines</span></summary>
+        <pre class="docs-code"><code>{{ source | highlightHtml | safe }}</code></pre>
+      </details>
     {% else %}
-      <span class="docs-example__label">{{ title }}</span>
+      <pre class="docs-code"><code>{{ source | highlightHtml | safe }}</code></pre>
     {% endif %}
-    {% if meta %}<span class="docs-example__meta">{{ meta }}</span>{% endif %}
-    {% if description %}<p class="docs-example__reason">{{ description }}</p>{% endif %}
-  </figcaption>
-
-  <div class="docs-example__preview{% if tone == 'warning' %} is-warning{% endif %}">
-    {{ markup | safe }}
   </div>
-
-  <pre class="docs-code"><code>{{ source | escape }}</code></pre>
-</figure>
+</div>

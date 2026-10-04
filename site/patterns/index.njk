@@ -25,7 +25,7 @@ description: Generated multi-component patterns for the Aihio design system.
             <span class="docs-component-card__version">{{ pattern.componentEntries.length }} components</span>
           </div>
           <aihio-card-title>{{ pattern.name }}</aihio-card-title>
-          <aihio-card-description>{{ pattern.description }}</aihio-card-description>
+          <aihio-card-description>{{ pattern.description | prose | safe }}</aihio-card-description>
         </aihio-card-header>
 
         <aihio-card-content>

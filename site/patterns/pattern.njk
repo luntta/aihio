@@ -17,18 +17,18 @@ eleventyComputed:
     {% endfor %}
   </div>
   <h1>{{ pattern.name }}</h1>
-  <p>{{ pattern.description }}</p>
+  <p>{{ pattern.description | prose | safe }}</p>
 </section>
 
 <section class="docs-detail-grid">
   <div class="docs-detail-grid__main">
-    <div class="docs-example-grid docs-example-grid--single">
-      {% set label = "Pattern" %}
+    <div class="docs-examples">
+      {% set id = pattern.id + '-base' %}
       {% set title = "Base markup" %}
       {% set description = null %}
       {% set markup = pattern.previewMarkup %}
       {% set source = pattern.markup %}
-      {% set tone = "default" %}
+      {% set level = 2 %}
       {% include "partials/example-frame.njk" %}
     </div>
 
@@ -41,14 +41,14 @@ eleventyComputed:
           </div>
         </div>
 
-        <div class="docs-example-grid">
+        <div class="docs-examples">
           {% for variation in pattern.variationEntries %}
-            {% set label = "Variation" %}
+            {% set id = variation.id %}
             {% set title = variation.title %}
             {% set description = variation.description %}
             {% set markup = variation.previewMarkup %}
             {% set source = variation.markup %}
-            {% set tone = "default" %}
+            {% set level = 3 %}
             {% include "partials/example-frame.njk" %}
           {% endfor %}
         </div>

@@ -56,3 +56,47 @@ function report(preview, label, text) {
   body.textContent = text;
   output.replaceChildren(heading, body);
 }
+
+/* Copy buttons, added here rather than in the markup so that without script
+   there is no button that does nothing. Every code block gets one; a shared
+   status region says when the copy happened, since a changed label alone is
+   not reliably announced. */
+const copyStatus = document.createElement('p');
+copyStatus.className = 'docs-visually-hidden';
+copyStatus.setAttribute('role', 'status');
+document.body.append(copyStatus);
+
+for (const block of document.querySelectorAll('pre.docs-code')) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'docs-codeblock';
+  block.before(wrapper);
+  wrapper.append(block);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'docs-copy';
+  button.textContent = 'Copy';
+  button.setAttribute('aria-label', 'Copy code');
+  wrapper.append(button);
+}
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest?.('.docs-copy');
+  if (!button) return;
+
+  const code = button.parentElement.querySelector('code')?.textContent ?? '';
+  try {
+    await navigator.clipboard.writeText(code);
+    button.textContent = 'Copied';
+    button.toggleAttribute('data-copied', true);
+    copyStatus.textContent = 'Copied to the clipboard';
+  } catch {
+    button.textContent = 'Copy failed';
+  }
+  clearTimeout(button._reset);
+  button._reset = setTimeout(() => {
+    button.textContent = 'Copy';
+    button.removeAttribute('data-copied');
+    copyStatus.textContent = '';
+  }, 1600);
+});

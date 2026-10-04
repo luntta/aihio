@@ -391,6 +391,24 @@ a {
   gap: var(--aihio-spacing-2);
 }
 
+.docs-page-intro__meta,
+.docs-page-intro__intents {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-3);
+  margin: 0;
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-sm);
+}
+
+.docs-page-intro__intents > span {
+  font-size: var(--aihio-font-size-xs);
+  font-weight: var(--aihio-font-weight-medium);
+  letter-spacing: var(--aihio-letter-spacing-label);
+  text-transform: uppercase;
+}
+
 .docs-section-heading {
   display: flex;
   align-items: baseline;
@@ -448,7 +466,6 @@ a {
 
 .docs-feature-grid,
 .docs-component-grid,
-.docs-example-grid,
 .docs-stat-grid,
 .docs-surface-grid {
   display: grid;
@@ -465,14 +482,6 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
 }
 
-.docs-example-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
-}
-
-.docs-example-grid--single {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .docs-stat-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
 }
@@ -481,7 +490,6 @@ a {
    sample or table set the column width and push the page sideways. */
 .docs-feature-grid > *,
 .docs-component-grid > *,
-.docs-example-grid > *,
 .docs-stat-grid > *,
 .docs-surface-grid > *,
 .docs-detail-grid > *,
@@ -696,45 +704,43 @@ a {
    Example frames
    ========================================================================== */
 
+/* One column of examples, each a heading over a single frame: the preview on
+   the page canvas, the source under a hairline. A frame inside a card inside
+   a grid cell left a phone a third of its width for code. */
+.docs-examples {
+  display: grid;
+  gap: var(--aihio-spacing-10);
+}
+
 .docs-example {
-  display: flex;
-  flex-direction: column;
-  gap: var(--aihio-spacing-3);
   min-width: 0;
-  margin: 0;
-  padding: var(--aihio-spacing-4);
-  border: 1px solid var(--docs-hairline);
-  border-radius: var(--aihio-radius-surface);
-  background: var(--aihio-color-surface-bg);
+  scroll-margin-top: calc(var(--docs-topbar-height) + 1rem);
 }
 
-.docs-example--warning {
-  border-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 35%, transparent);
+.docs-example__title {
+  margin: 0 0 var(--aihio-spacing-1);
+  font-size: var(--aihio-font-size-base);
+  font-weight: var(--aihio-font-weight-semibold);
+  letter-spacing: var(--aihio-letter-spacing-heading);
 }
 
-.docs-example__head {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--aihio-spacing-2);
-}
-
-.docs-example__label,
-.docs-example__meta {
-  color: var(--aihio-color-muted-fg);
-  font-size: var(--aihio-font-size-xs);
-  font-weight: var(--aihio-font-weight-control);
-  letter-spacing: var(--aihio-letter-spacing-label);
-  text-transform: uppercase;
-}
-
-.docs-example__reason {
-  flex-basis: 100%;
-  margin: 0;
+.docs-example__description {
+  max-width: var(--docs-measure);
+  margin: 0 0 var(--aihio-spacing-3);
   color: var(--aihio-color-muted-fg);
   font-size: var(--aihio-font-size-sm);
   line-height: var(--aihio-line-height-relaxed);
   text-wrap: pretty;
+}
+
+.docs-example__title + .docs-example__frame {
+  margin-top: var(--aihio-spacing-3);
+}
+
+.docs-example__frame {
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--aihio-radius-surface);
+  background: var(--aihio-color-page-bg);
 }
 
 .docs-example__preview {
@@ -744,23 +750,43 @@ a {
      Components that should fill the row set their own width. */
   justify-items: start;
   gap: var(--aihio-spacing-4);
-  padding: var(--aihio-spacing-5);
-  border: 1px solid var(--docs-hairline);
-  border-radius: var(--aihio-radius-surface);
-  background: var(--aihio-color-page-bg);
+  padding: clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
   /* `clip` rather than `auto`: an `auto` on one axis blockifies the other, and
      that was cutting the tops off dropdown menus that are supposed to escape
      the frame. `clip` leaves the block axis genuinely visible. */
   overflow-x: clip;
   overflow-y: visible;
-  /* Overlays that escape the frame have to land on top of the code sample
-     below, which is a later sibling and would otherwise paint over them. */
+  /* Overlays that escape the frame have to land on top of the source below,
+     which is a later sibling and would otherwise paint over them. */
   position: relative;
   z-index: 1;
 }
 
-.docs-example__preview.is-warning {
-  border-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 35%, transparent);
+.docs-example__frame > .docs-code,
+.docs-example__frame > .docs-codeblock > .docs-code,
+.docs-example__source {
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-example__frame .docs-code {
+  margin: 0;
+  border: 0;
+  border-radius: 0 0 var(--aihio-radius-surface) var(--aihio-radius-surface);
+}
+
+.docs-example__source > summary {
+  padding: var(--aihio-spacing-3) var(--aihio-spacing-4);
+  font-size: var(--aihio-font-size-sm);
+  font-weight: var(--aihio-font-weight-medium);
+  cursor: pointer;
+}
+
+.docs-example__source > summary:hover {
+  background: var(--aihio-color-control-highlight-bg);
+}
+
+.docs-example__source[open] > summary {
+  border-bottom: 1px solid var(--docs-hairline);
 }
 
 /* What an example form or link would have done, printed by assets/docs.js in
@@ -768,9 +794,10 @@ a {
 .docs-result {
   display: grid;
   gap: var(--aihio-spacing-1);
+  margin: 0 var(--aihio-spacing-4) var(--aihio-spacing-4);
   padding: var(--aihio-spacing-3) var(--aihio-spacing-4);
   border: 1px dashed color-mix(in oklch, var(--aihio-color-field-border) 60%, transparent);
-  border-radius: var(--aihio-radius-surface);
+  border-radius: var(--aihio-radius-interactive);
   font-size: var(--aihio-font-size-sm);
 }
 
@@ -790,6 +817,12 @@ a {
   overflow-wrap: anywhere;
 }
 
+/* Code blocks ------------------------------------------------------------- */
+
+.docs-codeblock {
+  position: relative;
+}
+
 .docs-code {
   margin: var(--aihio-spacing-3) 0 0;
   padding: var(--aihio-spacing-4);
@@ -800,19 +833,66 @@ a {
   color: var(--aihio-color-page-fg);
 }
 
-.docs-example .docs-code {
+.docs-codeblock > .docs-code {
   margin-top: 0;
 }
 
+/* Long lines scroll rather than wrap: a wrapped line of markup breaks at the
+   hyphen in a tag name (</aihio- / button>), which reads as two tags. */
 .docs-code code {
   font-family: var(--aihio-font-family-code);
   font-size: 0.8125rem;
   line-height: 1.7;
-  /* Wrapped, not clipped. These samples are short markup lines, and a
-     horizontal scrollbar inside a card in a grid is a worse trade than a
-     wrapped line — indentation and line breaks both survive pre-wrap. */
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
+  white-space: pre;
+}
+
+/* Monochrome highlighting: tags carry weight, attribute names step back, and
+   values sit in between, so structure reads without a colour of its own. */
+.docs-code .hl-tag {
+  font-weight: var(--aihio-font-weight-semibold);
+}
+
+.docs-code .hl-attr,
+.docs-code .hl-punct,
+.docs-code .hl-comment {
+  color: var(--aihio-color-muted-fg);
+}
+
+.docs-code .hl-comment {
+  font-style: italic;
+}
+
+.docs-copy {
+  position: absolute;
+  top: var(--aihio-spacing-2);
+  right: var(--aihio-spacing-2);
+  z-index: 1;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--docs-hairline);
+  border-radius: var(--aihio-radius-interactive-compact);
+  background: var(--aihio-color-page-bg);
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+  font-weight: var(--aihio-font-weight-medium);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--aihio-duration-feedback) ease;
+}
+
+.docs-codeblock:hover .docs-copy,
+.docs-copy:focus-visible,
+.docs-copy[data-copied] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .docs-copy {
+    opacity: 1;
+  }
+}
+
+.docs-copy:hover {
+  color: var(--aihio-color-page-fg);
 }
 
 /* Inline code inside prose reads as a token, not as a block. */
@@ -822,6 +902,33 @@ a {
   background: var(--aihio-color-muted-bg);
   font-family: var(--aihio-font-family-code);
   font-size: 0.875em;
+}
+
+/* On this page ------------------------------------------------------------ */
+
+.docs-toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-toc a {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-sm);
+  text-decoration: none;
+}
+
+.docs-toc a:hover {
+  color: var(--aihio-color-page-fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.docs-content > section[id] {
+  scroll-margin-top: calc(var(--docs-topbar-height) + 1.5rem);
 }
 
 /* ==========================================================================

@@ -31,7 +31,7 @@ description: The intent vocabulary, and the components and patterns that declare
     {% for intent in docs.intents %}
       <div class="docs-intents__row" id="{{ intent.name }}">
         <dt><code>{{ intent.name }}</code></dt>
-        <dd class="docs-intents__meaning">{{ intent.description }}</dd>
+        <dd class="docs-intents__meaning">{{ intent.description | prose | safe }}</dd>
         <dd class="docs-intents__used">
           {% if intent.components.length %}
             <ul class="docs-intents__links" aria-label="Components">

@@ -10,34 +10,48 @@ eleventyComputed:
   description: "{{ component.description }}"
 ---
 <section class="docs-page-intro">
-  <div class="docs-eyebrow">
-    <aihio-badge>{{ component.tag }}</aihio-badge>
-    <aihio-badge variant="outline">v{{ component.version }}</aihio-badge>
-    {% for intent in component.intentsDetailed %}
-      <aihio-badge variant="secondary">{{ intent.name }}</aihio-badge>
-    {% endfor %}
-  </div>
+  <p class="docs-page-intro__meta">
+    <code>&lt;{{ component.tag }}&gt;</code>
+    <span>v{{ component.version }}</span>
+  </p>
   <h1>{{ component.name }}</h1>
-  <p>{{ component.description }}</p>
+  <p>{{ component.description | prose | safe }}</p>
+  <p class="docs-page-intro__intents">
+    <span>Intents</span>
+    {% for intent in component.intentsDetailed %}
+      <a class="docs-code-link" href="{{ ('/intents/#' + intent.name) | docsUrl(page.url) }}" title="{{ intent.description }}"><code>{{ intent.name }}</code></a>
+    {% endfor %}
+  </p>
 </section>
 
+<nav class="docs-toc" aria-label="On this page">
+  <ul>
+    {% if component.examplesDetailed.length %}<li><a href="#examples">Examples</a></li>{% endif %}
+    {% if component.counterExamplesDetailed.length %}<li><a href="#mistakes">Mistakes</a></li>{% endif %}
+    <li><a href="#api">API</a></li>
+    {% if component.subComponents.length %}<li><a href="#sub-components">Sub-components</a></li>{% endif %}
+    <li><a href="#accessibility">Accessibility</a></li>
+    {% if component.patternsUsing.length %}<li><a href="#patterns">In patterns</a></li>{% endif %}
+  </ul>
+</nav>
+
 {% if component.examplesDetailed.length %}
-  <section>
+  <section id="examples">
     <div class="docs-section-heading">
       <div>
-        <h2>Live examples</h2>
-        <p>Rendered live from the schema, with the authored source beneath each preview.</p>
+        <h2>Examples</h2>
+        <p>Each one rendered live, over the markup that produces it.</p>
       </div>
     </div>
 
-    <div class="docs-example-grid">
+    <div class="docs-examples">
       {% for example in component.examplesDetailed %}
-        {% set label = "Example" %}
+        {% set id = example.id %}
         {% set title = example.title %}
         {% set description = example.description %}
         {% set markup = example.previewMarkup %}
         {% set source = example.markup %}
-        {% set tone = "default" %}
+        {% set level = 3 %}
         {% include "partials/example-frame.njk" %}
       {% endfor %}
     </div>
@@ -45,22 +59,22 @@ eleventyComputed:
 {% endif %}
 
 {% if component.counterExamplesDetailed.length %}
-  <section>
+  <section id="mistakes">
     <div class="docs-section-heading">
       <div>
-        <h2>Counterexamples</h2>
+        <h2>Mistakes</h2>
         <p>Markup the runtime warns about and the linter rejects, with the reason it is wrong.</p>
       </div>
     </div>
 
-    <div class="docs-example-grid">
+    <div class="docs-examples">
       {% for example in component.counterExamplesDetailed %}
-        {% set label = "Counterexample" %}
+        {% set id = example.id %}
         {% set title = example.title %}
         {% set description = example.reason %}
         {% set markup = example.previewMarkup %}
         {% set source = example.markup %}
-        {% set tone = "warning" %}
+        {% set level = 3 %}
         {% include "partials/example-frame.njk" %}
       {% endfor %}
     </div>
@@ -110,7 +124,7 @@ eleventyComputed:
     {% for sub in component.subComponents %}
       <div class="docs-subcomponent" id="{{ sub.anchor }}">
         <h3><code>&lt;{{ sub.tag }}&gt;</code></h3>
-        <p class="docs-subcomponent__description">{{ sub.description }}</p>
+        <p class="docs-subcomponent__description">{{ sub.description | prose | safe }}</p>
         {% set api = sub %}
         {% set level = 4 %}
         {% include "partials/api-reference.njk" %}
@@ -137,9 +151,9 @@ eleventyComputed:
         <li class="docs-obligations__item">
           <p class="docs-obligations__when">
             <aihio-badge variant="{% if rule.severity == 'error' %}destructive{% else %}warning{% endif %}">{{ rule.severity }}</aihio-badge>
-            When {{ rule.when }}
+            When {{ rule.when | prose | safe }}
           </p>
-          <p class="docs-obligations__requirement">{{ rule.requirement }}</p>
+          <p class="docs-obligations__requirement">{{ rule.requirement | prose | safe }}</p>
           <p class="docs-obligations__rule">
             {% if rule.rule %}Checked as <code>{{ rule.rule }}</code>{% else %}Not machine-checkable: a judgment for the author.{% endif %}
           </p>
@@ -154,7 +168,7 @@ eleventyComputed:
   {% if component.handledA11y.length %}
     <ul class="docs-handled">
       {% for item in component.handledA11y %}
-        <li>{{ item }}</li>
+        <li>{{ item | prose | safe }}</li>
       {% endfor %}
     </ul>
   {% else %}

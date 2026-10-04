@@ -15,7 +15,7 @@
           {% endif %}
           {% if attribute.hasDefault %}<span class="docs-api__default">default <code>{{ attribute.defaultLabel }}</code></span>{% endif %}
         </dd>
-        <dd class="docs-api__description">{{ attribute.description }}</dd>
+        <dd class="docs-api__description">{{ attribute.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>
@@ -31,7 +31,7 @@
           <code>{{ property.type }}</code>
           {% if property.readonly %}<span class="docs-api__default">read-only</span>{% endif %}
         </dd>
-        <dd class="docs-api__description">{{ property.description }}</dd>
+        <dd class="docs-api__description">{{ property.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>
@@ -43,7 +43,7 @@
     {% for method in api.methodEntries %}
       <div class="docs-api__row docs-api__row--wide">
         <dt><code>{{ method.signature }}</code></dt>
-        <dd class="docs-api__description">{{ method.description }}</dd>
+        <dd class="docs-api__description">{{ method.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>
@@ -62,7 +62,7 @@
           {% endif %}
           {% if event.cancelable %}<span class="docs-api__default">cancelable</span>{% endif %}
         </dd>
-        <dd class="docs-api__description">{{ event.description }}</dd>
+        <dd class="docs-api__description">{{ event.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>
@@ -77,7 +77,7 @@
         {% if slot.accepts %}
           <dd class="docs-api__type"><span class="docs-api__kind">accepts</span>{% for accepted in slot.accepts %}<code>{{ accepted }}</code>{% endfor %}</dd>
         {% endif %}
-        <dd class="docs-api__description">{{ slot.description }}</dd>
+        <dd class="docs-api__description">{{ slot.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>
@@ -93,7 +93,7 @@
     {% for command in api.commandEntries %}
       <div class="docs-api__row">
         <dt><code>{{ command.name }}</code></dt>
-        <dd class="docs-api__description">{{ command.description }}</dd>
+        <dd class="docs-api__description">{{ command.description | prose | safe }}</dd>
       </div>
     {% endfor %}
   </dl>

@@ -244,7 +244,7 @@ const components = schema.components
         id: `${slug}-counter-example-${index + 1}`,
         ...example,
         previewMarkup: toPreviewMarkup(example.markup, `${slug}-counter-example-${index + 1}`),
-        title: `Counterexample ${index + 1}`,
+        title: example.rule ? `Caught as ${example.rule}` : "A judgment call the linter can't make",
       })),
       handledA11y: component.a11yContract?.handled ?? [],
       requiredA11y: component.a11yContract?.required ?? [],
