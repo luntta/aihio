@@ -15,26 +15,26 @@ export default {
     aihio-input input {
       display: flex;
       width: 100%;
-      height: var(--input-height-md);
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      height: var(--aihio-input-height-md);
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding: var(--spacing-intent-field-padding-block) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      padding: var(--aihio-spacing-field-padding-block) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-input input::placeholder {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-input input:focus-visible {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     aihio-input input:disabled {
@@ -44,23 +44,23 @@ export default {
 
     /* Sizes */
     aihio-input[size="sm"] input {
-      height: var(--input-height-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      padding: var(--spacing-intent-field-padding-block-sm) var(--spacing-intent-field-padding-inline-sm);
+      height: var(--aihio-input-height-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      padding: var(--aihio-spacing-field-padding-block-sm) var(--aihio-spacing-field-padding-inline-sm);
     }
     aihio-input[size="lg"] input {
-      height: var(--input-height-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      padding: var(--spacing-intent-field-padding-block-lg) var(--spacing-intent-field-padding-inline-lg);
+      height: var(--aihio-input-height-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      padding: var(--aihio-spacing-field-padding-block-lg) var(--aihio-spacing-field-padding-inline-lg);
     }
 
     /* Error state */
     aihio-input[error] input {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
     aihio-input[error] input:focus-visible {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     @media (forced-colors: active) {

@@ -17,7 +17,7 @@ const PROMPT_DEFINITION = {
   name: PROMPT_NAME,
   title: 'Aihio authoring guide',
   description:
-    'The canonical prompt fragment for generating Aihio markup: strategy, authoring rules, component inventory, intent map, pattern inventory, accessibility obligations, hard rules from counterexamples, and the intent-token vocabulary.',
+    'The canonical prompt fragment for generating Aihio markup: strategy, authoring rules, component inventory, intent map, pattern inventory, accessibility obligations, hard rules from counterexamples, and the semantic token vocabulary.',
 };
 
 const NO_ARGUMENTS = { type: 'object', properties: {}, additionalProperties: false };

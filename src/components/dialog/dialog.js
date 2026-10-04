@@ -34,16 +34,16 @@ export class AihioDialog extends AihioElement {
 
     .panel {
       width: 100%;
-      max-width: var(--dialog-width);
-      max-height: calc(100dvh - (var(--spacing-intent-stack-md) * 2));
+      max-width: var(--aihio-dialog-width);
+      max-height: calc(100dvh - (var(--aihio-spacing-stack-md) * 2));
       overflow-y: auto;
-      border-radius: var(--radius-intent-surface);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      background-color: oklch(var(--color-intent-surface-bg));
-      color: oklch(var(--color-intent-surface-fg));
-      padding: var(--dialog-padding);
-      box-shadow: var(--shadow-intent-modal);
-      animation: dialog-in var(--duration-intent-overlay) ease;
+      border-radius: var(--aihio-radius-surface);
+      border: 1px solid var(--aihio-color-border-subtle);
+      background-color: var(--aihio-color-surface-bg);
+      color: var(--aihio-color-surface-fg);
+      padding: var(--aihio-dialog-padding);
+      box-shadow: var(--aihio-shadow-modal);
+      animation: dialog-in var(--aihio-duration-overlay) ease;
       outline: none;
       overscroll-behavior: contain;
       margin: auto;
@@ -54,13 +54,13 @@ export class AihioDialog extends AihioElement {
     }
 
     .panel::backdrop {
-      background-color: oklch(var(--color-intent-overlay-scrim));
+      background-color: var(--aihio-color-overlay-scrim);
     }
 
     @keyframes dialog-in {
       from {
         opacity: 0;
-        transform: scale(0.95) translateY(var(--spacing-intent-control-gap));
+        transform: scale(0.95) translateY(var(--aihio-spacing-control-gap));
       }
       to {
         opacity: 1;
@@ -77,15 +77,15 @@ export class AihioDialog extends AihioElement {
     ::slotted(aihio-dialog-header) {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      margin-bottom: var(--spacing-intent-stack-md);
+      gap: var(--aihio-spacing-stack-tight);
+      margin-bottom: var(--aihio-spacing-stack-md);
     }
 
     ::slotted(aihio-dialog-footer) {
       display: flex;
       justify-content: flex-end;
-      gap: var(--spacing-intent-control-gap);
-      margin-top: var(--spacing-intent-stack-lg);
+      gap: var(--aihio-spacing-control-gap);
+      margin-top: var(--aihio-spacing-stack-lg);
     }
 
     @media (forced-colors: active) {

@@ -9,15 +9,15 @@ export default {
     aihio-dropdown-item {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      border-radius: var(--radius-intent-interactive-compact);
-      font-size: var(--fontSize-intent-control);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
+      font-size: var(--aihio-font-size-control);
       cursor: pointer;
       user-select: none;
       outline: none;
-      transition: background-color var(--duration-intent-feedback-fast) ease,
-                  color var(--duration-intent-feedback-fast) ease;
+      transition: background-color var(--aihio-duration-feedback-fast) ease,
+                  color var(--aihio-duration-feedback-fast) ease;
     }
 
     /* A link item: the <a> is the menuitem, so it carries the row's padding
@@ -30,8 +30,8 @@ export default {
       display: flex;
       flex: 1;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
       border-radius: inherit;
       color: inherit;
       text-decoration: none;
@@ -42,8 +42,8 @@ export default {
     aihio-dropdown-item:hover,
     aihio-dropdown-item:focus-visible,
     aihio-dropdown-item:has(> a:focus-visible) {
-      background-color: oklch(var(--color-intent-overlay-highlight-bg));
-      color: oklch(var(--color-intent-overlay-fg));
+      background-color: var(--aihio-color-overlay-highlight-bg);
+      color: var(--aihio-color-overlay-fg);
     }
 
     aihio-dropdown-item[disabled] {
@@ -73,8 +73,8 @@ export default {
     aihio-dropdown-separator {
       display: block;
       height: 1px;
-      background-color: oklch(var(--color-intent-border-subtle));
-      margin: var(--spacing-intent-cluster-gap-tight) calc(var(--spacing-intent-cluster-gap-tight) * -1);
+      background-color: var(--aihio-color-border-subtle);
+      margin: var(--aihio-spacing-cluster-gap-tight) calc(var(--aihio-spacing-cluster-gap-tight) * -1);
     }
   `,
 };

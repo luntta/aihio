@@ -16,38 +16,83 @@ test('dist CSS includes generated light DOM component styles', () => {
   assert.match(css, /aihio-dropdown-item/);
 });
 
-test('dist CSS exposes intent tokens and component styles consume them', () => {
+test('dist CSS exposes semantic tokens and component styles consume them', () => {
   const css = readFileSync(resolve(root, 'dist/aihio.css'), 'utf8');
 
-  assert.match(css, /--color-zinc-900:\s*\.?2316 \.?0038 286;/);
-  assert.match(css, /--color-red-500:\s*\.?63 \.?196 25;/);
+  // Colours are full values, so a token is usable as written: var(--…).
+  assert.match(css, /--aihio-color-zinc-900:\s*oklch\(0?\.2316 0?\.0038 286\)/);
+  assert.match(css, /--aihio-color-red-500:\s*oklch\(0?\.63 0?\.196 25\)/);
 
   // The neutral ramp runs to true white and true black, so a page canvas is
   // untinted in both themes rather than a very light or very dark grey.
-  assert.match(css, /--color-zinc-0:\s*1 0 0;/);
-  assert.match(css, /--color-zinc-1000:\s*0 0 0;/);
-  assert.match(css, /--background:\s*var\(--color-zinc-0\)/);
-  assert.match(css, /--card:\s*var\(--color-zinc-50\)/);
+  assert.match(css, /--aihio-color-zinc-0:\s*oklch\(1 0 0\)/);
+  assert.match(css, /--aihio-color-zinc-1000:\s*oklch\(0 0 0\)/);
+  assert.match(css, /--aihio-color-page-bg:\s*var\(--aihio-color-zinc-0\)/);
+  assert.match(css, /--aihio-color-surface-bg:\s*var\(--aihio-color-zinc-50\)/);
+  assert.match(css, /--aihio-color-primary-action-bg:\s*var\(--aihio-color-zinc-900\)/);
 
   // Typography is tokenised too: components must not hardcode a font stack or
   // a tracking value.
-  assert.match(css, /--fontFamily-intent-body:\s*var\(--fontFamily-sans\)/);
-  assert.match(css, /--letterSpacing-intent-heading:\s*var\(--letterSpacing-heading\)/);
-  assert.match(css, /--color-intent-action-primary-bg:\s*var\(--primary\)/);
-  assert.match(css, /--spacing-intent-control-gap:\s*var\(--spacing-2\)/);
-  assert.match(css, /--radius-intent-interactive:\s*var\(--radius-md\)/);
-  assert.match(css, /oklch\(var\(--color-intent-action-primary-bg\)\)/);
-  assert.match(css, /var\(--spacing-intent-control-gap\)/);
-  assert.match(css, /var\(--radius-intent-surface\)/);
+  assert.match(css, /--aihio-font-family-body:\s*var\(--aihio-font-family-sans\)/);
+  assert.match(css, /--aihio-letter-spacing-heading:\s*var\(--aihio-letter-spacing-tight\)/);
+  assert.match(css, /--aihio-spacing-control-gap:\s*var\(--aihio-spacing-2\)/);
+  assert.match(css, /--aihio-spacing-stack-tight:\s*var\(--aihio-spacing-1-5\)/);
+  assert.match(css, /--aihio-radius-interactive:\s*var\(--aihio-radius-md\)/);
+  assert.match(css, /--aihio-radius-md:\s*calc\(var\(--aihio-radius-base\) - 2px\)/);
+
+  assert.match(css, /background-color:\s*var\(--aihio-color-primary-action-bg\)/);
+  assert.match(css, /color-mix\(in oklch,\s*var\(--aihio-color-primary-action-bg\) 90%,\s*transparent\)/);
+  assert.match(css, /var\(--aihio-spacing-control-gap\)/);
+  assert.match(css, /var\(--aihio-radius-surface\)/);
 });
 
-test('intent token vocabulary markdown is generated into dist', () => {
-  const doc = readFileSync(resolve(root, 'dist/intent-tokens.md'), 'utf8');
+test('semantic token references are generated into dist, as markdown and as JSON', () => {
+  const doc = readFileSync(resolve(root, 'dist/semantic-tokens.md'), 'utf8');
+  assert.match(doc, /^# Aihio Semantic Tokens/m);
+  assert.match(doc, /`--aihio-color-primary-action-bg`/);
+  assert.match(doc, /`--aihio-spacing-form-field-gap`/);
+  assert.match(doc, /`--aihio-radius-interactive`/);
 
-  assert.match(doc, /^# Aihio Intent Tokens/m);
-  assert.match(doc, /`color\.intent\.action-primary-bg`/);
-  assert.match(doc, /`spacing\.intent\.form-field-gap`/);
-  assert.match(doc, /`radius\.intent\.interactive`/);
+  const reference = JSON.parse(readFileSync(resolve(root, 'dist/tokens.json'), 'utf8'));
+  const byName = new Map(reference.tokens.map((token) => [token.name, token]));
+  assert.deepEqual(byName.get('--aihio-color-page-bg').value, { light: 'oklch(1 0 0)', dark: 'oklch(0 0 0)' });
+  assert.equal(byName.get('--aihio-spacing-stack-md').value, '1rem');
+  assert.deepEqual(byName.get('--aihio-spacing-stack-md').references, ['--aihio-spacing-4']);
+  assert.equal(byName.get('--aihio-radius-md').value, 'calc(0.5rem - 2px)');
+  assert.equal(reference.contrast.length, 16);
+  for (const pair of reference.contrast) {
+    assert.ok(pair.ratio.light >= pair.min && pair.ratio.dark >= pair.min, `${pair.id} meets ${pair.min}:1`);
+  }
+});
+
+// The token contract. A custom property is the one API that fails silently:
+// var(--aihio-spacing-2.5) is a parse error that drops the whole declaration,
+// and a colour stored as bare channels breaks the moment someone writes the
+// obvious var(--…). So every name Aihio defines is --aihio-<lowercase-kebab>,
+// every var() it reads (and the docs site reads) is defined somewhere, and no
+// colour is wrapped around a variable.
+test('every custom property is --aihio-kebab-case, and every var() resolves', () => {
+  const sources = Object.fromEntries(
+    ['dist/aihio.css', 'dist/aihio.js', 'site/assets/docs.css'].map((path) => [path, readFileSync(resolve(root, path), 'utf8')])
+  );
+  const defined = new Set();
+  for (const text of Object.values(sources)) {
+    // A declaration, not a BEM modifier in a selector (.card--link:hover).
+    for (const [, name] of text.matchAll(/(?<![\w-])(--[A-Za-z0-9_\\.-]+)\s*:/g)) defined.add(name);
+    for (const [, name] of text.matchAll(/setProperty\(\s*["'`](--[^"'`]+)["'`]/g)) defined.add(name);
+  }
+
+  for (const name of defined) {
+    if (name.startsWith('--docs-')) continue;
+    assert.match(name, /^--aihio-[a-z0-9]+(?:-[a-z0-9]+)*$/, `${name} is not --aihio-<lowercase-kebab>`);
+  }
+
+  for (const [path, text] of Object.entries(sources)) {
+    for (const [, name] of text.matchAll(/var\(\s*(--[^,)\s]+)/g)) {
+      assert.ok(defined.has(name), `${path} reads ${name}, which nothing defines`);
+    }
+    assert.doesNotMatch(text, /oklch\(\s*var\(/, `${path} wraps a variable in oklch(); colour tokens are full values`);
+  }
 });
 
 test('schema output is sorted and includes all components', () => {
@@ -156,8 +201,8 @@ test('canonical prompt fragment is generated as markdown and as an importable mo
   assert.match(promptMarkdown, /`auth-form` -/);
   assert.match(promptMarkdown, /^## Hard Rules from Counterexamples/m);
   assert.match(promptMarkdown, /variant="primary"/);
-  assert.match(promptMarkdown, /^## Token Intent Vocabulary/m);
-  assert.match(promptMarkdown, /`color\.intent\.action-primary-bg` - Default filled action background\./);
+  assert.match(promptMarkdown, /^## Semantic Token Vocabulary/m);
+  assert.match(promptMarkdown, /`--aihio-color-primary-action-bg` - Default filled action background\./);
   assert.equal(prompt, promptMarkdown, 'prompt module default export matches the generated markdown');
   assert.match(promptTypes, /declare const prompt: string;/);
 });
@@ -473,9 +518,7 @@ test('palette meets its contrast contract in both themes', async () => {
 
   for (const theme of ['light', 'dark']) {
     const colors = Object.fromEntries(
-      Object.entries(semantic[theme])
-        .filter(([, token]) => token?.$type === 'color')
-        .map(([name, token]) => [name, resolveValue(token.$value)])
+      Object.entries(semantic[theme].color).map(([name, token]) => [name, resolveValue(token.$value)])
     );
 
     for (const result of checkTheme(theme, colors)) {
@@ -521,11 +564,11 @@ test('reduced motion collapses transition timings but not the spinner', () => {
   const css = readFileSync(resolve(root, 'src/css/tokens.css'), 'utf8');
   const block = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
 
-  assert.match(block, /--duration-intent-feedback:\s*1ms;/);
-  assert.match(block, /--duration-intent-overlay:\s*1ms;/);
+  assert.match(block, /--aihio-duration-feedback:\s*1ms;/);
+  assert.match(block, /--aihio-duration-overlay:\s*1ms;/);
   assert.doesNotMatch(
     block,
-    /--duration-intent-spinner:/,
+    /--aihio-duration-spinner:/,
     'a 1ms infinite rotation is a strobe; the spinner is stopped at its declaration instead'
   );
 });

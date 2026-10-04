@@ -11,13 +11,13 @@ export default {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
     }
 
-    aihio-cluster[gap="tight"] { gap: var(--spacing-intent-cluster-gap-tight); }
-    aihio-cluster[gap="sm"]    { gap: var(--spacing-intent-control-gap); }
-    aihio-cluster[gap="md"]    { gap: var(--spacing-intent-stack-sm); }
-    aihio-cluster[gap="lg"]    { gap: var(--spacing-intent-stack-md); }
+    aihio-cluster[gap="tight"] { gap: var(--aihio-spacing-cluster-gap-tight); }
+    aihio-cluster[gap="sm"]    { gap: var(--aihio-spacing-control-gap); }
+    aihio-cluster[gap="md"]    { gap: var(--aihio-spacing-stack-sm); }
+    aihio-cluster[gap="lg"]    { gap: var(--aihio-spacing-stack-md); }
 
     aihio-cluster[align="start"]    { align-items: flex-start; }
     aihio-cluster[align="center"]   { align-items: center; }

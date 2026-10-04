@@ -20,51 +20,51 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       font-family: inherit;
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      height: var(--button-height-md);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      height: var(--aihio-button-height-md);
       margin: 0;
-      padding-inline: var(--button-padding-x-md);
+      padding-inline: var(--aihio-button-padding-x-md);
       border: 1px solid transparent;
       appearance: none;
       cursor: pointer;
       user-select: none;
       background-color: transparent;
-      color: oklch(var(--color-intent-surface-muted-fg));
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease;
+      color: var(--aihio-color-muted-fg);
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease;
     }
 
     ${box('', ':hover')} {
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      color: oklch(var(--color-intent-surface-muted-fg));
+      background-color: var(--aihio-color-muted-bg);
+      color: var(--aihio-color-muted-fg);
     }
 
     ${box('[pressed]')} {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     ${box('[variant="outline"]')} {
-      border-color: oklch(var(--color-intent-border-subtle));
+      border-color: var(--aihio-color-border-subtle);
     }
     ${box('[variant="outline"][pressed]')} {
-      background-color: oklch(var(--color-intent-action-accent-bg));
+      background-color: var(--aihio-color-control-highlight-bg);
     }
 
     /* Sizes */
     ${box('[size="sm"]')} {
-      height: var(--button-height-sm);
-      padding-inline: var(--button-padding-x-sm);
+      height: var(--aihio-button-height-sm);
+      padding-inline: var(--aihio-button-padding-x-sm);
     }
     ${box('[size="lg"]')} {
-      height: var(--button-height-lg);
-      padding-inline: var(--button-padding-x-lg);
+      height: var(--aihio-button-height-lg);
+      padding-inline: var(--aihio-button-padding-x-lg);
     }
 
     /* :disabled rather than the host attribute, so <fieldset disabled> — which
@@ -76,7 +76,7 @@ export default {
     }
 
     ${box('', ':focus-visible')} {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 

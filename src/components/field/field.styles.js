@@ -9,26 +9,26 @@ export default {
     aihio-field {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-form-field-gap);
+      gap: var(--aihio-spacing-form-field-gap);
     }
 
     aihio-field [slot="label"] {
-      font-size: var(--fontSize-intent-control-sm);
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      color: oklch(var(--color-intent-page-fg));
+      font-size: var(--aihio-font-size-control-sm);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      color: var(--aihio-color-page-fg);
     }
 
     aihio-field [slot="description"] {
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-field [slot="error"] {
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-state-destructive-text));
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-destructive-text);
     }
 
     /* The description is redundant once an error is showing: the error message
@@ -44,8 +44,8 @@ export default {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      column-gap: var(--spacing-intent-stack-md);
-      row-gap: var(--spacing-intent-form-field-gap);
+      column-gap: var(--aihio-spacing-stack-md);
+      row-gap: var(--aihio-spacing-form-field-gap);
     }
 
     aihio-field:has(> aihio-switch) > * {
@@ -65,38 +65,38 @@ export default {
       box-sizing: border-box;
       width: 100%;
       margin: 0;
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding: var(--spacing-intent-field-padding-block) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      padding: var(--aihio-spacing-field-padding-block) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-field > textarea {
-      min-height: calc(var(--input-height-md) * 2);
+      min-height: calc(var(--aihio-input-height-md) * 2);
       resize: vertical;
     }
 
     aihio-field > textarea::placeholder {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     /* The chevron is two gradient triangles in currentColor, so it follows the
        theme and forced colours without an image. */
     aihio-field > select {
       appearance: none;
-      height: var(--input-height-md);
-      padding-inline-end: calc(var(--spacing-intent-field-padding-inline) + 1.25rem);
+      height: var(--aihio-input-height-md);
+      padding-inline-end: calc(var(--aihio-spacing-field-padding-inline) + 1.25rem);
       background-image:
         linear-gradient(45deg, transparent 50%, currentColor 50%),
         linear-gradient(135deg, currentColor 50%, transparent 50%);
       background-position:
-        right calc(var(--spacing-intent-field-padding-inline) + 5px) center,
-        right var(--spacing-intent-field-padding-inline) center;
+        right calc(var(--aihio-spacing-field-padding-inline) + 5px) center,
+        right var(--aihio-spacing-field-padding-inline) center;
       background-size: 5px 5px;
       background-repeat: no-repeat;
       cursor: pointer;
@@ -104,25 +104,25 @@ export default {
 
     aihio-field > select:dir(rtl) {
       background-position:
-        left var(--spacing-intent-field-padding-inline) center,
-        left calc(var(--spacing-intent-field-padding-inline) + 5px) center;
+        left var(--aihio-spacing-field-padding-inline) center,
+        left calc(var(--aihio-spacing-field-padding-inline) + 5px) center;
     }
 
     aihio-field > textarea:focus-visible,
     aihio-field > select:focus-visible {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     aihio-field[error] > textarea,
     aihio-field[error] > select {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
 
     aihio-field[error] > textarea:focus-visible,
     aihio-field[error] > select:focus-visible {
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     aihio-field > textarea:disabled,

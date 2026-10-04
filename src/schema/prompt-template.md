@@ -7,7 +7,7 @@ Use this fragment when you want an AI system to generate Aihio UI quickly and co
 - Match user intent to components before thinking about visual styling.
 - Start from a seeded pattern when the request already resembles auth, settings, empty states, destructive confirmations, tabbed settings, inline validation, or toast alerts.
 - Use native HTML for document semantics around Aihio custom elements.
-- Prefer intent tokens and `data-aihio-intent` annotations when you need to explain meaning.
+- When markup needs CSS of its own, use the semantic tokens below (`var(--aihio-color-muted-fg)`, `var(--aihio-spacing-stack-md)`), never raw colours or pixel values. `data-aihio-intent` annotations say what an element is for.
 - Adapt existing variants, sizes, slots, and compositions instead of inventing new APIs.
 
 ## Authoring Rules

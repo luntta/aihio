@@ -27,7 +27,7 @@ export default function(eleventyConfig) {
   eleventyConfig.addWatchTarget('./dist/**/*');
   eleventyConfig.addWatchTarget('./site/assets/**/*');
   eleventyConfig.addWatchTarget('./package.json');
-  eleventyConfig.addWatchTarget('./docs/intent-tokens.md');
+  eleventyConfig.addWatchTarget('./docs/tokens.json');
 
   eleventyConfig.addFilter('componentUrl', (component) => {
     const tag = typeof component === 'string' ? component : component?.tag ?? component?.$component;

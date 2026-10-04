@@ -1,18 +1,19 @@
 ---
 layout: layouts/base.njk
-title: Token Foundations
-description: Intent tokens and schema-linked design foundations in Aihio.
+title: Semantic tokens
+description: The semantic design tokens Aihio components are styled with.
 ---
 <section class="docs-page-intro">
   <div class="docs-eyebrow">
     <aihio-badge>Foundations</aihio-badge>
-    <aihio-badge variant="outline">{{ docs.intentCount }} intents</aihio-badge>
+    <aihio-badge variant="outline">{{ docs.semanticTokenCount }} semantic tokens</aihio-badge>
   </div>
-  <h1>Intent tokens</h1>
+  <h1>Semantic tokens</h1>
   <p>
-    Primitive values flow into semantic roles, semantic roles into intent-facing variables, and only then into
-    component decisions. Components ask for meaning — <code>surface-bg</code>, <code>stack-md</code> — never for a
-    position on a scale. Everything below is generated from <code>tokens/intent.json</code>.
+    Primitive scales give values, semantic tokens give them a purpose, and components read only the purpose:
+    <code>--aihio-color-surface-bg</code>, <code>--aihio-spacing-stack-md</code>, never a position on a scale. Every
+    name is <code>--aihio-&lt;group&gt;-&lt;name&gt;</code>, and everything below is generated from
+    <code>tokens/semantic.json</code>.
   </p>
 </section>
 
@@ -34,7 +35,7 @@ description: Intent tokens and schema-linked design foundations in Aihio.
   </dl>
 </section>
 
-{% for group in docs.intentTokenGroups %}
+{% for group in docs.semanticTokenGroups %}
   <section>
     <div class="docs-section-heading">
       <div>
@@ -59,7 +60,7 @@ description: Intent tokens and schema-linked design foundations in Aihio.
             <tr>
               {% if group.name == 'color' %}
                 <td class="docs-table__swatch-cell">
-                  <span class="docs-swatch" style="background: oklch(var({{ token.variable }}))"></span>
+                  <span class="docs-swatch" style="background: var({{ token.variable }})"></span>
                 </td>
               {% endif %}
               <td><code>{{ token.variable }}</code></td>
@@ -77,8 +78,11 @@ description: Intent tokens and schema-linked design foundations in Aihio.
   <div class="docs-section-heading">
     <div>
       <h2>Generated artifact</h2>
-      <p>The same markdown reference ships inside the package, so agents read the vocabulary without scraping this site.</p>
+      <p>The same reference ships inside the package, as markdown and as JSON with resolved values for both themes, so agents read it without scraping this site.</p>
     </div>
-    <a class="docs-inline-link" href="{{ '/dist/intent-tokens.md' | docsUrl(page.url) }}">Open intent-tokens.md</a>
+    <aihio-cluster>
+      <a class="docs-inline-link" href="{{ '/dist/semantic-tokens.md' | docsUrl(page.url) }}">semantic-tokens.md</a>
+      <a class="docs-inline-link" href="{{ '/dist/tokens.json' | docsUrl(page.url) }}">tokens.json</a>
+    </aihio-cluster>
   </div>
 </section>

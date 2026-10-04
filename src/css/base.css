@@ -4,16 +4,16 @@
 @import './pre-upgrade.css';
 
 body {
-  font-family: var(--fontFamily-intent-body);
-  font-size: var(--fontSize-intent-body);
-  font-weight: var(--fontWeight-intent-body);
-  line-height: var(--lineHeight-intent-body);
-  letter-spacing: var(--letterSpacing-intent-body);
-  color: oklch(var(--color-intent-page-fg));
-  background-color: oklch(var(--color-intent-page-bg));
+  font-family: var(--aihio-font-family-body);
+  font-size: var(--aihio-font-size-body);
+  font-weight: var(--aihio-font-weight-body);
+  line-height: var(--aihio-line-height-body);
+  letter-spacing: var(--aihio-letter-spacing-body);
+  color: var(--aihio-color-page-fg);
+  background-color: var(--aihio-color-page-bg);
   /* Native checkboxes, radios, and range inputs — which Aihio leaves to the
      platform — take the primary action colour, so they belong to the theme. */
-  accent-color: oklch(var(--color-intent-action-primary-bg));
+  accent-color: var(--aihio-color-primary-action-bg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -23,12 +23,12 @@ code,
 kbd,
 samp,
 pre {
-  font-family: var(--fontFamily-intent-code);
+  font-family: var(--aihio-font-family-code);
   letter-spacing: 0;
 }
 
 :focus-visible {
-  outline: 2px solid oklch(var(--color-intent-focus-ring));
+  outline: 2px solid var(--aihio-color-focus-ring);
   outline-offset: 2px;
 }
 

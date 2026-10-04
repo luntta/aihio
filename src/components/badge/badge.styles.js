@@ -9,47 +9,47 @@ export default {
     aihio-badge {
       display: inline-flex;
       align-items: center;
-      border-radius: var(--radius-intent-pill);
-      padding: var(--badge-padding-y) var(--badge-padding-x);
-      font-size: var(--fontSize-intent-badge);
-      font-weight: var(--fontWeight-intent-badge);
-      line-height: var(--lineHeight-intent-compact);
+      border-radius: var(--aihio-radius-pill);
+      padding: var(--aihio-badge-padding-y) var(--aihio-badge-padding-x);
+      font-size: var(--aihio-font-size-badge);
+      font-weight: var(--aihio-font-weight-badge);
+      line-height: var(--aihio-line-height-compact);
       border: 1px solid transparent;
       white-space: nowrap;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease;
     }
 
     aihio-badge:not([variant]),
     aihio-badge[variant="default"] {
-      background-color: oklch(var(--color-intent-action-primary-bg));
-      color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-bg);
+      color: var(--aihio-color-primary-action-fg);
     }
 
     aihio-badge[variant="secondary"] {
-      background-color: oklch(var(--color-intent-action-secondary-bg));
-      color: oklch(var(--color-intent-action-secondary-fg));
+      background-color: var(--aihio-color-secondary-action-bg);
+      color: var(--aihio-color-secondary-action-fg);
     }
 
     aihio-badge[variant="outline"] {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
-      border-color: oklch(var(--color-intent-border-subtle));
+      color: var(--aihio-color-page-fg);
+      border-color: var(--aihio-color-border-subtle);
     }
 
     aihio-badge[variant="destructive"] {
-      background-color: oklch(var(--color-intent-state-destructive-bg));
-      color: oklch(var(--color-intent-state-destructive-fg));
+      background-color: var(--aihio-color-destructive-bg);
+      color: var(--aihio-color-destructive-fg);
     }
 
     aihio-badge[variant="success"] {
-      background-color: oklch(var(--color-intent-state-success-bg));
-      color: oklch(var(--color-intent-state-success-fg));
+      background-color: var(--aihio-color-success-bg);
+      color: var(--aihio-color-success-fg);
     }
 
     aihio-badge[variant="warning"] {
-      background-color: oklch(var(--color-intent-state-warning-bg));
-      color: oklch(var(--color-intent-state-warning-fg));
+      background-color: var(--aihio-color-warning-bg);
+      color: var(--aihio-color-warning-fg);
     }
 
     /* Every variant collapses to the same fill under forced colours, so give

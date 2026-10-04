@@ -6,7 +6,7 @@ import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
 const root = resolve(import.meta.dirname, '..', '..');
 const schemaPath = resolve(root, 'dist/schema.json');
 const packagePath = resolve(root, 'package.json');
-const intentTokensPath = resolve(root, 'docs/intent-tokens.md');
+const tokensPath = resolve(root, 'dist/tokens.json');
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -82,49 +82,11 @@ function hasAncestor(node, tagName) {
   return false;
 }
 
-/**
- * The generated intent-token reference is a markdown document of pipe tables.
- * Rendering it as preformatted text put a four-column table inside a <pre>,
- * which is the single least responsive thing a page can contain. Parsing it
- * back into rows lets the page render real tables that reflow and scroll.
- */
-function parseIntentTokenGroups(markdown) {
-  const groups = [];
-  let group = null;
-
-  for (const line of markdown.split('\n')) {
-    const heading = line.match(/^##\s+(.+)$/);
-    if (heading) {
-      group = { name: heading[1].trim(), intro: '', tokens: [] };
-      groups.push(group);
-      continue;
-    }
-
-    if (!group) continue;
-
-    const cells = line.trim().startsWith('|')
-      ? line.trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim())
-      : null;
-
-    if (!cells) {
-      const text = line.trim();
-      if (text && !group.intro) group.intro = text;
-      continue;
-    }
-
-    // Skip the header row and the |---|---| separator beneath it.
-    if (cells[0] === 'Token' || cells.every((cell) => /^-+$/.test(cell))) continue;
-
-    const [token, variable, source, description] = cells;
-    group.tokens.push({
-      token: token.replace(/`/g, ''),
-      variable: variable.replace(/`/g, ''),
-      source: source.replace(/`/g, ''),
-      description,
-    });
-  }
-
-  return groups.filter((entry) => entry.tokens.length > 0);
+/** A token's source, as the CSS variables it reads (per theme for colours). */
+function formatTokenSource(token) {
+  const list = (references, value) => (references.length > 0 ? references.join(', ') : value);
+  if (Array.isArray(token.references)) return list(token.references, token.value);
+  return `light: ${list(token.references.light, token.value.light)} · dark: ${list(token.references.dark, token.value.dark)}`;
 }
 
 if (!existsSync(schemaPath)) {
@@ -133,7 +95,21 @@ if (!existsSync(schemaPath)) {
 
 const schema = readJson(schemaPath);
 const pkg = readJson(packagePath);
-const intentTokensMarkdown = readFileSync(intentTokensPath, 'utf8');
+const tokens = readJson(tokensPath);
+
+const semanticTokenGroups = Object.entries(tokens.groups)
+  .map(([name, intro]) => ({
+    name,
+    intro,
+    tokens: tokens.tokens
+      .filter((token) => token.tier === 'semantic' && token.group === name)
+      .map((token) => ({
+        variable: token.name,
+        source: formatTokenSource(token),
+        description: token.description ?? '',
+      })),
+  }))
+  .filter((group) => group.tokens.length > 0);
 
 const rawPatterns = schema.patterns.map((pattern) => ({
   ...pattern,
@@ -257,6 +233,7 @@ export default {
     name,
     description,
   })),
-  intentTokensMarkdown,
-  intentTokenGroups: parseIntentTokenGroups(intentTokensMarkdown),
+  tokens,
+  semanticTokenGroups,
+  semanticTokenCount: semanticTokenGroups.reduce((count, group) => count + group.tokens.length, 0),
 };

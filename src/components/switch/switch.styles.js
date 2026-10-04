@@ -22,8 +22,8 @@ export default {
     aihio-switch:not(:defined) {
       width: var(--aihio-switch-width);
       height: var(--aihio-switch-height);
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-field-border);
     }
 
     /* The checkbox is the track and its ::before the thumb, so the element
@@ -40,10 +40,10 @@ export default {
       height: var(--aihio-switch-height);
       margin: 0;
       border: 1px solid transparent;
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-field-border);
       cursor: pointer;
-      transition: background-color var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease;
     }
 
     aihio-switch > input::before {
@@ -53,23 +53,23 @@ export default {
       inset-inline-start: var(--aihio-switch-inset);
       width: var(--aihio-switch-thumb);
       height: var(--aihio-switch-thumb);
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-page-bg));
-      box-shadow: var(--shadow-intent-surface);
-      transition: inset-inline-start var(--duration-intent-feedback) ease;
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-page-bg);
+      box-shadow: var(--aihio-shadow-surface);
+      transition: inset-inline-start var(--aihio-duration-feedback) ease;
     }
 
     aihio-switch > input:checked {
-      background-color: oklch(var(--color-intent-action-primary-bg));
+      background-color: var(--aihio-color-primary-action-bg);
     }
 
     aihio-switch > input:checked::before {
       inset-inline-start: calc(100% - var(--aihio-switch-thumb) - var(--aihio-switch-inset));
-      background-color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-fg);
     }
 
     aihio-switch > input:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 

@@ -20,7 +20,7 @@ const sections = [
   {
     title: 'Foundations',
     items: [
-      { title: 'Intent tokens', url: '/foundations/tokens/' },
+      { title: 'Semantic tokens', url: '/foundations/tokens/' },
     ],
   },
   {

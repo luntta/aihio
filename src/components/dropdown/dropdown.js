@@ -24,16 +24,16 @@ export class AihioDropdown extends AihioElement {
       margin: 0;
       z-index: 50;
       min-width: 8rem;
-      max-width: calc(100vw - (var(--spacing-intent-stack-md) * 2));
-      max-height: calc(100dvh - (var(--spacing-intent-stack-md) * 2));
+      max-width: calc(100vw - (var(--aihio-spacing-stack-md) * 2));
+      max-height: calc(100dvh - (var(--aihio-spacing-stack-md) * 2));
       overflow-y: auto;
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      background-color: oklch(var(--color-intent-overlay-bg));
-      color: oklch(var(--color-intent-overlay-fg));
-      padding: var(--spacing-intent-cluster-gap-tight);
-      box-shadow: var(--shadow-intent-overlay);
-      animation: dropdown-in var(--duration-intent-feedback) ease;
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-border-subtle);
+      background-color: var(--aihio-color-overlay-bg);
+      color: var(--aihio-color-overlay-fg);
+      padding: var(--aihio-spacing-cluster-gap-tight);
+      box-shadow: var(--aihio-shadow-overlay);
+      animation: dropdown-in var(--aihio-duration-feedback) ease;
     }
 
     .content[data-fallback-open] {
@@ -47,7 +47,7 @@ export class AihioDropdown extends AihioElement {
     @keyframes dropdown-in {
       from {
         opacity: 0;
-        transform: translateY(calc(var(--spacing-intent-cluster-gap-tight) * -1));
+        transform: translateY(calc(var(--aihio-spacing-cluster-gap-tight) * -1));
       }
       to {
         opacity: 1;

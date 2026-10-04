@@ -1,17 +1,16 @@
 // Build-time colour-contrast math. Not bundled into dist — src/tokens/* runs
 // only under `npm run tokens`, so this stays out of the shipped runtime.
 //
-// Token colour values are stored as bare Oklch components ("L C H"), because
-// the CSS layer wraps them in oklch(...) so alpha can be applied at the call
-// site. Everything here works from that same triple.
+// Token colour values are written as oklch(L C H), the same string that ships
+// in the CSS, so what the contract checks is what renders.
 
-/** Parse a "L C H" token value into numeric components. */
+/** Parse an oklch(L C H) token value (or a bare "L C H") into numeric components. */
 export function parseOklch(value) {
-  const parts = String(value).trim().split(/[\s/]+/);
-  const [l, c, h] = parts.map(Number);
+  const inner = String(value).trim().replace(/^oklch\((.*)\)$/i, '$1');
+  const [l, c, h] = inner.split(/[\s/]+/).map(Number);
 
   if (![l, c, h].every((part) => Number.isFinite(part))) {
-    throw new Error(`Not an "L C H" colour value: ${JSON.stringify(value)}`);
+    throw new Error(`Not an oklch(L C H) colour value: ${JSON.stringify(value)}`);
   }
 
   return { l, c, h };
@@ -50,7 +49,7 @@ export function relativeLuminance(srgb) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** WCAG 2.x contrast ratio between two "L C H" token values. */
+/** WCAG 2.x contrast ratio between two oklch() token values. */
 export function contrastRatio(foreground, background) {
   const a = relativeLuminance(oklchToSrgb(parseOklch(foreground)));
   const b = relativeLuminance(oklchToSrgb(parseOklch(background)));
@@ -64,127 +63,129 @@ export function contrastRatio(foreground, background) {
 // for that pair's role: 4.5 for body-size text (1.4.3), 3 for the boundary of
 // an interactive control (1.4.11).
 //
-// Decorative framing — `border`, used for card and alert edges — is deliberately
+// Pairs name semantic colour tokens (tokens/semantic.json), which are themed.
+//
+// Decorative framing — `border-subtle`, used for card and alert edges — is deliberately
 // absent. 1.4.11 covers boundaries that carry meaning; a card edge that also
 // reads from its background fill does not, and holding it to 3:1 would make
 // every surface in the system shout.
 export const CONTRAST_REQUIREMENTS = [
   {
     id: 'destructive-button',
-    foreground: 'destructive-foreground',
-    background: 'destructive',
+    foreground: 'destructive-fg',
+    background: 'destructive-bg',
     min: 4.5,
     note: 'Destructive button label on its fill.',
   },
   {
     id: 'destructive-text',
     foreground: 'destructive-text',
-    background: 'background',
+    background: 'page-bg',
     min: 4.5,
     note: 'Destructive alert copy drawn on the page canvas.',
   },
   {
     id: 'success-button',
-    foreground: 'success-foreground',
-    background: 'success',
+    foreground: 'success-fg',
+    background: 'success-bg',
     min: 4.5,
     note: 'Success badge label on its fill.',
   },
   {
     id: 'success-text',
     foreground: 'success-text',
-    background: 'background',
+    background: 'page-bg',
     min: 4.5,
     note: 'Success alert copy drawn on the page canvas.',
   },
   {
     id: 'warning-button',
-    foreground: 'warning-foreground',
-    background: 'warning',
+    foreground: 'warning-fg',
+    background: 'warning-bg',
     min: 4.5,
     note: 'Warning badge label on its fill. The fill is light in both themes, so this pairs with a dark foreground.',
   },
   {
     id: 'warning-text',
     foreground: 'warning-text',
-    background: 'background',
+    background: 'page-bg',
     min: 4.5,
     note: 'Warning alert copy drawn on the page canvas.',
   },
   {
     id: 'primary-button',
-    foreground: 'primary-foreground',
-    background: 'primary',
+    foreground: 'primary-action-fg',
+    background: 'primary-action-bg',
     min: 4.5,
     note: 'Default button label on its fill.',
   },
   {
     id: 'secondary-button',
-    foreground: 'secondary-foreground',
-    background: 'secondary',
+    foreground: 'secondary-action-fg',
+    background: 'secondary-action-bg',
     min: 4.5,
     note: 'Secondary button label on its fill.',
   },
   {
-    id: 'accent-hover',
-    foreground: 'accent-foreground',
-    background: 'accent',
+    id: 'control-highlight',
+    foreground: 'control-highlight-fg',
+    background: 'control-highlight-bg',
     min: 4.5,
     note: 'Ghost and outline button labels on their hover fill.',
   },
   {
     id: 'overlay-highlight',
-    foreground: 'popover-foreground',
-    background: 'popover-highlight',
+    foreground: 'overlay-fg',
+    background: 'overlay-highlight-bg',
     min: 4.5,
     note: 'The active combobox option or hovered dropdown item label on its highlight, inside an overlay.',
   },
   {
     id: 'muted-text-on-page',
-    foreground: 'muted-foreground',
-    background: 'background',
+    foreground: 'muted-fg',
+    background: 'page-bg',
     min: 4.5,
     note: 'Supporting copy on the page canvas.',
   },
   {
     id: 'muted-text-on-muted',
-    foreground: 'muted-foreground',
-    background: 'muted',
+    foreground: 'muted-fg',
+    background: 'muted-bg',
     min: 4.5,
     note: 'Supporting copy on muted fills (toggle hover, muted surfaces).',
   },
   {
     id: 'body-text',
-    foreground: 'foreground',
-    background: 'background',
+    foreground: 'page-fg',
+    background: 'page-bg',
     min: 4.5,
     note: 'Body copy on the page canvas.',
   },
   {
     id: 'surface-text',
-    foreground: 'card-foreground',
-    background: 'card',
+    foreground: 'surface-fg',
+    background: 'surface-bg',
     min: 4.5,
     note: 'Body copy on raised surfaces.',
   },
   {
     id: 'field-border',
-    foreground: 'input',
-    background: 'background',
+    foreground: 'field-border',
+    background: 'page-bg',
     min: 3,
     note: 'Field boundary — the only affordance marking an empty text input.',
   },
   {
     id: 'focus-ring',
-    foreground: 'ring',
-    background: 'background',
+    foreground: 'focus-ring',
+    background: 'page-bg',
     min: 3,
     note: 'Focus indicator against the page canvas.',
   },
 ];
 
 /**
- * Check a resolved theme (a flat map of semantic token name -> "L C H") against
+ * Check a resolved theme (a flat map of semantic colour name -> oklch()) against
  * CONTRAST_REQUIREMENTS. Returns one result per requirement.
  */
 export function checkTheme(theme, resolvedColors) {

@@ -1,4 +1,5 @@
 {
+  "$description": "Component tokens: sizes specific to one component. They compile to --aihio-<component>-<name>.",
   "button": {
     "height": {
       "sm":   { "$value": "2.25rem", "$type": "dimension" },
@@ -13,9 +14,9 @@
       "icon": { "$value": "0", "$type": "dimension" }
     },
     "font-size": {
-      "sm":   { "$value": "{fontSize.sm}", "$type": "dimension" },
-      "md":   { "$value": "{fontSize.sm}", "$type": "dimension" },
-      "lg":   { "$value": "{fontSize.base}", "$type": "dimension" }
+      "sm":   { "$value": "{font-size.sm}", "$type": "dimension" },
+      "md":   { "$value": "{font-size.sm}", "$type": "dimension" },
+      "lg":   { "$value": "{font-size.base}", "$type": "dimension" }
     }
   },
   "input": {
@@ -28,7 +29,7 @@
   "badge": {
     "padding-x": { "$value": "0.625rem", "$type": "dimension" },
     "padding-y": { "$value": "0.125rem", "$type": "dimension" },
-    "font-size": { "$value": "{fontSize.xs}", "$type": "dimension" }
+    "font-size": { "$value": "{font-size.xs}", "$type": "dimension" }
   },
   "avatar": {
     "size": {

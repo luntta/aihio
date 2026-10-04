@@ -10,32 +10,32 @@ export default {
     aihio-dialog-header {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      margin-bottom: var(--spacing-intent-stack-md);
+      gap: var(--aihio-spacing-stack-tight);
+      margin-bottom: var(--aihio-spacing-stack-md);
     }
   `,
   'aihio-dialog-title': `
     aihio-dialog-title {
       display: block;
-      font-size: var(--fontSize-intent-heading-sm);
-      font-weight: var(--fontWeight-intent-heading);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-size: var(--aihio-font-size-heading-sm);
+      font-weight: var(--aihio-font-weight-heading);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
   `,
   'aihio-dialog-description': `
     aihio-dialog-description {
       display: block;
-      font-size: var(--fontSize-intent-body-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      color: var(--aihio-color-muted-fg);
     }
   `,
   'aihio-dialog-footer': `
     aihio-dialog-footer {
       display: flex;
       justify-content: flex-end;
-      gap: var(--spacing-intent-control-gap);
-      margin-top: var(--spacing-intent-stack-lg);
+      gap: var(--aihio-spacing-control-gap);
+      margin-top: var(--aihio-spacing-stack-lg);
     }
   `,
 };

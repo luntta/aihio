@@ -2,7 +2,7 @@
 
 AI-first design system built on native web components. Zero runtime dependencies.
 
-Aihio is designed for AI agents to generate markup predictably — every component has a machine-readable schema, predictable attributes, flat composition, and an intent-token layer that maps prompt meaning onto concrete UI decisions. Visually it follows a clean, minimal aesthetic with an extensive Oklch-based token system and light/dark mode support.
+Aihio is designed for AI agents to generate markup predictably — every component has a machine-readable schema, predictable attributes, flat composition, an intent vocabulary that maps prompt meaning onto components, and semantic tokens that name what each style value is for. Visually it follows a clean, minimal aesthetic with an extensive Oklch-based token system and light/dark mode support.
 
 ## Install
 
@@ -190,7 +190,7 @@ const schema = await fetch('node_modules/aihio/dist/schema.json').then(r => r.js
 // { $schema: "aihio-design-system", version: "2.0.0", components: [...], patterns: [...] }
 ```
 
-AI agents can use this schema to understand and generate correct markup without reading documentation. For styling decisions, the generated intent-token vocabulary is available at `dist/intent-tokens.md`.
+AI agents can use this schema to understand and generate correct markup without reading documentation. For styling decisions, the semantic token vocabulary is available at `dist/semantic-tokens.md`, and with resolved values at `dist/tokens.json`.
 
 The seeded patterns cover higher-level compositions such as auth forms, settings sections, destructive confirmations, tabbed settings, and toast-style alert stacks.
 
@@ -504,13 +504,46 @@ pipeline, including documentation and automated accessibility checks.
 
 Design tokens follow the [W3C Design Token Community Group](https://tr.designtokens.org/format/) format, defined in JSON and compiled to CSS custom properties. Colors use Oklch for perceptual uniformity.
 
-Four tiers:
-- **Primitive** (`tokens/base.json`) — raw values (colors, spacing, typography, radius, shadows)
-- **Semantic** (`tokens/semantic.json`) — theme roles (background, foreground, primary, destructive, etc.)
-- **Intent** (`tokens/intent.json`) — component-facing meaning (surface, action-primary, form-field-gap, interactive radius, etc.)
-- **Component** (`tokens/component.json`) — component-level tokens (button height, input height, etc.)
+Three tiers:
+- **Primitive** (`tokens/base.json`) — raw scales: the colour ramps, spacing, type, radius, shadow, and duration steps
+- **Semantic** (`tokens/semantic.json`) — what a value is for: `color.surface-bg`, `spacing.stack-md`, `radius.interactive`, with light and dark values for every colour
+- **Component** (`tokens/component.json`) — sizes specific to one component (button height, input height, and so on)
 
-Intent tokens compile to CSS custom properties without collapsing the alias chain, so overriding a lower tier still flows upward.
+Components read only semantic and component tokens. Every token compiles to
+`--aihio-<group>-<name>`, lowercase and hyphenated:
+
+```css
+.note {
+  color: var(--aihio-color-muted-fg);
+  padding: var(--aihio-spacing-stack-sm);
+  border-radius: var(--aihio-radius-surface);
+}
+```
+
+That shape is a contract, enforced by a build test, because a custom property
+fails silently:
+
+- **Prefixed**, so Aihio's names cannot collide with a host app's. shadcn/ui
+  defines `--primary` and `--background` on `:root`, and Tailwind v4 defines
+  `--color-red-600` and `--radius-md`, each in its own value format.
+- **Lowercase and hyphenated, with no escapes.** Half steps are written with a
+  hyphen (`--aihio-spacing-1-5` is 0.375rem): `var(--spacing-2.5)` is a parse
+  error that drops the whole declaration.
+- **Full colour values.** `var(--aihio-color-page-fg)` is a colour as written.
+  Transparency is mixed in, which works on any colour value:
+  `color-mix(in oklch, var(--aihio-color-page-fg) 40%, transparent)`.
+- **Resolved.** Every `var()` that `aihio.css`, the component shadow styles,
+  and the docs site read has to be defined.
+
+Semantic colour names follow the schema's intent vocabulary where they meet it
+(`primary-action-bg` for the `primary-action` intent), and the tier is called
+semantic so that "intent" means one thing in Aihio: the vocabulary in the
+schema.
+
+The full reference ships in the package as `dist/semantic-tokens.md` (`aihio/tokens.md`)
+and as `dist/tokens.json` (`aihio/tokens`), which carries every token's resolved light
+and dark values, the token it reads, and the measured contrast of each pair in
+the contract.
 
 ### Palette
 
@@ -522,31 +555,31 @@ Light and dark are built as mirror images rather than as two separate palettes:
 a pure canvas, an elevated surface one step off it, and a hairline that only
 just separates the two.
 
-| Role | Light | Dark |
+| Token | Light | Dark |
 | --- | --- | --- |
-| `page-bg` | `zinc.0` (`#ffffff`) | `zinc.1000` (`#000000`) |
-| `surface-bg` | `zinc.50` (`#f5f5f7`) | `zinc.950` (`#161617`) |
-| `border-subtle` | `zinc.200` | `zinc.850` |
-| `overlay-highlight-bg` | `zinc.100` | `zinc.800` |
+| `--aihio-color-page-bg` | `zinc.0` (`#ffffff`) | `zinc.1000` (`#000000`) |
+| `--aihio-color-surface-bg` | `zinc.50` (`#f5f5f7`) | `zinc.950` (`#161617`) |
+| `--aihio-color-border-subtle` | `zinc.200` | `zinc.850` |
+| `--aihio-color-overlay-highlight-bg` | `zinc.100` | `zinc.800` |
 
 `overlay-highlight-bg` marks the active item inside an overlay. It exists
-because `accent` and the overlay surface are the same `zinc.900` in the dark
-theme, so a highlight drawn with `accent` would be invisible there.
+because `control-highlight-bg` and the overlay surface are the same `zinc.900`
+in the dark theme, so a highlight drawn with it would be invisible there.
 
 Because the elevated surface differs from the canvas in both themes, cards,
 alerts, and dialogs read as raised without needing a shadow to prove it.
 
 ### Typography
 
-The type stack (`fontFamily.sans`) leads with the platform UI face, so text
-renders in the grey the OS already optimises for and no webfont ships — the
-package stays zero-dependency.
+The type stack (`--aihio-font-family-sans`) leads with the platform UI face, so
+text renders in the grey the OS already optimises for and no webfont ships —
+the package stays zero-dependency.
 
-`letterSpacing.*` tightens as type grows (`display` -0.025em, `heading`
--0.018em, `body` -0.011em), because the same em value reads looser at larger
-sizes. `letterSpacing.wide` is the one positive value, reserved for small
-capitalised labels. Components read these through `--letterSpacing-intent-*`
-rather than hardcoding a tracking value.
+Letter spacing tightens as type grows (`display` -0.025em, `heading` -0.018em,
+`body` -0.011em), because the same em value reads looser at larger sizes.
+`label` is the one positive value, reserved for small capitalised labels.
+Components read these through `--aihio-letter-spacing-*` rather than
+hardcoding a tracking value.
 
 ### Contrast
 
@@ -573,7 +606,7 @@ keeps the palette to what the system can actually keep accessible.
 
 ### Motion
 
-Component transitions are timed from `--duration-intent-*`, and
+Component transitions are timed from `--aihio-duration-*`, and
 `@media (prefers-reduced-motion: reduce)` collapses those tokens to `1ms` — one
 place, no `!important`, and consumer animation is left alone. Looping and
 entrance keyframes are switched off at their own declaration instead, since a
@@ -591,21 +624,37 @@ on colour at all.
 
 ### Dark mode
 
-Dark mode works automatically via `prefers-color-scheme`, or manually:
+Dark mode works automatically via `prefers-color-scheme`, or manually, on the
+page or on any element for its subtree:
 
 ```html
 <html data-theme="dark">
+<section data-theme="light">…</section>
 ```
+
+`color-scheme` follows the theme, so the native controls Aihio leaves to the
+platform (`<select>`, `<textarea>`, checkboxes, scrollbars) are drawn for the
+same theme as everything around them.
 
 ### Customization
 
-Override CSS custom properties to theme the entire system:
+Override custom properties to theme the whole system. Untinted tokens need one
+declaration; colours are themed, so set them for each theme:
 
 ```css
 :root {
-  --primary: 0.55 0.2 260;
-  --color-intent-action-primary-bg: var(--primary);
-  --radius-intent-surface: 1rem;
+  --aihio-radius-base: 0.75rem;   /* every radius step is computed from it */
+  --aihio-color-primary-action-bg: oklch(0.55 0.2 260);
+}
+
+:root[data-theme="dark"] {
+  --aihio-color-primary-action-bg: oklch(0.72 0.15 260);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --aihio-color-primary-action-bg: oklch(0.72 0.15 260);
+  }
 }
 ```
 
@@ -637,7 +686,7 @@ npm run docs:test   # Validate generated docs HTML assumptions
 npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Run tests, build docs, and validate the docs output
 npm exec aihio-mcp  # Start the local MCP server over stdio
-npm run tokens    # Rebuild tokens only (also enforces the contrast contract)
+npm run tokens    # Rebuild tokens and their references (also enforces the contrast contract)
 npm run styles    # Rebuild generated component CSS
 npm run schema    # Rebuild schema only
 ```

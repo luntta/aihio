@@ -1,359 +1,207 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTheme } from './contrast.js';
+import { CONTRAST_REQUIREMENTS, checkTheme } from './contrast.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '../..');
 
-const base = JSON.parse(readFileSync(resolve(root, 'tokens/base.json'), 'utf8'));
-const semantic = JSON.parse(readFileSync(resolve(root, 'tokens/semantic.json'), 'utf8'));
-const component = JSON.parse(readFileSync(resolve(root, 'tokens/component.json'), 'utf8'));
-const intent = JSON.parse(readFileSync(resolve(root, 'tokens/intent.json'), 'utf8'));
+const base = readJson('tokens/base.json');
+const component = readJson('tokens/component.json');
+const semantic = readJson('tokens/semantic.json');
+const packageVersion = readJson('package.json').version;
 
-function deepMerge(...sources) {
-  const target = {};
+// Every custom property Aihio defines is --aihio-<group>-<name>: prefixed, so
+// it cannot collide with a host app's --primary or Tailwind's --color-red-600,
+// and lowercase-hyphenated, so it is written the same way everywhere it is read
+// and never needs escaping. The build refuses any other shape.
+const NAME_PATTERN = /^--aihio-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-  for (const source of sources) {
-    mergeInto(target, source);
-  }
+const TIERS = [
+  ['primitive', base],
+  ['component', component],
+  ['semantic', semantic.shared],
+];
 
-  return target;
+// References ({spacing.4}) resolve against primitives, component tokens, and
+// the shared semantic tokens. Themed colours are only ever read from CSS.
+const tokenRoot = {};
+for (const [, tier] of TIERS) mergeTier(tokenRoot, tier);
+
+function readJson(path) {
+  return JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 }
 
-function mergeInto(target, source) {
-  if (!source || typeof source !== 'object' || Array.isArray(source)) return target;
+function isToken(node) {
+  return Boolean(node) && typeof node === 'object' && Object.prototype.hasOwnProperty.call(node, '$value');
+}
 
+function mergeTier(target, source, path = []) {
   for (const [key, value] of Object.entries(source)) {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      !Object.prototype.hasOwnProperty.call(value, '$value')
-    ) {
-      if (
-        !target[key] ||
-        typeof target[key] !== 'object' ||
-        Array.isArray(target[key]) ||
-        Object.prototype.hasOwnProperty.call(target[key], '$value')
-      ) {
-        target[key] = {};
-      }
-
-      mergeInto(target[key], value);
+    if (key.startsWith('$')) continue;
+    if (key.includes('.')) {
+      throw new Error(`Token key ${JSON.stringify([...path, key].join('.'))} contains a dot; write half steps with a hyphen (1-5).`);
+    }
+    if (isToken(value)) {
+      if (target[key] !== undefined) throw new Error(`Token ${[...path, key].join('.')} is defined twice`);
+      target[key] = value;
       continue;
     }
-
-    target[key] = value;
+    target[key] ??= {};
+    mergeTier(target[key], value, [...path, key]);
   }
-
-  return target;
 }
 
-const tokenRoot = deepMerge(base, component, intent.shared, { semantic });
-
-function resolvePath(path, tokens, parts = path.split('.'), matched = []) {
-  if (!tokens || typeof tokens !== 'object') return null;
-  if (parts.length === 0) return { keys: matched, node: tokens };
-
-  for (let size = parts.length; size > 0; size -= 1) {
-    const key = parts.slice(0, size).join('.');
-    if (!Object.prototype.hasOwnProperty.call(tokens, key)) continue;
-
-    const resolved = resolvePath(path, tokens[key], parts.slice(size), [...matched, key]);
-    if (resolved) return resolved;
+function lookup(path) {
+  let node = tokenRoot;
+  for (const key of path.split('.')) {
+    node = node?.[key];
   }
-
-  return null;
+  return isToken(node) ? node : null;
 }
 
-function lookup(path, tokens) {
-  return resolvePath(path, tokens)?.node;
+function toVarName(path) {
+  const name = `--aihio-${path.replace(/\./g, '-')}`;
+  if (!NAME_PATTERN.test(name)) throw new Error(`Token ${path} would compile to ${name}, which is not --aihio-<lowercase-kebab>`);
+  return name;
 }
 
-function toCssVarName(path, tokens) {
-  if (path.startsWith('semantic.light.')) {
-    return toCssVarName(path.slice('semantic.light.'.length), semantic.light);
-  }
-
-  if (path.startsWith('semantic.dark.')) {
-    return toCssVarName(path.slice('semantic.dark.'.length), semantic.dark);
-  }
-
-  const resolved = resolvePath(path, tokens);
-  if (!resolved) {
-    throw new Error(`Unresolved token reference: ${path}`);
-  }
-
-  return resolved.keys.map((key) => key.replace(/\./g, '\\.')).join('-');
-}
-
-function validateReferences(value, tokens, trail = []) {
-  if (typeof value !== 'string') return value;
-
-  value.replace(/\{([^}]+)\}/g, (_, path) => {
-    if (trail.includes(path)) {
-      throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
-    }
-
-    const node = lookup(path, tokens);
-    if (!node || node.$value === undefined) {
-      throw new Error(`Unresolved token reference: ${path}`);
-    }
-
-    validateReferences(node.$value, tokens, [...trail, path]);
-    return '';
+/** Replace {path} references with var(--aihio-…), checking each one resolves. */
+function toCssValue(value, trail = []) {
+  return String(value).replace(/\{([^}]+)\}/g, (_, path) => {
+    if (trail.includes(path)) throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
+    const target = lookup(path);
+    if (!target) throw new Error(`Unresolved token reference: ${path}`);
+    toCssValue(target.$value, [...trail, path]);
+    return `var(${toVarName(path)})`;
   });
-
-  return value;
 }
 
-function toCSSValue(value, tokens, trail = []) {
-  if (typeof value !== 'string') return value;
-
-  validateReferences(value, tokens, trail);
-
-  return value.replace(/\{([^}]+)\}/g, (_, path) => `var(--${toCssVarName(path, tokens)})`);
+/** Follow references down to a literal value, for docs and the contrast check. */
+function resolveValue(value, trail = []) {
+  return String(value).replace(/\{([^}]+)\}/g, (_, path) => {
+    if (trail.includes(path)) throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
+    return resolveValue(lookup(path).$value, [...trail, path]);
+  });
 }
 
-/** Flatten nested token object into [name, value] pairs */
-function flatten(obj, prefix = '', tokens = tokenRoot) {
-  if (!obj || typeof obj !== 'object') return [];
+/** Source references of a value, as CSS variable names. */
+function referencesOf(value) {
+  return [...String(value).matchAll(/\{([^}]+)\}/g)].map(([, path]) => toVarName(path));
+}
 
-  const entries = [];
-  for (const [key, val] of Object.entries(obj)) {
-    if (key.startsWith('$')) continue;
-
-    const safeName = key.replace(/\./g, '\\.');
-    const name = prefix ? `${prefix}-${safeName}` : safeName;
-    if (!val || typeof val !== 'object') continue;
-
-    if (Object.prototype.hasOwnProperty.call(val, '$value')) {
-      entries.push([name, toCSSValue(val.$value, tokens)]);
+function listTokens(node, path = []) {
+  const tokens = [];
+  for (const [key, value] of Object.entries(node)) {
+    if (key.startsWith('$') || !value || typeof value !== 'object') continue;
+    const next = [...path, key];
+    if (isToken(value)) {
+      tokens.push({
+        path: next.join('.'),
+        group: next[0],
+        name: toVarName(next.join('.')),
+        type: value.$type,
+        raw: value.$value,
+        css: toCssValue(value.$value),
+        description: value.$description ?? '',
+      });
     } else {
-      entries.push(...flatten(val, name, tokens));
+      tokens.push(...listTokens(value, next));
     }
   }
-  return entries;
+  return tokens;
 }
 
-function toCSS(entries, indent = '  ') {
-  return entries.map(([name, value]) => `${indent}--${name}: ${value};`).join('\n');
+const primitiveTokens = listTokens(base);
+const componentTokens = listTokens(component);
+const sharedSemanticTokens = listTokens(semantic.shared);
+const lightTokens = listTokens(semantic.light);
+const darkTokens = listTokens(semantic.dark);
+
+const lightNames = lightTokens.map((token) => token.name).sort().join();
+if (lightNames !== darkTokens.map((token) => token.name).sort().join()) {
+  throw new Error('semantic.json: light and dark must define the same tokens');
 }
 
-// Build primitive tokens, including color scales used by semantic aliases.
-const primitiveEntries = flatten(base);
-
-// Build semantic tokens for light and dark
-const lightEntries = flatten(semantic.light, '', tokenRoot);
-const darkEntries = flatten(semantic.dark, '', tokenRoot);
-
-// Build component tokens
-const componentEntries = flatten(component, '', tokenRoot);
+function declarations(tokens, indent = '  ') {
+  return tokens.map((token) => `${indent}${token.name}: ${token.css};`).join('\n');
+}
 
 // Transition and entrance timings collapse under reduced motion. The spinner
-// duration is excluded — see the media block below.
-const reducedMotionEntries = flatten(intent.shared, '', tokenRoot)
-  .filter(([name]) => name.startsWith('duration-intent-') && name !== 'duration-intent-spinner')
-  .map(([name]) => [name, '1ms']);
-
-// Build intent tokens
-const sharedIntentEntries = flatten(intent.shared, '', tokenRoot);
-const lightIntentEntries = flatten(intent.light, '', tokenRoot);
-const darkIntentEntries = flatten(intent.dark, '', tokenRoot);
+// is excluded: it drives a looping animation — see the media block below.
+const reducedMotionTokens = sharedSemanticTokens
+  .filter((token) => token.group === 'duration' && token.path !== 'duration.spinner')
+  .map((token) => ({ ...token, css: '1ms' }));
 
 const css = `/* Generated by src/tokens/build.js — do not edit */
 
 :root {
-  --radius: 0.5rem;
+  color-scheme: light;
 
   /* Primitives */
-${toCSS(primitiveEntries)}
+${declarations(primitiveTokens)}
 
   /* Component tokens */
-${toCSS(componentEntries)}
+${declarations(componentTokens)}
 
-  /* Semantic (light) */
-${toCSS(lightEntries)}
+  /* Semantic */
+${declarations(sharedSemanticTokens)}
 
-  /* Intent (shared) */
-${toCSS(sharedIntentEntries)}
-
-  /* Intent (light) */
-${toCSS(lightIntentEntries)}
+  /* Semantic colour (light) */
+${declarations(lightTokens)}
 }
 
+/* Any element can switch theme for its subtree. color-scheme follows, so the
+   native controls Aihio leaves to the platform (select, textarea, checkboxes,
+   scrollbars) are drawn for the same theme as everything around them. */
 [data-theme="dark"] {
-  /* Semantic (dark) */
-${toCSS(darkEntries)}
+  color-scheme: dark;
 
-  /* Intent (dark) */
-${toCSS(darkIntentEntries)}
+  /* Semantic colour (dark) */
+${declarations(darkTokens)}
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Semantic colour (light) */
+${declarations(lightTokens)}
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    /* Semantic (dark) — auto */
-${toCSS(darkEntries, '    ')}
+    color-scheme: dark;
 
-    /* Intent (dark) — auto */
-${toCSS(darkIntentEntries, '    ')}
+    /* Semantic colour (dark) — auto */
+${declarations(darkTokens, '    ')}
   }
 }
 
 /* Every component transition and entrance animation is timed from these
    tokens, so collapsing them here removes the motion system-wide without a
    global !important override that would also flatten consumer animation.
-   --duration-intent-spinner is deliberately left alone: it drives a looping
+   --aihio-duration-spinner is deliberately left alone: it drives a looping
    animation, and a 1ms infinite rotation is a strobe. Looping animations are
    switched off at their own declaration instead. */
 @media (prefers-reduced-motion: reduce) {
   :root {
-${toCSS(reducedMotionEntries, '    ')}
+${declarations(reducedMotionTokens, '    ')}
   }
 }
 `;
 
-function listTokens(node, prefix = '') {
-  if (!node || typeof node !== 'object') return [];
+// Contrast contract -----------------------------------------------------------
 
-  const entries = [];
-  for (const [key, value] of Object.entries(node)) {
-    if (key.startsWith('$')) continue;
-
-    const next = prefix ? `${prefix}.${key}` : key;
-    if (!value || typeof value !== 'object') continue;
-
-    if (Object.prototype.hasOwnProperty.call(value, '$value')) {
-      entries.push({
-        path: next,
-        value: value.$value,
-        description: value.$description ?? '',
-      });
-      continue;
-    }
-
-    entries.push(...listTokens(value, next));
-  }
-
-  return entries;
+function resolvedTheme(tokens) {
+  return Object.fromEntries(
+    tokens.map((token) => [token.path.replace(/^color\./, ''), resolveValue(token.raw)])
+  );
 }
 
-function normalizeSource(value) {
-  if (typeof value !== 'string') return String(value);
-  const match = value.match(/^\{([^}]+)\}$/);
-  if (!match) return value;
-  return match[1].replace(/^semantic\.(light|dark)\./, 'semantic.');
-}
-
-function toDocRow(path, entry) {
-  return `| \`${path}\` | \`--${path.replace(/\./g, '-')}\` | \`${entry.source}\` | ${entry.description || 'No description.'} |`;
-}
-
-function buildIntentDocs() {
-  const shared = listTokens(intent.shared);
-  const light = listTokens(intent.light);
-  const dark = listTokens(intent.dark);
-  const combined = new Map();
-
-  for (const token of [...shared, ...light, ...dark]) {
-    const current = combined.get(token.path);
-    const source = normalizeSource(token.value);
-
-    if (!current) {
-      combined.set(token.path, {
-        description: token.description,
-        source,
-      });
-      continue;
-    }
-
-    current.description ||= token.description;
-    if (current.source !== source) {
-      current.source = `${current.source}; ${source}`;
-    }
-  }
-
-  const sections = [
-    ['color', 'Theme-aware color intents used by components and page-level chrome.'],
-    ['spacing', 'Layout spacing tokens that encode component rhythm rather than raw scale values.'],
-    ['radius', 'Corner-radius choices for surfaced and interactive affordances.'],
-    ['fontFamily', 'Typeface intents for interface copy and fixed-width data.'],
-    ['fontSize', 'Text-size intents for body copy, controls, and surfaced headings.'],
-    ['fontWeight', 'Weight intents for body text, controls, and headings.'],
-    ['letterSpacing', 'Optical tracking intents, tightening as type grows.'],
-    ['lineHeight', 'Line-height intents for readable body copy and compact labels.'],
-    ['shadow', 'Elevation intents for surfaces and overlays.'],
-    ['duration', 'Motion timing intents for feedback and overlay entrance.'],
-  ];
-
-  const lines = [
-    '# Aihio Intent Tokens',
-    '',
-    'Generated from `tokens/intent.json` by `src/tokens/build.js`.',
-    '',
-    'Intent tokens sit above semantic and primitive tokens so component styles can ask for meaning, not raw scale positions.',
-    '',
-    '- `color.intent.*` tokens are theme-aware and map through `tokens/semantic.json`.',
-    '- Shared intent tokens for spacing, radius, typography, elevation, and motion map through primitive or component tokens.',
-    '- Components should prefer intent tokens for public-facing styling decisions and keep raw primitive usage for internal wiring only.',
-    '',
-  ];
-
-  for (const [section, intro] of sections) {
-    const rows = [...combined.entries()]
-      .filter(([path]) => path.startsWith(`${section}.intent.`))
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([path, entry]) => toDocRow(path, entry));
-
-    if (rows.length === 0) continue;
-
-    lines.push(`## ${section}`);
-    lines.push('');
-    lines.push(intro);
-    lines.push('');
-    lines.push('| Token | CSS Variable | Source | Description |');
-    lines.push('| --- | --- | --- | --- |');
-    lines.push(...rows);
-    lines.push('');
-  }
-
-  return `${lines.join('\n').trim()}\n`;
-}
-
-/**
- * Follow a semantic token through its alias chain down to a literal "L C H"
- * triple, so the contrast checker compares rendered colours rather than
- * references.
- */
-function resolveColorValue(value, seen = new Set()) {
-  if (typeof value !== 'string') return null;
-
-  const match = value.match(/^\{([^}]+)\}$/);
-  if (!match) return value;
-
-  const path = match[1];
-  if (seen.has(path)) {
-    throw new Error(`Circular colour reference: ${[...seen, path].join(' -> ')}`);
-  }
-
-  return resolveColorValue(lookup(path, tokenRoot)?.$value, new Set([...seen, path]));
-}
-
-function resolveTheme(themeTokens) {
-  const resolved = {};
-
-  for (const [name, token] of Object.entries(themeTokens)) {
-    if (name.startsWith('$') || token?.$type !== 'color') continue;
-    resolved[name] = resolveColorValue(token.$value);
-  }
-
-  return resolved;
-}
-
+const themes = { light: resolvedTheme(lightTokens), dark: resolvedTheme(darkTokens) };
 const contrastResults = [
-  ...checkTheme('light', resolveTheme(semantic.light)),
-  ...checkTheme('dark', resolveTheme(semantic.dark)),
+  ...checkTheme('light', themes.light),
+  ...checkTheme('dark', themes.dark),
 ];
 const contrastFailures = contrastResults.filter((result) => !result.pass);
 
@@ -365,10 +213,124 @@ if (contrastFailures.length > 0) {
   process.exit(1);
 }
 
+// Machine-readable reference --------------------------------------------------
+
+const GROUP_INTROS = {
+  color: 'Themed colours, named for what they colour. Each has a light and a dark value.',
+  spacing: 'Gaps and padding, named for the rhythm they set rather than a step on the scale.',
+  radius: 'Corner rounding for surfaces and controls.',
+  'font-family': 'Typefaces for interface text and fixed-width data.',
+  'font-size': 'Text sizes for body copy, controls, and surface titles.',
+  'font-weight': 'Weights for body text, controls, and headings.',
+  'letter-spacing': 'Optical tracking, tightening as type grows.',
+  'line-height': 'Line heights for readable copy and compact labels.',
+  shadow: 'Elevation for surfaces and overlays.',
+  duration: 'Motion timing for feedback and overlay entrance. Collapsed to 1ms under reduced motion, except the spinner.',
+};
+
+function describeToken(token, tier) {
+  return {
+    name: token.name,
+    tier,
+    group: token.group,
+    type: token.type,
+    value: resolveValue(token.raw),
+    references: referencesOf(token.raw),
+    ...(token.description ? { description: token.description } : {}),
+  };
+}
+
+const darkByName = new Map(darkTokens.map((token) => [token.name, token]));
+const semanticReference = [
+  ...sharedSemanticTokens.map((token) => describeToken(token, 'semantic')),
+  ...lightTokens.map((token) => {
+    const dark = darkByName.get(token.name);
+    return {
+      name: token.name,
+      tier: 'semantic',
+      group: token.group,
+      type: token.type,
+      value: { light: resolveValue(token.raw), dark: resolveValue(dark.raw) },
+      references: { light: referencesOf(token.raw), dark: referencesOf(dark.raw) },
+      ...(token.description ? { description: token.description } : {}),
+    };
+  }),
+].sort((left, right) => left.name.localeCompare(right.name));
+
+const reference = {
+  $schema: 'aihio-tokens',
+  version: packageVersion,
+  groups: GROUP_INTROS,
+  tokens: [
+    ...semanticReference,
+    ...componentTokens.map((token) => describeToken(token, 'component')),
+    ...primitiveTokens.map((token) => describeToken(token, 'primitive')),
+  ],
+  contrast: CONTRAST_REQUIREMENTS.map((requirement) => {
+    const ratio = (theme) => contrastResults.find((result) => result.id === requirement.id && result.theme === theme).ratio;
+    return {
+      id: requirement.id,
+      foreground: toVarName(`color.${requirement.foreground}`),
+      background: toVarName(`color.${requirement.background}`),
+      min: requirement.min,
+      note: requirement.note,
+      ratio: { light: round(ratio('light')), dark: round(ratio('dark')) },
+    };
+  }),
+};
+
+function round(value) {
+  return Math.round(value * 100) / 100;
+}
+
+// Markdown vocabulary, for agents reading the package -------------------------
+
+function formatSource(token) {
+  if (!Array.isArray(token.references)) {
+    return `light: ${formatList(token.references.light, token.value.light)}; dark: ${formatList(token.references.dark, token.value.dark)}`;
+  }
+  return formatList(token.references, token.value);
+}
+
+function formatList(references, value) {
+  return references.length > 0 ? references.map((name) => `\`${name}\``).join(', ') : `\`${value}\``;
+}
+
+function buildMarkdown() {
+  const lines = [
+    '# Aihio Semantic Tokens',
+    '',
+    'Generated from `tokens/semantic.json` by `src/tokens/build.js`. The same data, with resolved values for both themes, is in `tokens.json`.',
+    '',
+    'Semantic tokens name what a value is for: `--aihio-color-surface-bg`, `--aihio-spacing-stack-md`. Components read only these and their own component tokens; the primitive scales beneath them are wiring. Write them exactly as listed: every name is `--aihio-<group>-<name>`, lowercase and hyphenated.',
+    '',
+    '- Colours are themed. Each has a light and a dark value, switched by `prefers-color-scheme` or `data-theme` on any element.',
+    '- Colours are full values: `color: var(--aihio-color-page-fg)`. For transparency, mix: `color-mix(in oklch, var(--aihio-color-page-fg) 40%, transparent)`.',
+    '',
+  ];
+
+  for (const [group, intro] of Object.entries(GROUP_INTROS)) {
+    const rows = semanticReference.filter((token) => token.group === group);
+    if (rows.length === 0) continue;
+
+    lines.push(`## ${group}`, '', intro, '', '| CSS variable | Source | Description |', '| --- | --- | --- |');
+    for (const token of rows) {
+      lines.push(`| \`${token.name}\` | ${formatSource(token)} | ${token.description ?? ''} |`);
+    }
+    lines.push('');
+  }
+
+  return `${lines.join('\n').trim()}\n`;
+}
+
+for (const token of reference.tokens) {
+  if (!NAME_PATTERN.test(token.name)) throw new Error(`Invalid token name ${token.name}`);
+}
+
 const outPath = resolve(__dirname, '../css/tokens.css');
 writeFileSync(outPath, css, 'utf8');
-const docsPath = resolve(root, 'docs/intent-tokens.md');
-writeFileSync(docsPath, buildIntentDocs(), 'utf8');
+writeFileSync(resolve(root, 'docs/semantic-tokens.md'), buildMarkdown(), 'utf8');
+writeFileSync(resolve(root, 'docs/tokens.json'), `${JSON.stringify(reference, null, 2)}\n`, 'utf8');
 console.log(`tokens → ${outPath}`);
-console.log(`intent docs → ${docsPath}`);
+console.log('tokens → docs/semantic-tokens.md, docs/tokens.json');
 console.log(`contrast → ${contrastResults.length} pairs pass (light + dark)`);

@@ -10,26 +10,26 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: var(--avatar-size-md);
-      height: var(--avatar-size-md);
-      border-radius: var(--radius-intent-pill);
+      width: var(--aihio-avatar-size-md);
+      height: var(--aihio-avatar-size-md);
+      border-radius: var(--aihio-radius-pill);
       overflow: hidden;
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      color: oklch(var(--color-intent-surface-muted-fg));
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
+      background-color: var(--aihio-color-muted-bg);
+      color: var(--aihio-color-muted-fg);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
       flex-shrink: 0;
     }
 
     aihio-avatar[size="sm"] {
-      width: var(--avatar-size-sm);
-      height: var(--avatar-size-sm);
-      font-size: var(--fontSize-intent-control-sm);
+      width: var(--aihio-avatar-size-sm);
+      height: var(--aihio-avatar-size-sm);
+      font-size: var(--aihio-font-size-control-sm);
     }
     aihio-avatar[size="lg"] {
-      width: var(--avatar-size-lg);
-      height: var(--avatar-size-lg);
-      font-size: var(--fontSize-intent-control-lg);
+      width: var(--aihio-avatar-size-lg);
+      height: var(--aihio-avatar-size-lg);
+      font-size: var(--aihio-font-size-control-lg);
     }
 
     aihio-avatar img {

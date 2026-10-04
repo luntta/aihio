@@ -24,38 +24,38 @@ export default {
        jump when the input appears. */
     aihio-combobox:not(:defined) {
       box-sizing: border-box;
-      height: var(--input-height-md);
-      border: 1px solid oklch(var(--color-intent-field-border));
-      border-radius: var(--radius-intent-interactive);
+      height: var(--aihio-input-height-md);
+      border: 1px solid var(--aihio-color-field-border);
+      border-radius: var(--aihio-radius-interactive);
     }
 
     ${field()} {
       display: flex;
       width: 100%;
-      height: var(--input-height-md);
+      height: var(--aihio-input-height-md);
       margin: 0;
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding-block: var(--spacing-intent-field-padding-block);
-      padding-inline: var(--spacing-intent-field-padding-inline) var(--input-height-md);
+      padding-block: var(--aihio-spacing-field-padding-block);
+      padding-inline: var(--aihio-spacing-field-padding-inline) var(--aihio-input-height-md);
       font: inherit;
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
       text-overflow: ellipsis;
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     ${field('::placeholder')} {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     ${field(':focus-visible')} {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     ${field(':disabled')} {
@@ -64,24 +64,24 @@ export default {
     }
 
     aihio-combobox[size="sm"] [data-combobox-part="input"] {
-      height: var(--input-height-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      padding-block: var(--spacing-intent-field-padding-block-sm);
-      padding-inline: var(--spacing-intent-field-padding-inline-sm) var(--input-height-sm);
+      height: var(--aihio-input-height-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      padding-block: var(--aihio-spacing-field-padding-block-sm);
+      padding-inline: var(--aihio-spacing-field-padding-inline-sm) var(--aihio-input-height-sm);
     }
     aihio-combobox[size="lg"] [data-combobox-part="input"] {
-      height: var(--input-height-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      padding-block: var(--spacing-intent-field-padding-block-lg);
-      padding-inline: var(--spacing-intent-field-padding-inline-lg) var(--input-height-lg);
+      height: var(--aihio-input-height-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      padding-block: var(--aihio-spacing-field-padding-block-lg);
+      padding-inline: var(--aihio-spacing-field-padding-inline-lg) var(--aihio-input-height-lg);
     }
 
     aihio-combobox[error] [data-combobox-part="input"] {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
     aihio-combobox[error] [data-combobox-part="input"]:focus-visible {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     /* A pointer affordance only: it is out of the tab order, and the keyboard
@@ -93,31 +93,31 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: var(--input-height-md);
+      width: var(--aihio-input-height-md);
       margin: 0;
       padding: 0;
       border: 0;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       background: none;
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
       cursor: pointer;
-      transition: color var(--duration-intent-feedback-fast) ease;
+      transition: color var(--aihio-duration-feedback-fast) ease;
     }
     aihio-combobox[size="sm"] [data-combobox-part="toggle"] {
-      width: var(--input-height-sm);
+      width: var(--aihio-input-height-sm);
     }
     aihio-combobox[size="lg"] [data-combobox-part="toggle"] {
-      width: var(--input-height-lg);
+      width: var(--aihio-input-height-lg);
     }
     aihio-combobox [data-combobox-part="toggle"]:hover {
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
     aihio-combobox [data-combobox-part="toggle"]:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
     aihio-combobox [data-combobox-part="toggle"] svg {
-      transition: transform var(--duration-intent-feedback) ease;
+      transition: transform var(--aihio-duration-feedback) ease;
     }
     aihio-combobox[open] [data-combobox-part="toggle"] svg {
       transform: rotate(180deg);
@@ -139,23 +139,23 @@ export default {
       margin: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding: var(--spacing-intent-cluster-gap-tight);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      border-radius: var(--radius-intent-interactive);
-      background-color: oklch(var(--color-intent-overlay-bg));
-      color: oklch(var(--color-intent-overlay-fg));
-      box-shadow: var(--shadow-intent-overlay);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      --aihio-combobox-shift: calc(var(--spacing-intent-cluster-gap-tight) * -1);
+      padding: var(--aihio-spacing-cluster-gap-tight);
+      border: 1px solid var(--aihio-color-border-subtle);
+      border-radius: var(--aihio-radius-interactive);
+      background-color: var(--aihio-color-overlay-bg);
+      color: var(--aihio-color-overlay-fg);
+      box-shadow: var(--aihio-shadow-overlay);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      --aihio-combobox-shift: calc(var(--aihio-spacing-cluster-gap-tight) * -1);
     }
     aihio-combobox [data-combobox-part="popup"][data-side="top"] {
-      --aihio-combobox-shift: var(--spacing-intent-cluster-gap-tight);
+      --aihio-combobox-shift: var(--aihio-spacing-cluster-gap-tight);
     }
     aihio-combobox [data-combobox-part="popup"]:popover-open,
     aihio-combobox [data-combobox-part="popup"][data-fallback-open] {
       display: block;
-      animation: aihio-combobox-in var(--duration-intent-feedback) ease;
+      animation: aihio-combobox-in var(--aihio-duration-feedback) ease;
     }
 
     @keyframes aihio-combobox-in {
@@ -168,9 +168,9 @@ export default {
     aihio-combobox [role="option"] {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      border-radius: var(--radius-intent-interactive-compact);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
       cursor: pointer;
       user-select: none;
     }
@@ -186,8 +186,8 @@ export default {
        keeps DOM focus, so no outline is drawn — and its fill has to read
        against the overlay in both themes. */
     aihio-combobox [role="option"][data-active] {
-      background-color: oklch(var(--color-intent-overlay-highlight-bg));
-      color: oklch(var(--color-intent-overlay-fg));
+      background-color: var(--aihio-color-overlay-highlight-bg);
+      color: var(--aihio-color-overlay-fg);
     }
 
     aihio-combobox [role="option"][aria-disabled="true"] {
@@ -206,7 +206,7 @@ export default {
     aihio-combobox [data-combobox-part="option-label"] mark {
       background: none;
       color: inherit;
-      font-weight: var(--fontWeight-intent-heading);
+      font-weight: var(--aihio-font-weight-heading);
     }
 
     aihio-combobox [data-combobox-part="check"] {
@@ -221,10 +221,10 @@ export default {
     aihio-combobox [data-combobox-part="message"] {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
-      font-size: var(--fontSize-intent-body-sm);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      color: var(--aihio-color-muted-fg);
+      font-size: var(--aihio-font-size-body-sm);
     }
 
     aihio-combobox [data-combobox-part="message"][data-loading]::before {
@@ -234,8 +234,8 @@ export default {
       height: 0.875em;
       border: 2px solid currentColor;
       border-inline-end-color: transparent;
-      border-radius: var(--radius-intent-pill);
-      animation: aihio-combobox-spin var(--duration-intent-spinner) linear infinite;
+      border-radius: var(--aihio-radius-pill);
+      animation: aihio-combobox-spin var(--aihio-duration-spinner) linear infinite;
     }
 
     @keyframes aihio-combobox-spin {

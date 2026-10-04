@@ -105,6 +105,8 @@
     "./css": "./dist/aihio.css",
     "./schema": "./dist/schema.json",
     "./schema/min": "./dist/schema.min.json",
+    "./tokens": "./dist/tokens.json",
+    "./tokens.md": "./dist/semantic-tokens.md",
     "./prompt.md": "./dist/aihio.prompt.md"
   },
   "files": [

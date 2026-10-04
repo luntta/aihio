@@ -13,7 +13,7 @@ export default {
     aihio-grid {
       --aihio-grid-min: 16rem;
       --aihio-grid-columns: 12;
-      --aihio-grid-gap: var(--spacing-intent-stack-md);
+      --aihio-grid-gap: var(--aihio-spacing-stack-md);
 
       display: grid;
       gap: var(--aihio-grid-gap);
@@ -33,9 +33,9 @@ export default {
     aihio-grid[columns="3"] { --aihio-grid-columns: 3; }
     aihio-grid[columns="4"] { --aihio-grid-columns: 4; }
 
-    aihio-grid[gap="tight"] { --aihio-grid-gap: var(--spacing-intent-stack-tight); }
-    aihio-grid[gap="sm"]    { --aihio-grid-gap: var(--spacing-intent-stack-sm); }
-    aihio-grid[gap="md"]    { --aihio-grid-gap: var(--spacing-intent-stack-md); }
-    aihio-grid[gap="lg"]    { --aihio-grid-gap: var(--spacing-intent-stack-lg); }
+    aihio-grid[gap="tight"] { --aihio-grid-gap: var(--aihio-spacing-stack-tight); }
+    aihio-grid[gap="sm"]    { --aihio-grid-gap: var(--aihio-spacing-stack-sm); }
+    aihio-grid[gap="md"]    { --aihio-grid-gap: var(--aihio-spacing-stack-md); }
+    aihio-grid[gap="lg"]    { --aihio-grid-gap: var(--aihio-spacing-stack-lg); }
   `,
 };

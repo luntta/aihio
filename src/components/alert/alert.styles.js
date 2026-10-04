@@ -12,49 +12,49 @@ export default {
          explicit direction the default "row" set them side by side and
          squeezed both into half the callout. */
       flex-direction: column;
-      gap: var(--spacing-intent-cluster-gap-tight);
+      gap: var(--aihio-spacing-cluster-gap-tight);
       width: 100%;
-      border-radius: var(--radius-intent-surface);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      padding: var(--spacing-intent-stack-md);
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
+      border-radius: var(--aihio-radius-surface);
+      border: 1px solid var(--aihio-color-border-subtle);
+      padding: var(--aihio-spacing-stack-md);
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
     }
 
     aihio-alert:not([variant]),
     aihio-alert[variant="default"] {
-      background-color: oklch(var(--color-intent-surface-bg));
-      color: oklch(var(--color-intent-surface-fg));
+      background-color: var(--aihio-color-surface-bg);
+      color: var(--aihio-color-surface-fg);
     }
 
     aihio-alert[variant="destructive"] {
-      border-color: oklch(var(--color-intent-state-destructive-bg) / 0.5);
-      color: oklch(var(--color-intent-state-destructive-text));
+      border-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 50%, transparent);
+      color: var(--aihio-color-destructive-text);
     }
     aihio-alert[variant="destructive"] [slot="title"] {
-      color: oklch(var(--color-intent-state-destructive-text));
+      color: var(--aihio-color-destructive-text);
     }
 
     aihio-alert[variant="success"] {
-      border-color: oklch(var(--color-intent-state-success-bg) / 0.5);
-      color: oklch(var(--color-intent-state-success-text));
+      border-color: color-mix(in oklch, var(--aihio-color-success-bg) 50%, transparent);
+      color: var(--aihio-color-success-text);
     }
     aihio-alert[variant="success"] [slot="title"] {
-      color: oklch(var(--color-intent-state-success-text));
+      color: var(--aihio-color-success-text);
     }
 
     aihio-alert[variant="warning"] {
-      border-color: oklch(var(--color-intent-state-warning-bg) / 0.5);
-      color: oklch(var(--color-intent-state-warning-text));
+      border-color: color-mix(in oklch, var(--aihio-color-warning-bg) 50%, transparent);
+      color: var(--aihio-color-warning-text);
     }
     aihio-alert[variant="warning"] [slot="title"] {
-      color: oklch(var(--color-intent-state-warning-text));
+      color: var(--aihio-color-warning-text);
     }
 
     aihio-alert [slot="title"] {
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
 
     /* No opacity to set the description back from the title: the contrast
@@ -62,7 +62,7 @@ export default {
        the success green at 0.9 opacity measured 4.31:1. The title's weight
        carries the hierarchy instead. */
     aihio-alert [slot="description"] {
-      font-size: var(--fontSize-intent-body-sm);
+      font-size: var(--aihio-font-size-body-sm);
     }
 
     /* Variant colour is discarded under forced colours. The border keeps the

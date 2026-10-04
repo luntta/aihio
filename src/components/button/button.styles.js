@@ -36,68 +36,68 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       font-family: inherit;
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      height: var(--button-height-md);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      height: var(--aihio-button-height-md);
       margin: 0;
-      padding-inline: var(--button-padding-x-md);
+      padding-inline: var(--aihio-button-padding-x-md);
       border: 1px solid transparent;
       appearance: none;
       cursor: pointer;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease,
-                  border-color var(--duration-intent-feedback) ease,
-                  opacity var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease,
+                  border-color var(--aihio-duration-feedback) ease,
+                  opacity var(--aihio-duration-feedback) ease;
       user-select: none;
       text-decoration: none;
-      line-height: var(--lineHeight-intent-compact);
+      line-height: var(--aihio-line-height-compact);
     }
 
     /* Variants */
     ${box(':not([variant])')},
     ${box('[variant="default"]')} {
-      background-color: oklch(var(--color-intent-action-primary-bg));
-      color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-bg);
+      color: var(--aihio-color-primary-action-fg);
     }
     ${box(':not([variant])', ':hover')},
     ${box('[variant="default"]', ':hover')} {
-      background-color: oklch(var(--color-intent-action-primary-bg) / 0.9);
+      background-color: color-mix(in oklch, var(--aihio-color-primary-action-bg) 90%, transparent);
     }
 
     ${box('[variant="secondary"]')} {
-      background-color: oklch(var(--color-intent-action-secondary-bg));
-      color: oklch(var(--color-intent-action-secondary-fg));
+      background-color: var(--aihio-color-secondary-action-bg);
+      color: var(--aihio-color-secondary-action-fg);
     }
     ${box('[variant="secondary"]', ':hover')} {
-      background-color: oklch(var(--color-intent-action-secondary-bg) / 0.8);
+      background-color: color-mix(in oklch, var(--aihio-color-secondary-action-bg) 80%, transparent);
     }
 
     ${box('[variant="outline"]')} {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
-      border-color: oklch(var(--color-intent-border-subtle));
+      color: var(--aihio-color-page-fg);
+      border-color: var(--aihio-color-border-subtle);
     }
     ${box('[variant="outline"]', ':hover')} {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     ${box('[variant="ghost"]')} {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
     ${box('[variant="ghost"]', ':hover')} {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     ${box('[variant="link"]')} {
       background-color: transparent;
-      color: oklch(var(--color-intent-action-primary-bg));
+      color: var(--aihio-color-primary-action-bg);
       text-decoration: underline;
       text-underline-offset: 4px;
       height: auto;
@@ -108,29 +108,29 @@ export default {
     }
 
     ${box('[variant="destructive"]')} {
-      background-color: oklch(var(--color-intent-state-destructive-bg));
-      color: oklch(var(--color-intent-state-destructive-fg));
+      background-color: var(--aihio-color-destructive-bg);
+      color: var(--aihio-color-destructive-fg);
     }
     ${box('[variant="destructive"]', ':hover')} {
-      background-color: oklch(var(--color-intent-state-destructive-bg) / 0.9);
+      background-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 90%, transparent);
     }
 
     /* Sizes */
     ${box('[size="sm"]')} {
-      height: var(--button-height-sm);
-      padding-inline: var(--button-padding-x-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      border-radius: var(--radius-intent-interactive-compact);
+      height: var(--aihio-button-height-sm);
+      padding-inline: var(--aihio-button-padding-x-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
     }
     ${box('[size="lg"]')} {
-      height: var(--button-height-lg);
-      padding-inline: var(--button-padding-x-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      border-radius: var(--radius-intent-interactive);
+      height: var(--aihio-button-height-lg);
+      padding-inline: var(--aihio-button-padding-x-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      border-radius: var(--aihio-radius-interactive);
     }
     ${box('[size="icon"]')} {
-      height: var(--button-height-icon);
-      width: var(--button-height-icon);
+      height: var(--aihio-button-height-icon);
+      width: var(--aihio-button-height-icon);
       padding: 0;
     }
 
@@ -161,10 +161,10 @@ export default {
       width: 1em;
       height: 1em;
       flex: none;
-      border-radius: var(--radius-intent-pill);
+      border-radius: var(--aihio-radius-pill);
       border: 2px solid currentColor;
       border-block-start-color: transparent;
-      animation: aihio-button-spin var(--duration-intent-spinner) linear infinite;
+      animation: aihio-button-spin var(--aihio-duration-spinner) linear infinite;
     }
 
     @keyframes aihio-button-spin {
@@ -180,7 +180,7 @@ export default {
     }
 
     ${box('', ':focus-visible')} {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 

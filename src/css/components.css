@@ -7,49 +7,49 @@ aihio-alert {
          explicit direction the default "row" set them side by side and
          squeezed both into half the callout. */
       flex-direction: column;
-      gap: var(--spacing-intent-cluster-gap-tight);
+      gap: var(--aihio-spacing-cluster-gap-tight);
       width: 100%;
-      border-radius: var(--radius-intent-surface);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      padding: var(--spacing-intent-stack-md);
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
+      border-radius: var(--aihio-radius-surface);
+      border: 1px solid var(--aihio-color-border-subtle);
+      padding: var(--aihio-spacing-stack-md);
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
     }
 
     aihio-alert:not([variant]),
     aihio-alert[variant="default"] {
-      background-color: oklch(var(--color-intent-surface-bg));
-      color: oklch(var(--color-intent-surface-fg));
+      background-color: var(--aihio-color-surface-bg);
+      color: var(--aihio-color-surface-fg);
     }
 
     aihio-alert[variant="destructive"] {
-      border-color: oklch(var(--color-intent-state-destructive-bg) / 0.5);
-      color: oklch(var(--color-intent-state-destructive-text));
+      border-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 50%, transparent);
+      color: var(--aihio-color-destructive-text);
     }
     aihio-alert[variant="destructive"] [slot="title"] {
-      color: oklch(var(--color-intent-state-destructive-text));
+      color: var(--aihio-color-destructive-text);
     }
 
     aihio-alert[variant="success"] {
-      border-color: oklch(var(--color-intent-state-success-bg) / 0.5);
-      color: oklch(var(--color-intent-state-success-text));
+      border-color: color-mix(in oklch, var(--aihio-color-success-bg) 50%, transparent);
+      color: var(--aihio-color-success-text);
     }
     aihio-alert[variant="success"] [slot="title"] {
-      color: oklch(var(--color-intent-state-success-text));
+      color: var(--aihio-color-success-text);
     }
 
     aihio-alert[variant="warning"] {
-      border-color: oklch(var(--color-intent-state-warning-bg) / 0.5);
-      color: oklch(var(--color-intent-state-warning-text));
+      border-color: color-mix(in oklch, var(--aihio-color-warning-bg) 50%, transparent);
+      color: var(--aihio-color-warning-text);
     }
     aihio-alert[variant="warning"] [slot="title"] {
-      color: oklch(var(--color-intent-state-warning-text));
+      color: var(--aihio-color-warning-text);
     }
 
     aihio-alert [slot="title"] {
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
 
     /* No opacity to set the description back from the title: the contrast
@@ -57,7 +57,7 @@ aihio-alert {
        the success green at 0.9 opacity measured 4.31:1. The title's weight
        carries the hierarchy instead. */
     aihio-alert [slot="description"] {
-      font-size: var(--fontSize-intent-body-sm);
+      font-size: var(--aihio-font-size-body-sm);
     }
 
     /* Variant colour is discarded under forced colours. The border keeps the
@@ -74,26 +74,26 @@ aihio-avatar {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: var(--avatar-size-md);
-      height: var(--avatar-size-md);
-      border-radius: var(--radius-intent-pill);
+      width: var(--aihio-avatar-size-md);
+      height: var(--aihio-avatar-size-md);
+      border-radius: var(--aihio-radius-pill);
       overflow: hidden;
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      color: oklch(var(--color-intent-surface-muted-fg));
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
+      background-color: var(--aihio-color-muted-bg);
+      color: var(--aihio-color-muted-fg);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
       flex-shrink: 0;
     }
 
     aihio-avatar[size="sm"] {
-      width: var(--avatar-size-sm);
-      height: var(--avatar-size-sm);
-      font-size: var(--fontSize-intent-control-sm);
+      width: var(--aihio-avatar-size-sm);
+      height: var(--aihio-avatar-size-sm);
+      font-size: var(--aihio-font-size-control-sm);
     }
     aihio-avatar[size="lg"] {
-      width: var(--avatar-size-lg);
-      height: var(--avatar-size-lg);
-      font-size: var(--fontSize-intent-control-lg);
+      width: var(--aihio-avatar-size-lg);
+      height: var(--aihio-avatar-size-lg);
+      font-size: var(--aihio-font-size-control-lg);
     }
 
     aihio-avatar img {
@@ -106,47 +106,47 @@ aihio-avatar {
 aihio-badge {
       display: inline-flex;
       align-items: center;
-      border-radius: var(--radius-intent-pill);
-      padding: var(--badge-padding-y) var(--badge-padding-x);
-      font-size: var(--fontSize-intent-badge);
-      font-weight: var(--fontWeight-intent-badge);
-      line-height: var(--lineHeight-intent-compact);
+      border-radius: var(--aihio-radius-pill);
+      padding: var(--aihio-badge-padding-y) var(--aihio-badge-padding-x);
+      font-size: var(--aihio-font-size-badge);
+      font-weight: var(--aihio-font-weight-badge);
+      line-height: var(--aihio-line-height-compact);
       border: 1px solid transparent;
       white-space: nowrap;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease;
     }
 
     aihio-badge:not([variant]),
     aihio-badge[variant="default"] {
-      background-color: oklch(var(--color-intent-action-primary-bg));
-      color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-bg);
+      color: var(--aihio-color-primary-action-fg);
     }
 
     aihio-badge[variant="secondary"] {
-      background-color: oklch(var(--color-intent-action-secondary-bg));
-      color: oklch(var(--color-intent-action-secondary-fg));
+      background-color: var(--aihio-color-secondary-action-bg);
+      color: var(--aihio-color-secondary-action-fg);
     }
 
     aihio-badge[variant="outline"] {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
-      border-color: oklch(var(--color-intent-border-subtle));
+      color: var(--aihio-color-page-fg);
+      border-color: var(--aihio-color-border-subtle);
     }
 
     aihio-badge[variant="destructive"] {
-      background-color: oklch(var(--color-intent-state-destructive-bg));
-      color: oklch(var(--color-intent-state-destructive-fg));
+      background-color: var(--aihio-color-destructive-bg);
+      color: var(--aihio-color-destructive-fg);
     }
 
     aihio-badge[variant="success"] {
-      background-color: oklch(var(--color-intent-state-success-bg));
-      color: oklch(var(--color-intent-state-success-fg));
+      background-color: var(--aihio-color-success-bg);
+      color: var(--aihio-color-success-fg);
     }
 
     aihio-badge[variant="warning"] {
-      background-color: oklch(var(--color-intent-state-warning-bg));
-      color: oklch(var(--color-intent-state-warning-fg));
+      background-color: var(--aihio-color-warning-bg);
+      color: var(--aihio-color-warning-fg);
     }
 
     /* Every variant collapses to the same fill under forced colours, so give
@@ -169,25 +169,25 @@ aihio-button:defined,
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       font-family: inherit;
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      height: var(--button-height-md);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      height: var(--aihio-button-height-md);
       margin: 0;
-      padding-inline: var(--button-padding-x-md);
+      padding-inline: var(--aihio-button-padding-x-md);
       border: 1px solid transparent;
       appearance: none;
       cursor: pointer;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease,
-                  border-color var(--duration-intent-feedback) ease,
-                  opacity var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease,
+                  border-color var(--aihio-duration-feedback) ease,
+                  opacity var(--aihio-duration-feedback) ease;
       user-select: none;
       text-decoration: none;
-      line-height: var(--lineHeight-intent-compact);
+      line-height: var(--aihio-line-height-compact);
     }
 
     /* Variants */
@@ -197,8 +197,8 @@ aihio-button:defined,
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="default"],
     aihio-button[variant="default"] > button,
     aihio-button[variant="default"] > a {
-      background-color: oklch(var(--color-intent-action-primary-bg));
-      color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-bg);
+      color: var(--aihio-color-primary-action-fg);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a))):not([variant]):hover,
     aihio-button:not([variant]) > button:hover,
@@ -206,53 +206,53 @@ aihio-button:defined,
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="default"]:hover,
     aihio-button[variant="default"] > button:hover,
     aihio-button[variant="default"] > a:hover {
-      background-color: oklch(var(--color-intent-action-primary-bg) / 0.9);
+      background-color: color-mix(in oklch, var(--aihio-color-primary-action-bg) 90%, transparent);
     }
 
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="secondary"],
     aihio-button[variant="secondary"] > button,
     aihio-button[variant="secondary"] > a {
-      background-color: oklch(var(--color-intent-action-secondary-bg));
-      color: oklch(var(--color-intent-action-secondary-fg));
+      background-color: var(--aihio-color-secondary-action-bg);
+      color: var(--aihio-color-secondary-action-fg);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="secondary"]:hover,
     aihio-button[variant="secondary"] > button:hover,
     aihio-button[variant="secondary"] > a:hover {
-      background-color: oklch(var(--color-intent-action-secondary-bg) / 0.8);
+      background-color: color-mix(in oklch, var(--aihio-color-secondary-action-bg) 80%, transparent);
     }
 
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="outline"],
     aihio-button[variant="outline"] > button,
     aihio-button[variant="outline"] > a {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
-      border-color: oklch(var(--color-intent-border-subtle));
+      color: var(--aihio-color-page-fg);
+      border-color: var(--aihio-color-border-subtle);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="outline"]:hover,
     aihio-button[variant="outline"] > button:hover,
     aihio-button[variant="outline"] > a:hover {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="ghost"],
     aihio-button[variant="ghost"] > button,
     aihio-button[variant="ghost"] > a {
       background-color: transparent;
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="ghost"]:hover,
     aihio-button[variant="ghost"] > button:hover,
     aihio-button[variant="ghost"] > a:hover {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="link"],
     aihio-button[variant="link"] > button,
     aihio-button[variant="link"] > a {
       background-color: transparent;
-      color: oklch(var(--color-intent-action-primary-bg));
+      color: var(--aihio-color-primary-action-bg);
       text-decoration: underline;
       text-underline-offset: 4px;
       height: auto;
@@ -267,37 +267,37 @@ aihio-button:defined,
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="destructive"],
     aihio-button[variant="destructive"] > button,
     aihio-button[variant="destructive"] > a {
-      background-color: oklch(var(--color-intent-state-destructive-bg));
-      color: oklch(var(--color-intent-state-destructive-fg));
+      background-color: var(--aihio-color-destructive-bg);
+      color: var(--aihio-color-destructive-fg);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[variant="destructive"]:hover,
     aihio-button[variant="destructive"] > button:hover,
     aihio-button[variant="destructive"] > a:hover {
-      background-color: oklch(var(--color-intent-state-destructive-bg) / 0.9);
+      background-color: color-mix(in oklch, var(--aihio-color-destructive-bg) 90%, transparent);
     }
 
     /* Sizes */
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[size="sm"],
     aihio-button[size="sm"] > button,
     aihio-button[size="sm"] > a {
-      height: var(--button-height-sm);
-      padding-inline: var(--button-padding-x-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      border-radius: var(--radius-intent-interactive-compact);
+      height: var(--aihio-button-height-sm);
+      padding-inline: var(--aihio-button-padding-x-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[size="lg"],
     aihio-button[size="lg"] > button,
     aihio-button[size="lg"] > a {
-      height: var(--button-height-lg);
-      padding-inline: var(--button-padding-x-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      border-radius: var(--radius-intent-interactive);
+      height: var(--aihio-button-height-lg);
+      padding-inline: var(--aihio-button-padding-x-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      border-radius: var(--aihio-radius-interactive);
     }
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a)))[size="icon"],
     aihio-button[size="icon"] > button,
     aihio-button[size="icon"] > a {
-      height: var(--button-height-icon);
-      width: var(--button-height-icon);
+      height: var(--aihio-button-height-icon);
+      width: var(--aihio-button-height-icon);
       padding: 0;
     }
 
@@ -330,10 +330,10 @@ aihio-button:defined,
       width: 1em;
       height: 1em;
       flex: none;
-      border-radius: var(--radius-intent-pill);
+      border-radius: var(--aihio-radius-pill);
       border: 2px solid currentColor;
       border-block-start-color: transparent;
-      animation: aihio-button-spin var(--duration-intent-spinner) linear infinite;
+      animation: aihio-button-spin var(--aihio-duration-spinner) linear infinite;
     }
 
     @keyframes aihio-button-spin {
@@ -353,7 +353,7 @@ aihio-button:defined,
     aihio-button:not(:defined):not(:is(:has(> button), :has(> a))):focus-visible,
     aihio-button > button:focus-visible,
     aihio-button > a:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 
@@ -406,11 +406,11 @@ aihio-button:defined,
 aihio-card {
       display: flex;
       flex-direction: column;
-      border-radius: var(--radius-intent-surface);
-      background-color: oklch(var(--color-intent-surface-bg));
-      color: oklch(var(--color-intent-surface-fg));
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      box-shadow: var(--shadow-intent-surface);
+      border-radius: var(--aihio-radius-surface);
+      background-color: var(--aihio-color-surface-bg);
+      color: var(--aihio-color-surface-fg);
+      border: 1px solid var(--aihio-color-border-subtle);
+      box-shadow: var(--aihio-shadow-surface);
     }
 
     aihio-card[variant="outline"] {
@@ -420,28 +420,28 @@ aihio-card {
     aihio-card-header {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      padding: var(--card-padding);
+      gap: var(--aihio-spacing-stack-tight);
+      padding: var(--aihio-card-padding);
       padding-bottom: 0;
     }
 
     aihio-card-title {
       display: block;
-      font-size: var(--fontSize-intent-heading);
-      font-weight: var(--fontWeight-intent-heading);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-size: var(--aihio-font-size-heading);
+      font-weight: var(--aihio-font-weight-heading);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
 
     aihio-card-description {
       display: block;
-      font-size: var(--fontSize-intent-body-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-card-content {
       display: block;
-      padding: var(--card-padding);
+      padding: var(--aihio-card-padding);
     }
 
     aihio-card-footer {
@@ -450,8 +450,8 @@ aihio-card {
          through the card edge on narrow viewports. */
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--card-padding);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-card-padding);
       padding-top: 0;
     }
 
@@ -467,13 +467,13 @@ aihio-cluster {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
     }
 
-    aihio-cluster[gap="tight"] { gap: var(--spacing-intent-cluster-gap-tight); }
-    aihio-cluster[gap="sm"]    { gap: var(--spacing-intent-control-gap); }
-    aihio-cluster[gap="md"]    { gap: var(--spacing-intent-stack-sm); }
-    aihio-cluster[gap="lg"]    { gap: var(--spacing-intent-stack-md); }
+    aihio-cluster[gap="tight"] { gap: var(--aihio-spacing-cluster-gap-tight); }
+    aihio-cluster[gap="sm"]    { gap: var(--aihio-spacing-control-gap); }
+    aihio-cluster[gap="md"]    { gap: var(--aihio-spacing-stack-sm); }
+    aihio-cluster[gap="lg"]    { gap: var(--aihio-spacing-stack-md); }
 
     aihio-cluster[align="start"]    { align-items: flex-start; }
     aihio-cluster[align="center"]   { align-items: center; }
@@ -510,38 +510,38 @@ aihio-combobox {
        jump when the input appears. */
     aihio-combobox:not(:defined) {
       box-sizing: border-box;
-      height: var(--input-height-md);
-      border: 1px solid oklch(var(--color-intent-field-border));
-      border-radius: var(--radius-intent-interactive);
+      height: var(--aihio-input-height-md);
+      border: 1px solid var(--aihio-color-field-border);
+      border-radius: var(--aihio-radius-interactive);
     }
 
     aihio-combobox [data-combobox-part="input"] {
       display: flex;
       width: 100%;
-      height: var(--input-height-md);
+      height: var(--aihio-input-height-md);
       margin: 0;
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding-block: var(--spacing-intent-field-padding-block);
-      padding-inline: var(--spacing-intent-field-padding-inline) var(--input-height-md);
+      padding-block: var(--aihio-spacing-field-padding-block);
+      padding-inline: var(--aihio-spacing-field-padding-inline) var(--aihio-input-height-md);
       font: inherit;
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
       text-overflow: ellipsis;
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-combobox [data-combobox-part="input"]::placeholder {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-combobox [data-combobox-part="input"]:focus-visible {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     aihio-combobox [data-combobox-part="input"]:disabled {
@@ -550,24 +550,24 @@ aihio-combobox {
     }
 
     aihio-combobox[size="sm"] [data-combobox-part="input"] {
-      height: var(--input-height-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      padding-block: var(--spacing-intent-field-padding-block-sm);
-      padding-inline: var(--spacing-intent-field-padding-inline-sm) var(--input-height-sm);
+      height: var(--aihio-input-height-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      padding-block: var(--aihio-spacing-field-padding-block-sm);
+      padding-inline: var(--aihio-spacing-field-padding-inline-sm) var(--aihio-input-height-sm);
     }
     aihio-combobox[size="lg"] [data-combobox-part="input"] {
-      height: var(--input-height-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      padding-block: var(--spacing-intent-field-padding-block-lg);
-      padding-inline: var(--spacing-intent-field-padding-inline-lg) var(--input-height-lg);
+      height: var(--aihio-input-height-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      padding-block: var(--aihio-spacing-field-padding-block-lg);
+      padding-inline: var(--aihio-spacing-field-padding-inline-lg) var(--aihio-input-height-lg);
     }
 
     aihio-combobox[error] [data-combobox-part="input"] {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
     aihio-combobox[error] [data-combobox-part="input"]:focus-visible {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     /* A pointer affordance only: it is out of the tab order, and the keyboard
@@ -579,31 +579,31 @@ aihio-combobox {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: var(--input-height-md);
+      width: var(--aihio-input-height-md);
       margin: 0;
       padding: 0;
       border: 0;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       background: none;
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
       cursor: pointer;
-      transition: color var(--duration-intent-feedback-fast) ease;
+      transition: color var(--aihio-duration-feedback-fast) ease;
     }
     aihio-combobox[size="sm"] [data-combobox-part="toggle"] {
-      width: var(--input-height-sm);
+      width: var(--aihio-input-height-sm);
     }
     aihio-combobox[size="lg"] [data-combobox-part="toggle"] {
-      width: var(--input-height-lg);
+      width: var(--aihio-input-height-lg);
     }
     aihio-combobox [data-combobox-part="toggle"]:hover {
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
     aihio-combobox [data-combobox-part="toggle"]:disabled {
       cursor: not-allowed;
       opacity: 0.5;
     }
     aihio-combobox [data-combobox-part="toggle"] svg {
-      transition: transform var(--duration-intent-feedback) ease;
+      transition: transform var(--aihio-duration-feedback) ease;
     }
     aihio-combobox[open] [data-combobox-part="toggle"] svg {
       transform: rotate(180deg);
@@ -625,23 +625,23 @@ aihio-combobox {
       margin: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding: var(--spacing-intent-cluster-gap-tight);
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      border-radius: var(--radius-intent-interactive);
-      background-color: oklch(var(--color-intent-overlay-bg));
-      color: oklch(var(--color-intent-overlay-fg));
-      box-shadow: var(--shadow-intent-overlay);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      --aihio-combobox-shift: calc(var(--spacing-intent-cluster-gap-tight) * -1);
+      padding: var(--aihio-spacing-cluster-gap-tight);
+      border: 1px solid var(--aihio-color-border-subtle);
+      border-radius: var(--aihio-radius-interactive);
+      background-color: var(--aihio-color-overlay-bg);
+      color: var(--aihio-color-overlay-fg);
+      box-shadow: var(--aihio-shadow-overlay);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      --aihio-combobox-shift: calc(var(--aihio-spacing-cluster-gap-tight) * -1);
     }
     aihio-combobox [data-combobox-part="popup"][data-side="top"] {
-      --aihio-combobox-shift: var(--spacing-intent-cluster-gap-tight);
+      --aihio-combobox-shift: var(--aihio-spacing-cluster-gap-tight);
     }
     aihio-combobox [data-combobox-part="popup"]:popover-open,
     aihio-combobox [data-combobox-part="popup"][data-fallback-open] {
       display: block;
-      animation: aihio-combobox-in var(--duration-intent-feedback) ease;
+      animation: aihio-combobox-in var(--aihio-duration-feedback) ease;
     }
 
     @keyframes aihio-combobox-in {
@@ -654,9 +654,9 @@ aihio-combobox {
     aihio-combobox [role="option"] {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      border-radius: var(--radius-intent-interactive-compact);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
       cursor: pointer;
       user-select: none;
     }
@@ -672,8 +672,8 @@ aihio-combobox {
        keeps DOM focus, so no outline is drawn — and its fill has to read
        against the overlay in both themes. */
     aihio-combobox [role="option"][data-active] {
-      background-color: oklch(var(--color-intent-overlay-highlight-bg));
-      color: oklch(var(--color-intent-overlay-fg));
+      background-color: var(--aihio-color-overlay-highlight-bg);
+      color: var(--aihio-color-overlay-fg);
     }
 
     aihio-combobox [role="option"][aria-disabled="true"] {
@@ -692,7 +692,7 @@ aihio-combobox {
     aihio-combobox [data-combobox-part="option-label"] mark {
       background: none;
       color: inherit;
-      font-weight: var(--fontWeight-intent-heading);
+      font-weight: var(--aihio-font-weight-heading);
     }
 
     aihio-combobox [data-combobox-part="check"] {
@@ -707,10 +707,10 @@ aihio-combobox {
     aihio-combobox [data-combobox-part="message"] {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
-      font-size: var(--fontSize-intent-body-sm);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      color: var(--aihio-color-muted-fg);
+      font-size: var(--aihio-font-size-body-sm);
     }
 
     aihio-combobox [data-combobox-part="message"][data-loading]::before {
@@ -720,8 +720,8 @@ aihio-combobox {
       height: 0.875em;
       border: 2px solid currentColor;
       border-inline-end-color: transparent;
-      border-radius: var(--radius-intent-pill);
-      animation: aihio-combobox-spin var(--duration-intent-spinner) linear infinite;
+      border-radius: var(--aihio-radius-pill);
+      animation: aihio-combobox-spin var(--aihio-duration-spinner) linear infinite;
     }
 
     @keyframes aihio-combobox-spin {
@@ -805,48 +805,48 @@ aihio-combobox {
 /* aihio-dialog-description */
 aihio-dialog-description {
       display: block;
-      font-size: var(--fontSize-intent-body-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      color: var(--aihio-color-muted-fg);
     }
 
 /* aihio-dialog-footer */
 aihio-dialog-footer {
       display: flex;
       justify-content: flex-end;
-      gap: var(--spacing-intent-control-gap);
-      margin-top: var(--spacing-intent-stack-lg);
+      gap: var(--aihio-spacing-control-gap);
+      margin-top: var(--aihio-spacing-stack-lg);
     }
 
 /* aihio-dialog-header */
 aihio-dialog-header {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      margin-bottom: var(--spacing-intent-stack-md);
+      gap: var(--aihio-spacing-stack-tight);
+      margin-bottom: var(--aihio-spacing-stack-md);
     }
 
 /* aihio-dialog-title */
 aihio-dialog-title {
       display: block;
-      font-size: var(--fontSize-intent-heading-sm);
-      font-weight: var(--fontWeight-intent-heading);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-size: var(--aihio-font-size-heading-sm);
+      font-weight: var(--aihio-font-weight-heading);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
 
 /* aihio-dropdown-item */
 aihio-dropdown-item {
       display: flex;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
-      border-radius: var(--radius-intent-interactive-compact);
-      font-size: var(--fontSize-intent-control);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
+      border-radius: var(--aihio-radius-interactive-compact);
+      font-size: var(--aihio-font-size-control);
       cursor: pointer;
       user-select: none;
       outline: none;
-      transition: background-color var(--duration-intent-feedback-fast) ease,
-                  color var(--duration-intent-feedback-fast) ease;
+      transition: background-color var(--aihio-duration-feedback-fast) ease,
+                  color var(--aihio-duration-feedback-fast) ease;
     }
 
     /* A link item: the <a> is the menuitem, so it carries the row's padding
@@ -859,8 +859,8 @@ aihio-dropdown-item {
       display: flex;
       flex: 1;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline-sm);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline-sm);
       border-radius: inherit;
       color: inherit;
       text-decoration: none;
@@ -871,8 +871,8 @@ aihio-dropdown-item {
     aihio-dropdown-item:hover,
     aihio-dropdown-item:focus-visible,
     aihio-dropdown-item:has(> a:focus-visible) {
-      background-color: oklch(var(--color-intent-overlay-highlight-bg));
-      color: oklch(var(--color-intent-overlay-fg));
+      background-color: var(--aihio-color-overlay-highlight-bg);
+      color: var(--aihio-color-overlay-fg);
     }
 
     aihio-dropdown-item[disabled] {
@@ -902,34 +902,34 @@ aihio-dropdown-item {
 aihio-dropdown-separator {
       display: block;
       height: 1px;
-      background-color: oklch(var(--color-intent-border-subtle));
-      margin: var(--spacing-intent-cluster-gap-tight) calc(var(--spacing-intent-cluster-gap-tight) * -1);
+      background-color: var(--aihio-color-border-subtle);
+      margin: var(--aihio-spacing-cluster-gap-tight) calc(var(--aihio-spacing-cluster-gap-tight) * -1);
     }
 
 /* aihio-field */
 aihio-field {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-form-field-gap);
+      gap: var(--aihio-spacing-form-field-gap);
     }
 
     aihio-field [slot="label"] {
-      font-size: var(--fontSize-intent-control-sm);
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      color: oklch(var(--color-intent-page-fg));
+      font-size: var(--aihio-font-size-control-sm);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      color: var(--aihio-color-page-fg);
     }
 
     aihio-field [slot="description"] {
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-field [slot="error"] {
-      font-size: var(--fontSize-intent-body-sm);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-state-destructive-text));
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-destructive-text);
     }
 
     /* The description is redundant once an error is showing: the error message
@@ -945,8 +945,8 @@ aihio-field {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      column-gap: var(--spacing-intent-stack-md);
-      row-gap: var(--spacing-intent-form-field-gap);
+      column-gap: var(--aihio-spacing-stack-md);
+      row-gap: var(--aihio-spacing-form-field-gap);
     }
 
     aihio-field:has(> aihio-switch) > * {
@@ -966,38 +966,38 @@ aihio-field {
       box-sizing: border-box;
       width: 100%;
       margin: 0;
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding: var(--spacing-intent-field-padding-block) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      padding: var(--aihio-spacing-field-padding-block) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-field > textarea {
-      min-height: calc(var(--input-height-md) * 2);
+      min-height: calc(var(--aihio-input-height-md) * 2);
       resize: vertical;
     }
 
     aihio-field > textarea::placeholder {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     /* The chevron is two gradient triangles in currentColor, so it follows the
        theme and forced colours without an image. */
     aihio-field > select {
       appearance: none;
-      height: var(--input-height-md);
-      padding-inline-end: calc(var(--spacing-intent-field-padding-inline) + 1.25rem);
+      height: var(--aihio-input-height-md);
+      padding-inline-end: calc(var(--aihio-spacing-field-padding-inline) + 1.25rem);
       background-image:
         linear-gradient(45deg, transparent 50%, currentColor 50%),
         linear-gradient(135deg, currentColor 50%, transparent 50%);
       background-position:
-        right calc(var(--spacing-intent-field-padding-inline) + 5px) center,
-        right var(--spacing-intent-field-padding-inline) center;
+        right calc(var(--aihio-spacing-field-padding-inline) + 5px) center,
+        right var(--aihio-spacing-field-padding-inline) center;
       background-size: 5px 5px;
       background-repeat: no-repeat;
       cursor: pointer;
@@ -1005,25 +1005,25 @@ aihio-field {
 
     aihio-field > select:dir(rtl) {
       background-position:
-        left var(--spacing-intent-field-padding-inline) center,
-        left calc(var(--spacing-intent-field-padding-inline) + 5px) center;
+        left var(--aihio-spacing-field-padding-inline) center,
+        left calc(var(--aihio-spacing-field-padding-inline) + 5px) center;
     }
 
     aihio-field > textarea:focus-visible,
     aihio-field > select:focus-visible {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     aihio-field[error] > textarea,
     aihio-field[error] > select {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
 
     aihio-field[error] > textarea:focus-visible,
     aihio-field[error] > select:focus-visible {
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     aihio-field > textarea:disabled,
@@ -1069,7 +1069,7 @@ aihio-field {
     aihio-grid {
       --aihio-grid-min: 16rem;
       --aihio-grid-columns: 12;
-      --aihio-grid-gap: var(--spacing-intent-stack-md);
+      --aihio-grid-gap: var(--aihio-spacing-stack-md);
 
       display: grid;
       gap: var(--aihio-grid-gap);
@@ -1089,10 +1089,10 @@ aihio-field {
     aihio-grid[columns="3"] { --aihio-grid-columns: 3; }
     aihio-grid[columns="4"] { --aihio-grid-columns: 4; }
 
-    aihio-grid[gap="tight"] { --aihio-grid-gap: var(--spacing-intent-stack-tight); }
-    aihio-grid[gap="sm"]    { --aihio-grid-gap: var(--spacing-intent-stack-sm); }
-    aihio-grid[gap="md"]    { --aihio-grid-gap: var(--spacing-intent-stack-md); }
-    aihio-grid[gap="lg"]    { --aihio-grid-gap: var(--spacing-intent-stack-lg); }
+    aihio-grid[gap="tight"] { --aihio-grid-gap: var(--aihio-spacing-stack-tight); }
+    aihio-grid[gap="sm"]    { --aihio-grid-gap: var(--aihio-spacing-stack-sm); }
+    aihio-grid[gap="md"]    { --aihio-grid-gap: var(--aihio-spacing-stack-md); }
+    aihio-grid[gap="lg"]    { --aihio-grid-gap: var(--aihio-spacing-stack-lg); }
 
 /* aihio-input */
 aihio-input {
@@ -1104,26 +1104,26 @@ aihio-input {
     aihio-input input {
       display: flex;
       width: 100%;
-      height: var(--input-height-md);
-      border-radius: var(--radius-intent-interactive);
-      border: 1px solid oklch(var(--color-intent-field-border));
+      height: var(--aihio-input-height-md);
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
       background-color: transparent;
-      padding: var(--spacing-intent-field-padding-block) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      line-height: var(--lineHeight-intent-body);
-      color: oklch(var(--color-intent-page-fg));
-      transition: border-color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      padding: var(--aihio-spacing-field-padding-block) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-input input::placeholder {
-      color: oklch(var(--color-intent-surface-muted-fg));
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-input input:focus-visible {
       outline: none;
-      border-color: oklch(var(--color-intent-focus-ring));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-focus-ring));
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
     }
 
     aihio-input input:disabled {
@@ -1133,23 +1133,23 @@ aihio-input {
 
     /* Sizes */
     aihio-input[size="sm"] input {
-      height: var(--input-height-sm);
-      font-size: var(--fontSize-intent-control-sm);
-      padding: var(--spacing-intent-field-padding-block-sm) var(--spacing-intent-field-padding-inline-sm);
+      height: var(--aihio-input-height-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      padding: var(--aihio-spacing-field-padding-block-sm) var(--aihio-spacing-field-padding-inline-sm);
     }
     aihio-input[size="lg"] input {
-      height: var(--input-height-lg);
-      font-size: var(--fontSize-intent-control-lg);
-      padding: var(--spacing-intent-field-padding-block-lg) var(--spacing-intent-field-padding-inline-lg);
+      height: var(--aihio-input-height-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      padding: var(--aihio-spacing-field-padding-block-lg) var(--aihio-spacing-field-padding-inline-lg);
     }
 
     /* Error state */
     aihio-input[error] input {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
     }
     aihio-input[error] input:focus-visible {
-      border-color: oklch(var(--color-intent-state-destructive-bg));
-      box-shadow: 0 0 0 1px oklch(var(--color-intent-state-destructive-bg));
+      border-color: var(--aihio-color-destructive-bg);
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
     }
 
     @media (forced-colors: active) {
@@ -1183,13 +1183,13 @@ aihio-input {
 aihio-stack {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-md);
+      gap: var(--aihio-spacing-stack-md);
     }
 
-    aihio-stack[gap="tight"] { gap: var(--spacing-intent-stack-tight); }
-    aihio-stack[gap="sm"]    { gap: var(--spacing-intent-stack-sm); }
-    aihio-stack[gap="md"]    { gap: var(--spacing-intent-stack-md); }
-    aihio-stack[gap="lg"]    { gap: var(--spacing-intent-stack-lg); }
+    aihio-stack[gap="tight"] { gap: var(--aihio-spacing-stack-tight); }
+    aihio-stack[gap="sm"]    { gap: var(--aihio-spacing-stack-sm); }
+    aihio-stack[gap="md"]    { gap: var(--aihio-spacing-stack-md); }
+    aihio-stack[gap="lg"]    { gap: var(--aihio-spacing-stack-lg); }
 
     aihio-stack[align="start"]   { align-items: flex-start; }
     aihio-stack[align="center"]  { align-items: center; }
@@ -1213,8 +1213,8 @@ aihio-switch {
     aihio-switch:not(:defined) {
       width: var(--aihio-switch-width);
       height: var(--aihio-switch-height);
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-field-border);
     }
 
     /* The checkbox is the track and its ::before the thumb, so the element
@@ -1231,10 +1231,10 @@ aihio-switch {
       height: var(--aihio-switch-height);
       margin: 0;
       border: 1px solid transparent;
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-field-border));
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-field-border);
       cursor: pointer;
-      transition: background-color var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease;
     }
 
     aihio-switch > input::before {
@@ -1244,23 +1244,23 @@ aihio-switch {
       inset-inline-start: var(--aihio-switch-inset);
       width: var(--aihio-switch-thumb);
       height: var(--aihio-switch-thumb);
-      border-radius: var(--radius-intent-pill);
-      background-color: oklch(var(--color-intent-page-bg));
-      box-shadow: var(--shadow-intent-surface);
-      transition: inset-inline-start var(--duration-intent-feedback) ease;
+      border-radius: var(--aihio-radius-pill);
+      background-color: var(--aihio-color-page-bg);
+      box-shadow: var(--aihio-shadow-surface);
+      transition: inset-inline-start var(--aihio-duration-feedback) ease;
     }
 
     aihio-switch > input:checked {
-      background-color: oklch(var(--color-intent-action-primary-bg));
+      background-color: var(--aihio-color-primary-action-bg);
     }
 
     aihio-switch > input:checked::before {
       inset-inline-start: calc(100% - var(--aihio-switch-thumb) - var(--aihio-switch-inset));
-      background-color: oklch(var(--color-intent-action-primary-fg));
+      background-color: var(--aihio-color-primary-action-fg);
     }
 
     aihio-switch > input:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 
@@ -1308,26 +1308,26 @@ aihio-tab {
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive-compact);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      border-radius: var(--aihio-radius-interactive-compact);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      color: var(--aihio-color-muted-fg);
       cursor: pointer;
       user-select: none;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-tab:hover:not([disabled]) {
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
 
     aihio-tab[active] {
-      background-color: oklch(var(--color-intent-page-bg));
-      color: oklch(var(--color-intent-page-fg));
-      box-shadow: var(--shadow-intent-surface);
+      background-color: var(--aihio-color-page-bg);
+      color: var(--aihio-color-page-fg);
+      box-shadow: var(--aihio-shadow-surface);
     }
 
     aihio-tab[disabled] {
@@ -1336,7 +1336,7 @@ aihio-tab {
     }
 
     aihio-tab:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 
@@ -1367,10 +1367,10 @@ aihio-tab {
 aihio-tab-list {
       display: inline-flex;
       align-items: center;
-      gap: var(--spacing-intent-cluster-gap-tight);
-      border-radius: var(--radius-intent-interactive);
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      padding: var(--spacing-intent-cluster-gap-tight);
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      border-radius: var(--aihio-radius-interactive);
+      background-color: var(--aihio-color-muted-bg);
+      padding: var(--aihio-spacing-cluster-gap-tight);
     }
 
     @media (forced-colors: active) {
@@ -1382,7 +1382,7 @@ aihio-tab-list {
 /* aihio-tab-panel */
 aihio-tab-panel {
       display: none;
-      padding-top: var(--spacing-intent-stack-sm);
+      padding-top: var(--aihio-spacing-stack-sm);
     }
     aihio-tab-panel[active] {
       display: block;
@@ -1398,57 +1398,57 @@ aihio-toggle:defined {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-intent-control-gap);
+      gap: var(--aihio-spacing-control-gap);
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive);
+      border-radius: var(--aihio-radius-interactive);
       font-family: inherit;
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      line-height: var(--lineHeight-intent-compact);
-      height: var(--button-height-md);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      height: var(--aihio-button-height-md);
       margin: 0;
-      padding-inline: var(--button-padding-x-md);
+      padding-inline: var(--aihio-button-padding-x-md);
       border: 1px solid transparent;
       appearance: none;
       cursor: pointer;
       user-select: none;
       background-color: transparent;
-      color: oklch(var(--color-intent-surface-muted-fg));
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease;
+      color: var(--aihio-color-muted-fg);
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease;
     }
 
     aihio-toggle:not(:defined):hover,
     aihio-toggle > button:hover {
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      color: oklch(var(--color-intent-surface-muted-fg));
+      background-color: var(--aihio-color-muted-bg);
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-toggle:not(:defined)[pressed],
     aihio-toggle[pressed] > button {
-      background-color: oklch(var(--color-intent-action-accent-bg));
-      color: oklch(var(--color-intent-action-accent-fg));
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
     }
 
     aihio-toggle:not(:defined)[variant="outline"],
     aihio-toggle[variant="outline"] > button {
-      border-color: oklch(var(--color-intent-border-subtle));
+      border-color: var(--aihio-color-border-subtle);
     }
     aihio-toggle:not(:defined)[variant="outline"][pressed],
     aihio-toggle[variant="outline"][pressed] > button {
-      background-color: oklch(var(--color-intent-action-accent-bg));
+      background-color: var(--aihio-color-control-highlight-bg);
     }
 
     /* Sizes */
     aihio-toggle:not(:defined)[size="sm"],
     aihio-toggle[size="sm"] > button {
-      height: var(--button-height-sm);
-      padding-inline: var(--button-padding-x-sm);
+      height: var(--aihio-button-height-sm);
+      padding-inline: var(--aihio-button-padding-x-sm);
     }
     aihio-toggle:not(:defined)[size="lg"],
     aihio-toggle[size="lg"] > button {
-      height: var(--button-height-lg);
-      padding-inline: var(--button-padding-x-lg);
+      height: var(--aihio-button-height-lg);
+      padding-inline: var(--aihio-button-padding-x-lg);
     }
 
     /* :disabled rather than the host attribute, so <fieldset disabled> — which
@@ -1461,7 +1461,7 @@ aihio-toggle:defined {
 
     aihio-toggle:not(:defined):focus-visible,
     aihio-toggle > button:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 

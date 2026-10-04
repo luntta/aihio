@@ -22,7 +22,8 @@ const promptTypesPath = resolve(distDir, 'prompt.d.ts');
 
 const metaSchema = JSON.parse(readFileSync(resolve(schemaDir, 'meta-schema.json'), 'utf8'));
 const intentVocabulary = JSON.parse(readFileSync(resolve(schemaDir, 'intents.json'), 'utf8'));
-const intentTokens = JSON.parse(readFileSync(resolve(__dirname, '../../tokens/intent.json'), 'utf8'));
+// Written by src/tokens/build.js, which runs first.
+const tokenReference = JSON.parse(readFileSync(resolve(__dirname, '../../docs/tokens.json'), 'utf8'));
 const validIntents = new Set(Object.keys(intentVocabulary.intents));
 
 const schemas = [];
@@ -1002,84 +1003,25 @@ function buildPromptHardRules(doc) {
 }
 
 function buildPromptTokenVocabulary() {
-  const tokens = collectPromptTokens();
-  const sections = [
-    ['color', 'Theme-aware color intent tokens used for actions, surfaces, overlays, borders, and state.'],
-    ['spacing', 'Spacing tokens that describe layout rhythm and field padding by meaning.'],
-    ['radius', 'Radius tokens for interactive controls and surfaced containers.'],
-    ['fontSize', 'Typography size tokens for body text, controls, and headings.'],
-    ['fontWeight', 'Typography weight tokens for body text, controls, and badges.'],
-    ['lineHeight', 'Readable and compact line-height intents.'],
-    ['shadow', 'Elevation tokens for surfaces and overlays.'],
-    ['duration', 'Motion timing tokens for control feedback and overlay entrance.'],
-  ];
   const lines = [
-    '## Token Intent Vocabulary',
+    '## Semantic Token Vocabulary',
     '',
-    'Prefer these meaning-based token names when describing styling or reasoning about visual emphasis.',
+    'When markup needs CSS of its own, read these custom properties rather than raw values. Write each name exactly as listed: `--aihio-<group>-<name>`, lowercase and hyphenated. Colours are full values (`color: var(--aihio-color-muted-fg)`) and theme themselves; for transparency, use `color-mix(in oklch, var(--aihio-color-page-fg) 40%, transparent)`.',
     '',
   ];
 
-  for (const [family, intro] of sections) {
-    const entries = tokens.filter((token) => token.path.startsWith(`${family}.intent.`));
-    if (entries.length === 0) continue;
+  for (const [group, intro] of Object.entries(tokenReference.groups)) {
+    const tokens = tokenReference.tokens.filter((token) => token.tier === 'semantic' && token.group === group);
+    if (tokens.length === 0) continue;
 
-    lines.push(`### ${family}`);
-    lines.push('');
-    lines.push(intro);
-    lines.push('');
-    for (const token of entries) {
-      lines.push(`- \`${token.path}\` - ${token.description || 'No description.'}`);
+    lines.push(`### ${group}`, '', intro, '');
+    for (const token of tokens) {
+      lines.push(`- \`${token.name}\`${token.description ? ` - ${token.description}` : ''}`);
     }
     lines.push('');
   }
 
   return lines.join('\n').trim();
-}
-
-function collectPromptTokens() {
-  const combined = new Map();
-  const tokens = [
-    ...listIntentTokens(intentTokens.shared),
-    ...listIntentTokens(intentTokens.light),
-    ...listIntentTokens(intentTokens.dark),
-  ];
-
-  for (const token of tokens) {
-    const current = combined.get(token.path);
-    if (!current) {
-      combined.set(token.path, { ...token });
-      continue;
-    }
-
-    current.description ||= token.description;
-  }
-
-  return [...combined.values()].sort((left, right) => left.path.localeCompare(right.path));
-}
-
-function listIntentTokens(node, prefix = '') {
-  if (!node || typeof node !== 'object') return [];
-
-  const entries = [];
-  for (const [key, value] of Object.entries(node)) {
-    if (key.startsWith('$')) continue;
-
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (!value || typeof value !== 'object') continue;
-
-    if (Object.prototype.hasOwnProperty.call(value, '$value')) {
-      entries.push({
-        path,
-        description: value.$description ?? '',
-      });
-      continue;
-    }
-
-    entries.push(...listIntentTokens(value, path));
-  }
-
-  return entries;
 }
 
 function toPromptModule(promptMarkdown) {

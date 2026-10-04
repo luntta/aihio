@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  line-height: var(--lineHeight-normal);
+  line-height: var(--aihio-line-height-normal);
   -webkit-font-smoothing: antialiased;
 }
 

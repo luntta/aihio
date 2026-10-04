@@ -9,11 +9,11 @@ export default {
     aihio-card {
       display: flex;
       flex-direction: column;
-      border-radius: var(--radius-intent-surface);
-      background-color: oklch(var(--color-intent-surface-bg));
-      color: oklch(var(--color-intent-surface-fg));
-      border: 1px solid oklch(var(--color-intent-border-subtle));
-      box-shadow: var(--shadow-intent-surface);
+      border-radius: var(--aihio-radius-surface);
+      background-color: var(--aihio-color-surface-bg);
+      color: var(--aihio-color-surface-fg);
+      border: 1px solid var(--aihio-color-border-subtle);
+      box-shadow: var(--aihio-shadow-surface);
     }
 
     aihio-card[variant="outline"] {
@@ -23,28 +23,28 @@ export default {
     aihio-card-header {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-tight);
-      padding: var(--card-padding);
+      gap: var(--aihio-spacing-stack-tight);
+      padding: var(--aihio-card-padding);
       padding-bottom: 0;
     }
 
     aihio-card-title {
       display: block;
-      font-size: var(--fontSize-intent-heading);
-      font-weight: var(--fontWeight-intent-heading);
-      line-height: var(--lineHeight-intent-compact);
-      letter-spacing: var(--letterSpacing-intent-heading);
+      font-size: var(--aihio-font-size-heading);
+      font-weight: var(--aihio-font-weight-heading);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
     }
 
     aihio-card-description {
       display: block;
-      font-size: var(--fontSize-intent-body-sm);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      font-size: var(--aihio-font-size-body-sm);
+      color: var(--aihio-color-muted-fg);
     }
 
     aihio-card-content {
       display: block;
-      padding: var(--card-padding);
+      padding: var(--aihio-card-padding);
     }
 
     aihio-card-footer {
@@ -53,8 +53,8 @@ export default {
          through the card edge on narrow viewports. */
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--spacing-intent-control-gap);
-      padding: var(--card-padding);
+      gap: var(--aihio-spacing-control-gap);
+      padding: var(--aihio-card-padding);
       padding-top: 0;
     }
 

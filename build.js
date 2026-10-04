@@ -98,7 +98,8 @@ await esbuild.build({
   minify: true,
 });
 
-copyFileSync('docs/intent-tokens.md', 'dist/intent-tokens.md');
+copyFileSync('docs/semantic-tokens.md', 'dist/semantic-tokens.md');
+copyFileSync('docs/tokens.json', 'dist/tokens.json');
 copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
 console.log('build → package, component, lint, MCP, schema runtime, and CSS entrypoints in dist/');

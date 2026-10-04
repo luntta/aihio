@@ -9,10 +9,10 @@ export default {
     aihio-tab-list {
       display: inline-flex;
       align-items: center;
-      gap: var(--spacing-intent-cluster-gap-tight);
-      border-radius: var(--radius-intent-interactive);
-      background-color: oklch(var(--color-intent-surface-muted-bg));
-      padding: var(--spacing-intent-cluster-gap-tight);
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      border-radius: var(--aihio-radius-interactive);
+      background-color: var(--aihio-color-muted-bg);
+      padding: var(--aihio-spacing-cluster-gap-tight);
     }
 
     @media (forced-colors: active) {
@@ -27,26 +27,26 @@ export default {
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      border-radius: var(--radius-intent-interactive-compact);
-      padding: var(--spacing-intent-stack-tight) var(--spacing-intent-field-padding-inline);
-      font-size: var(--fontSize-intent-control);
-      font-weight: var(--fontWeight-intent-control);
-      color: oklch(var(--color-intent-surface-muted-fg));
+      border-radius: var(--aihio-radius-interactive-compact);
+      padding: var(--aihio-spacing-stack-tight) var(--aihio-spacing-field-padding-inline);
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      color: var(--aihio-color-muted-fg);
       cursor: pointer;
       user-select: none;
-      transition: background-color var(--duration-intent-feedback) ease,
-                  color var(--duration-intent-feedback) ease,
-                  box-shadow var(--duration-intent-feedback) ease;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
     }
 
     aihio-tab:hover:not([disabled]) {
-      color: oklch(var(--color-intent-page-fg));
+      color: var(--aihio-color-page-fg);
     }
 
     aihio-tab[active] {
-      background-color: oklch(var(--color-intent-page-bg));
-      color: oklch(var(--color-intent-page-fg));
-      box-shadow: var(--shadow-intent-surface);
+      background-color: var(--aihio-color-page-bg);
+      color: var(--aihio-color-page-fg);
+      box-shadow: var(--aihio-shadow-surface);
     }
 
     aihio-tab[disabled] {
@@ -55,7 +55,7 @@ export default {
     }
 
     aihio-tab:focus-visible {
-      outline: 2px solid oklch(var(--color-intent-focus-ring));
+      outline: 2px solid var(--aihio-color-focus-ring);
       outline-offset: 2px;
     }
 
@@ -85,7 +85,7 @@ export default {
   'aihio-tab-panel': `
     aihio-tab-panel {
       display: none;
-      padding-top: var(--spacing-intent-stack-sm);
+      padding-top: var(--aihio-spacing-stack-sm);
     }
     aihio-tab-panel[active] {
       display: block;

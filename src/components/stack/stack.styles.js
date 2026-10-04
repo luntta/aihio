@@ -9,13 +9,13 @@ export default {
     aihio-stack {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-intent-stack-md);
+      gap: var(--aihio-spacing-stack-md);
     }
 
-    aihio-stack[gap="tight"] { gap: var(--spacing-intent-stack-tight); }
-    aihio-stack[gap="sm"]    { gap: var(--spacing-intent-stack-sm); }
-    aihio-stack[gap="md"]    { gap: var(--spacing-intent-stack-md); }
-    aihio-stack[gap="lg"]    { gap: var(--spacing-intent-stack-lg); }
+    aihio-stack[gap="tight"] { gap: var(--aihio-spacing-stack-tight); }
+    aihio-stack[gap="sm"]    { gap: var(--aihio-spacing-stack-sm); }
+    aihio-stack[gap="md"]    { gap: var(--aihio-spacing-stack-md); }
+    aihio-stack[gap="lg"]    { gap: var(--aihio-spacing-stack-lg); }
 
     aihio-stack[align="start"]   { align-items: flex-start; }
     aihio-stack[align="center"]  { align-items: center; }
