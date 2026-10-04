@@ -103,6 +103,25 @@ the platform's own. Ordered by how often the gap bites generated markup.
 - [x] Avatar fallback: its muted fill is nearly invisible on a card surface (both near zinc-50 in light)
 - [x] `aihio-button` as a link: adopt an authored `<a href>` as its control, the way a dropdown item does, so a call-to-action that navigates does not need `href` on a `<button>`
 
+## Phase 10 — A contract you can't break by accident, and docs that show it
+
+A review of the system and the site found the same failure in both: things
+that break silently. A token name that needed escaping dropped the docs'
+brand gap; a scrim with its own alpha left the drawer undimmed; shadcn's
+`--primary` turned every button transparent; a counterexample rendered live
+locked the Dialog page. This phase makes those fail loudly, and makes the
+docs show what the schema knows.
+
+- [x] Tokens: every custom property is `--aihio-<group>-<name>`, lowercase and hyphenated (half steps are `1-5`), colours are full `oklch()` values with alpha mixed in by `color-mix()`, and a build test fails on any other name, any `var()` nothing defines, or any `oklch(var(…))`
+- [x] Three token tiers: the shadcn-named tier merges into `tokens/semantic.json`, so "intent" means only the schema vocabulary; colour names follow it (`primary-action-bg`); `color-scheme` follows the theme; `docs/tokens.json` (`aihio/tokens`) carries resolved values and the measured contrast contract
+- [x] `aihio-button` adopts an authored `<a href>`; `href` on it is linted with the wrapped link as the suggestion, and `onclick` navigation is an a11y-contract error
+- [x] Every counterexample carries a `fix` and the `rule` that catches it; the build holds both to the linter, and new rules (`boolean-attribute-value`, `hand-rolled-layout`, `cluster-needs-grow`, `alert-role`, `card-click-handler`, `field-error-message`, `switch-state-name`, `toggle-state-name`) catch the 11 that slipped through. a11y issues name their rule in `contract`
+- [x] Component examples are linted at build like patterns, and carry a title and description
+- [x] Docs: the full API including sub-components, variants drawn from the schema, Don't / Do mistakes with the linter's output, single-column example frames with copy buttons, the accessibility obligations out of their tab, live cards on the index, and pattern previews with a width switch
+- [x] Docs: an Intents page, Foundations pages for colour (with the contrast contract), type, space and shape, and motion, search ranked by the MCP `find` function (now `src/schema/find.js`), a rebuilt AI page, `llms.txt`, and every component page as markdown
+- [x] Docs checks: no broken link or fragment, no repeated id, no dialog rendered open, and the site's own markup lint-clean
+- [ ] Two dropdown browser tests (typeahead, link items) fail intermittently under a full parallel run; they pass alone and failed the same way before this phase
+
 ## Sequencing notes
 
 - Phase 1 is the keystone. Everything else depends on its format.
