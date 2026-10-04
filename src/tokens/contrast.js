@@ -155,6 +155,13 @@ export const CONTRAST_REQUIREMENTS = [
     note: 'Supporting copy on muted fills (toggle hover, muted surfaces).',
   },
   {
+    id: 'placeholder-text',
+    foreground: 'placeholder-fg',
+    background: 'placeholder-bg',
+    min: 4.5,
+    note: "Avatar initials on their fill.",
+  },
+  {
     id: 'body-text',
     foreground: 'page-fg',
     background: 'page-bg',

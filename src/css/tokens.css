@@ -179,6 +179,8 @@
   --aihio-color-overlay-highlight-bg: var(--aihio-color-zinc-100);
   --aihio-color-muted-bg: var(--aihio-color-zinc-50);
   --aihio-color-muted-fg: var(--aihio-color-zinc-550);
+  --aihio-color-placeholder-bg: var(--aihio-color-zinc-200);
+  --aihio-color-placeholder-fg: var(--aihio-color-zinc-700);
   --aihio-color-primary-action-bg: var(--aihio-color-zinc-900);
   --aihio-color-primary-action-fg: var(--aihio-color-zinc-0);
   --aihio-color-secondary-action-bg: var(--aihio-color-zinc-100);
@@ -215,6 +217,8 @@
   --aihio-color-overlay-highlight-bg: var(--aihio-color-zinc-800);
   --aihio-color-muted-bg: var(--aihio-color-zinc-950);
   --aihio-color-muted-fg: var(--aihio-color-zinc-450);
+  --aihio-color-placeholder-bg: var(--aihio-color-zinc-800);
+  --aihio-color-placeholder-fg: var(--aihio-color-zinc-300);
   --aihio-color-primary-action-bg: var(--aihio-color-zinc-50);
   --aihio-color-primary-action-fg: var(--aihio-color-zinc-1000);
   --aihio-color-secondary-action-bg: var(--aihio-color-zinc-900);
@@ -248,6 +252,8 @@
   --aihio-color-overlay-highlight-bg: var(--aihio-color-zinc-100);
   --aihio-color-muted-bg: var(--aihio-color-zinc-50);
   --aihio-color-muted-fg: var(--aihio-color-zinc-550);
+  --aihio-color-placeholder-bg: var(--aihio-color-zinc-200);
+  --aihio-color-placeholder-fg: var(--aihio-color-zinc-700);
   --aihio-color-primary-action-bg: var(--aihio-color-zinc-900);
   --aihio-color-primary-action-fg: var(--aihio-color-zinc-0);
   --aihio-color-secondary-action-bg: var(--aihio-color-zinc-100);
@@ -282,6 +288,8 @@
     --aihio-color-overlay-highlight-bg: var(--aihio-color-zinc-800);
     --aihio-color-muted-bg: var(--aihio-color-zinc-950);
     --aihio-color-muted-fg: var(--aihio-color-zinc-450);
+    --aihio-color-placeholder-bg: var(--aihio-color-zinc-800);
+    --aihio-color-placeholder-fg: var(--aihio-color-zinc-300);
     --aihio-color-primary-action-bg: var(--aihio-color-zinc-50);
     --aihio-color-primary-action-fg: var(--aihio-color-zinc-1000);
     --aihio-color-secondary-action-bg: var(--aihio-color-zinc-900);

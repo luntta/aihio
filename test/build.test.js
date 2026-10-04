@@ -59,7 +59,7 @@ test('semantic token references are generated into dist, as markdown and as JSON
   assert.equal(byName.get('--aihio-spacing-stack-md').value, '1rem');
   assert.deepEqual(byName.get('--aihio-spacing-stack-md').references, ['--aihio-spacing-4']);
   assert.equal(byName.get('--aihio-radius-md').value, 'calc(0.5rem - 2px)');
-  assert.equal(reference.contrast.length, 16);
+  assert.equal(reference.contrast.length, 17);
   for (const pair of reference.contrast) {
     assert.ok(pair.ratio.light >= pair.min && pair.ratio.dark >= pair.min, `${pair.id} meets ${pair.min}:1`);
   }

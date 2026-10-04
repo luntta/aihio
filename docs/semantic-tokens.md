@@ -29,6 +29,8 @@ Themed colours, named for what they colour. Each has a light and a dark value.
 | `--aihio-color-overlay-scrim` | `oklch(0 0 0 / 0.8)` | Modal backdrop scrim behind blocking overlays. |
 | `--aihio-color-page-bg` | light: `--aihio-color-zinc-0`; dark: `--aihio-color-zinc-1000` | Default page canvas and neutral active backgrounds. |
 | `--aihio-color-page-fg` | light: `--aihio-color-zinc-900`; dark: `--aihio-color-zinc-50` | Primary foreground on the page canvas. |
+| `--aihio-color-placeholder-bg` | light: `--aihio-color-zinc-200`; dark: `--aihio-color-zinc-800` | Fill for something that stands in for missing content, such as an avatar's initials. One step off both the page and a surface, where muted-bg matches the surface and disappears into a card. |
+| `--aihio-color-placeholder-fg` | light: `--aihio-color-zinc-700`; dark: `--aihio-color-zinc-300` | Text on the placeholder fill. |
 | `--aihio-color-primary-action-bg` | light: `--aihio-color-zinc-900`; dark: `--aihio-color-zinc-50` | Default filled action background. |
 | `--aihio-color-primary-action-fg` | light: `--aihio-color-zinc-0`; dark: `--aihio-color-zinc-1000` | Foreground on default filled actions. |
 | `--aihio-color-secondary-action-bg` | light: `--aihio-color-zinc-100`; dark: `--aihio-color-zinc-900` | Lower-emphasis filled action background. |

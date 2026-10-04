@@ -294,6 +294,16 @@
         "$type": "color",
         "$description": "Supporting foreground on muted fills."
       },
+      "placeholder-bg": {
+        "$value": "{color.zinc.200}",
+        "$type": "color",
+        "$description": "Fill for something that stands in for missing content, such as an avatar's initials. One step off both the page and a surface, where muted-bg matches the surface and disappears into a card."
+      },
+      "placeholder-fg": {
+        "$value": "{color.zinc.700}",
+        "$type": "color",
+        "$description": "Text on the placeholder fill."
+      },
       "primary-action-bg": {
         "$value": "{color.zinc.900}",
         "$type": "color",
@@ -422,6 +432,14 @@
       },
       "muted-fg": {
         "$value": "{color.zinc.450}",
+        "$type": "color"
+      },
+      "placeholder-bg": {
+        "$value": "{color.zinc.800}",
+        "$type": "color"
+      },
+      "placeholder-fg": {
+        "$value": "{color.zinc.300}",
         "$type": "color"
       },
       "primary-action-bg": {

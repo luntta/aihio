@@ -78,8 +78,10 @@ aihio-avatar {
       height: var(--aihio-avatar-size-md);
       border-radius: var(--aihio-radius-pill);
       overflow: hidden;
-      background-color: var(--aihio-color-muted-bg);
-      color: var(--aihio-color-muted-fg);
+      /* Not muted-bg: that is the surface colour in both themes, so initials
+         on a card had no circle around them. */
+      background-color: var(--aihio-color-placeholder-bg);
+      color: var(--aihio-color-placeholder-fg);
       font-size: var(--aihio-font-size-control);
       font-weight: var(--aihio-font-weight-control);
       flex-shrink: 0;

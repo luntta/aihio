@@ -592,7 +592,7 @@ in the system shout. Field borders are covered, because on an empty input the
 border is the only thing marking the control.
 
 Add or change a pair in `CONTRAST_REQUIREMENTS` in `src/tokens/contrast.js`.
-It currently checks 16 pairs per theme, 32 in total.
+It currently checks 17 pairs per theme, 34 in total.
 
 ### State colours
 
