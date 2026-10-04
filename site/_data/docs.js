@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
+
 const root = resolve(import.meta.dirname, '..', '..');
 const schemaPath = resolve(root, 'dist/schema.json');
 const packagePath = resolve(root, 'package.json');
@@ -23,19 +25,61 @@ function tagToSlug(tag) {
 }
 
 /**
- * A dialog snippet with no trigger would preview as an empty box, so one that
- * starts at <aihio-dialog> is opened for display. Examples that carry their
- * own trigger (commandfor + command="--open") start at the button and are
- * left closed, like a dropdown, for the reader to open — the live component
- * demonstrates itself better than a frozen open state.
+ * A preview never opens a dialog. aihio-dialog opens with showModal(), which
+ * lifts the panel into the top layer, above the page and out of reach of any
+ * containment, and makes everything else inert: a snippet rendered open locked
+ * the whole docs page on load. So `open` is dropped, and a dialog that arrives
+ * without a trigger of its own gets one (commandfor + command="--open") for the
+ * reader to open, the way the examples that carry a trigger already work.
+ * Nested dialogs are left to their outer one.
  */
-function toPreviewMarkup(tag, markup) {
-  const normalizedMarkup = String(markup ?? '');
-  if (tag === 'aihio-dialog' && normalizedMarkup.startsWith('<aihio-dialog') && !normalizedMarkup.includes('<aihio-dialog open')) {
-    return normalizedMarkup.replace('<aihio-dialog', '<aihio-dialog open');
-  }
+function toPreviewMarkup(markup, previewId) {
+  const source = String(markup ?? '');
+  if (!/<aihio-dialog\b/.test(source)) return source;
 
-  return normalizedMarkup;
+  const fragment = parseFragment(source);
+  const invoked = new Set(
+    findElements(fragment, (node) => getAttr(node, 'commandfor') !== null).map((node) => getAttr(node, 'commandfor'))
+  );
+
+  findElements(fragment, (node) => node.tagName === 'aihio-dialog').forEach((dialog, index) => {
+    dialog.attrs = dialog.attrs.filter(({ name }) => name !== 'open');
+    if (hasAncestor(dialog, 'aihio-dialog')) return;
+
+    let id = getAttr(dialog, 'id');
+    if (id === null) {
+      id = `${previewId}-dialog-${index + 1}`;
+      dialog.attrs.push({ name: 'id', value: id });
+    }
+    if (invoked.has(id)) return;
+
+    const [trigger] = parseFragment(
+      `<aihio-button variant="outline" commandfor="${id}" command="--open">Open dialog</aihio-button>`
+    ).childNodes;
+    defaultTreeAdapter.insertBefore(dialog.parentNode, trigger, dialog);
+  });
+
+  return serialize(fragment);
+}
+
+function findElements(node, predicate, found = []) {
+  for (const child of node.childNodes ?? []) {
+    if (!child.tagName) continue;
+    if (predicate(child)) found.push(child);
+    findElements(child.tagName === 'template' ? child.content : child, predicate, found);
+  }
+  return found;
+}
+
+function getAttr(node, name) {
+  return node.attrs?.find((attr) => attr.name === name)?.value ?? null;
+}
+
+function hasAncestor(node, tagName) {
+  for (let current = node.parentNode; current; current = current.parentNode) {
+    if (current.tagName === tagName) return true;
+  }
+  return false;
 }
 
 /**
@@ -98,12 +142,12 @@ const rawPatterns = schema.patterns.map((pattern) => ({
     name: intent,
     description: schema.intents[intent] ?? '',
   })),
-  previewMarkup: pattern.markup,
+  previewMarkup: toPreviewMarkup(pattern.markup, pattern.id),
   variationEntries: (pattern.variations ?? []).map((variation, index) => ({
     ...variation,
     id: `${pattern.id}-variation-${index + 1}`,
     title: variation.name,
-    previewMarkup: variation.markup,
+    previewMarkup: toPreviewMarkup(variation.markup, `${pattern.id}-variation-${index + 1}`),
   })),
 }));
 
@@ -170,13 +214,13 @@ const components = schema.components
       examplesDetailed: (component.examples ?? []).map((markup, index) => ({
         id: `${slug}-example-${index + 1}`,
         markup,
-        previewMarkup: toPreviewMarkup(tag, markup),
+        previewMarkup: toPreviewMarkup(markup, `${slug}-example-${index + 1}`),
         title: `Example ${index + 1}`,
       })),
       counterExamplesDetailed: (component.counterExamples ?? []).map((example, index) => ({
         id: `${slug}-counter-example-${index + 1}`,
         ...example,
-        previewMarkup: toPreviewMarkup(tag, example.markup),
+        previewMarkup: toPreviewMarkup(example.markup, `${slug}-counter-example-${index + 1}`),
         title: `Counterexample ${index + 1}`,
       })),
       handledA11y: component.a11yContract?.handled ?? [],

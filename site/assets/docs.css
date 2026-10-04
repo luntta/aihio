@@ -763,19 +763,6 @@ a {
   border-color: oklch(var(--color-intent-state-destructive-bg) / 0.35);
 }
 
-/* A modal is position:fixed by design, so a force-opened dialog preview threw
-   its scrim over the whole page and blacked out the docs. `contain: paint`
-   makes the preview the containing block for fixed descendants, so the modal
-   stages itself inside its own frame. Scoped with :has() so dropdown menus,
-   which legitimately overflow their preview, are not clipped too. */
-.docs-example__preview:has(aihio-dialog[open]) {
-  contain: paint;
-  align-content: center;
-  justify-items: stretch;
-  min-height: 20rem;
-  padding: 0;
-}
-
 .docs-code {
   margin: var(--spacing-3) 0 0;
   padding: var(--spacing-4);
