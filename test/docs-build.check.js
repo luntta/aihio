@@ -3,7 +3,9 @@ import test from 'node:test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
-import { parse } from 'parse5';
+import { parse, serialize } from 'parse5';
+
+import { lintMarkup } from '../dist/lint.js';
 
 const root = resolve(import.meta.dirname, '..');
 const siteRoot = resolve(root, '_site');
@@ -75,5 +77,29 @@ test('no docs page renders a dialog open on load, and every dialog can be opened
       if (nested) continue;
       assert.ok(invoked.has(getAttr(dialog, 'id')), `${page}: aihio-dialog#${getAttr(dialog, 'id')} has no trigger`);
     }
+  }
+});
+
+// The site is built with the components it documents, so its own markup is
+// held to the same linter as everyone else's. Example previews are left out:
+// counterexamples there are wrong on purpose.
+test('the docs site markup outside example previews passes aihio-lint', () => {
+  const isPreview = (node) => (node.attrs ?? []).some(
+    (attr) => attr.name === 'class' && /\bdocs-example__preview\b/.test(attr.value)
+  );
+  const strip = (node) => {
+    node.childNodes = (node.childNodes ?? []).filter((child) => !isPreview(child));
+    for (const child of node.childNodes) strip(child.tagName === 'template' ? child.content : child);
+  };
+
+  for (const path of listSitePages()) {
+    const document = parse(readFileSync(path, 'utf8'));
+    strip(document);
+    const [body] = findElements(document, (node) => node.tagName === 'body');
+    const { issues } = lintMarkup(serialize(body), { source: relative(siteRoot, path) });
+    assert.deepEqual(
+      issues.map((issue) => `${issue.source}: ${issue.ruleId}: ${issue.message}`),
+      [],
+    );
   }
 });
