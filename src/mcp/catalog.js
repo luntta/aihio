@@ -6,14 +6,9 @@
 
 import schemaDocument from '../../dist/schema.json' with { type: 'json' };
 import authoringPrompt from '../../dist/prompt.js';
+import { rankCatalogue } from '../schema/find.js';
 
 export { authoringPrompt };
-
-const STOP_WORDS = new Set([
-  'a', 'an', 'and', 'as', 'at', 'be', 'by', 'for', 'from', 'i', 'in', 'into', 'is', 'it', 'me', 'my',
-  'need', 'of', 'on', 'or', 'show', 'so', 'some', 'that', 'the', 'their', 'them', 'this', 'to',
-  'use', 'user', 'users', 'want', 'with', 'you', 'your',
-]);
 
 const MAX_RESULTS = 5;
 
@@ -58,76 +53,13 @@ export function getPattern(id) {
 }
 
 /**
- * Rank components and patterns against a request. An exact intent name
- * ("destructive-action") selects everything declaring it; free text ("confirm
- * before deleting a project") is matched word by word against names, intents,
- * the intents' own definitions, and descriptions.
+ * Rank components and patterns against a request: an intent name, or free
+ * text such as "confirm before deleting a project".
  */
 export function find(query) {
-  const text = String(query ?? '').trim().toLowerCase();
-  const intentDefinitions = schemaDocument.intents;
-
-  if (Object.hasOwn(intentDefinitions, text)) {
-    return {
-      query: text,
-      intent: { name: text, description: intentDefinitions[text] },
-      components: listComponents().filter((component) => component.intents.includes(text)),
-      patterns: listPatterns().filter((pattern) => pattern.intents.includes(text)),
-    };
-  }
-
-  const terms = [...new Set(tokenize(text))];
-  const score = ({ names, relatedNames = [], intents, description }) => {
-    const nameWords = new Set(names.flatMap(tokenize));
-    const relatedWords = new Set(relatedNames.flatMap(tokenize));
-    const intentWords = new Set(intents.flatMap(tokenize));
-    const definitionWords = new Set(intents.flatMap((intent) => tokenize(intentDefinitions[intent] ?? '')));
-    const descriptionWords = new Set(tokenize(description ?? ''));
-    return terms.reduce(
-      (total, term) =>
-        total +
-        (nameWords.has(term) ? 4 : 0) +
-        (relatedWords.has(term) ? 1 : 0) +
-        (intentWords.has(term) ? 3 : 0) +
-        (definitionWords.has(term) ? 1 : 0) +
-        (descriptionWords.has(term) ? 2 : 0),
-      0
-    );
-  };
-  const rank = (entries, describe) =>
-    entries
-      .map((entry) => ({ ...entry, score: score(describe(entry)) }))
-      .filter((entry) => entry.score > 0)
-      .sort((left, right) => right.score - left.score)
-      .slice(0, MAX_RESULTS);
-
-  return {
-    query: text,
-    components: rank(listComponents(), (component) => ({
-      names: [component.tag.replace(/^aihio-/, '')],
-      relatedNames: component.related.map((tag) => tag.replace(/^aihio-/, '')),
-      intents: component.intents,
-      description: component.description,
-    })),
-    patterns: rank(listPatterns(), (pattern) => ({
-      names: [pattern.id, pattern.name],
-      intents: pattern.intents,
-      description: pattern.description,
-    })),
-  };
-}
-
-/* Words reduced to a rough stem, so "deleting", "delete", and "deletion"
-   meet, as do "confirm" and "confirmation". */
-function tokenize(text) {
-  return String(text)
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((word) => word.length > 1 && !STOP_WORDS.has(word))
-    .map(stem);
-}
-
-function stem(word) {
-  const stemmed = word.replace(/(ations?|ions?|ing|ed|es|s|e)$/, '');
-  return stemmed.length >= 3 ? stemmed : word;
+  return rankCatalogue(
+    query,
+    { intents: schemaDocument.intents, components: listComponents(), patterns: listPatterns() },
+    { limit: MAX_RESULTS }
+  );
 }

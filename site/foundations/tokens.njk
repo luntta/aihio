@@ -39,7 +39,7 @@ description: Every design token Aihio defines, by tier.
         </thead>
         <tbody>
           {% for token in group.tokens %}
-            <tr>
+            <tr id="{{ token.variable | replace('--', '', 1) }}">
               {% if group.name == 'color' %}
                 <td class="docs-table__swatch-cell">
                   <span class="docs-swatch" style="background: var({{ token.variable }})"></span>

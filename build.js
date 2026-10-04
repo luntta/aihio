@@ -41,6 +41,8 @@ await esbuild.build({
     { in: 'src/components/index.js', out: 'components' },
     { in: 'src/lint/index.js', out: 'lint' },
     { in: 'src/schema/runtime.js', out: 'runtime' },
+    // The ranking behind the MCP find tool, for the docs site's search.
+    { in: 'src/schema/find.js', out: 'find' },
     ...componentNames.map((name) => ({
       in: `src/components/${name}/${name}.js`,
       out: name,

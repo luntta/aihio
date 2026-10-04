@@ -6,6 +6,7 @@
   <title>{% if title %}{{ title }} · {% endif %}Aihio</title>
   <meta name="description" content="{{ description or 'Aihio is an AI-first design system built on native web components.' }}">
   <meta name="color-scheme" content="light dark">
+  <meta name="docs-root" content="{{ '/' | docsUrl(page.url) }}">
   <link rel="stylesheet" href="{{ '/dist/aihio.css' | docsUrl(page.url) }}">
   <link rel="stylesheet" href="{{ '/assets/docs.css' | docsUrl(page.url) }}">
   <script>
@@ -25,6 +26,7 @@
   </script>
   <script type="module" src="{{ '/dist/aihio.js' | docsUrl(page.url) }}"></script>
   <script type="module" src="{{ '/assets/docs.js' | docsUrl(page.url) }}"></script>
+  <script type="module" src="{{ '/assets/search.js' | docsUrl(page.url) }}"></script>
 </head>
 <body>
   <a class="docs-skip" href="#docs-content">Skip to content</a>
@@ -50,6 +52,11 @@
     </div>
 
     <div class="docs-topbar__actions">
+      <aihio-button class="docs-search-trigger" variant="outline" size="sm" commandfor="docs-search" command="--open">
+        <span class="docs-search-trigger__label">Search</span>
+        <kbd class="docs-search-trigger__key" aria-hidden="true">/</kbd>
+      </aihio-button>
+
       <div class="docs-theme" role="group" aria-label="Colour theme">
         <button class="docs-theme__option" type="button" data-theme-option="light" aria-pressed="false">Light</button>
         <button class="docs-theme__option" type="button" data-theme-option="dark" aria-pressed="false">Dark</button>
@@ -59,6 +66,21 @@
       <a class="docs-topbar__link" href="https://github.com/luntta/aihio">GitHub</a>
     </div>
   </header>
+
+  <aihio-dialog id="docs-search" class="docs-search">
+    <aihio-dialog-header>
+      <aihio-dialog-title>Search</aihio-dialog-title>
+      <aihio-dialog-description>
+        Describe what you are building, or name a component, intent, or token. Components and patterns are ranked
+        the way the MCP server's find tool ranks them for an agent.
+      </aihio-dialog-description>
+    </aihio-dialog-header>
+    <form role="search" data-search-form>
+      <aihio-input type="search" name="q" aria-label="Search the docs" placeholder="confirm before deleting a project" autofocus data-search-input></aihio-input>
+    </form>
+    <p class="docs-visually-hidden" role="status" data-search-status></p>
+    <div class="docs-search__results" data-search-results></div>
+  </aihio-dialog>
 
   <div class="docs-layout">
     <div class="docs-scrim" data-nav-scrim hidden></div>
