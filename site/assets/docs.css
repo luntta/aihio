@@ -490,8 +490,9 @@ a {
   text-wrap: pretty;
 }
 
-.docs-page-intro__meta,
-.docs-page-intro__intents {
+/* Two classes deep, to outrank the lede rule every intro paragraph gets. */
+.docs-page-intro .docs-page-intro__meta,
+.docs-page-intro .docs-page-intro__intents {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
