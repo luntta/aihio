@@ -53,11 +53,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-grid columns=\"6\"><aihio-card></aihio-card></aihio-grid>",
-      "reason": "columns takes 2, 3, or 4. Six 16rem columns do not fit a typical content width, and the grid would drop them anyway."
+      "reason": "columns takes 2, 3, or 4. Six 16rem columns do not fit a typical content width, and the grid would drop them anyway.",
+      "fix": "<aihio-grid columns=\"3\"><aihio-card></aihio-card></aihio-grid>",
+      "rule": "invalid-enum-attribute"
     },
     {
       "markup": "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:16px\">…</div>",
-      "reason": "A hand-rolled grid ignores the spacing scale and squeezes its columns on narrow screens. Use aihio-grid."
+      "reason": "A hand-rolled grid ignores the spacing scale and squeezes its columns on narrow screens. Use aihio-grid.",
+      "fix": "<aihio-grid columns=\"3\">…</aihio-grid>",
+      "rule": "hand-rolled-layout"
     }
   ],
   "examples": [

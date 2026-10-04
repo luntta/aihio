@@ -129,6 +129,14 @@ lintMarkup('<aihio-modal></aihio-modal>').issues[0].suggestion;
 // '<aihio-dialog>'
 ```
 
+A few rules catch markup that is valid but does not do what it says:
+`boolean-attribute-value` (`pressed="false"` turns a toggle on: a boolean
+attribute is on whenever it is present), `cluster-needs-grow` (a justified
+cluster in a card footer, where it has no room to justify), and
+`hand-rolled-layout` (an inline `display: grid` or `flex` that one of the
+layout primitives replaces). An `a11y-contract` issue names the obligation it
+enforces in `contract`, such as `button-accessible-name`.
+
 For MCP clients that launch local stdio servers, the package also ships
 `aihio-mcp`. Its tools take an agent from a request to checked markup:
 
@@ -186,7 +194,7 @@ AI agents can use this schema to understand and generate correct markup without 
 
 The seeded patterns cover higher-level compositions such as auth forms, settings sections, destructive confirmations, tabbed settings, and toast-style alert stacks.
 
-The component schemas also include author-facing `a11yContract` requirements and multiple `counterExamples` per component, so prompts, docs, and dev warnings can all point back to the same source-of-truth rules.
+The component schemas also include author-facing `a11yContract` requirements and multiple `counterExamples` per component, so prompts, docs, and dev warnings can all point back to the same source-of-truth rules. Each counterexample carries its `fix`, and the `rule` that catches it. The build holds them to the linter: a counterexample has to be reported under the rule it names (one that names none, a judgment the linter cannot make, has to pass), and every fix, example, and pattern has to lint clean.
 
 When you import `aihio/dev`, connected components also emit console warnings for schema-backed mistakes such as invalid enum attributes and machine-checkable `a11yContract` violations including unnamed icon buttons and toggles, unnamed dialogs, unlabeled inputs, icon-only dropdown triggers without labels, destructive alerts without announced content, and mismatched tab/panel values.
 

@@ -1,8 +1,30 @@
 import { runtimeSchema } from '../schema/runtime.js';
 import { collectA11yRuleViolations } from '../schema/a11y-rules.js';
 import { findCommandProblem } from '../schema/command-rules.js';
+import { collectMarkupRuleViolations } from '../schema/markup-rules.js';
 import { suggestAttribute, suggestComponent, suggestEnumValue } from '../schema/suggestions.js';
 import { parseFragment } from 'parse5';
+
+/** Every ruleId an issue can carry. a11y-contract issues name their rule in `contract`. */
+export const LINT_RULE_IDS = new Set([
+  'unknown-component',
+  'invalid-enum-attribute',
+  'invalid-parent',
+  'missing-required-ancestor',
+  'missing-required-slot',
+  'invalid-slot',
+  'missing-required-child',
+  'invalid-child',
+  'forbidden-descendant',
+  'a11y-contract',
+  'unknown-intent',
+  'intent-mismatch',
+  'invalid-command',
+  'unknown-attribute',
+  'boolean-attribute-value',
+  'cluster-needs-grow',
+  'hand-rolled-layout',
+]);
 
 const schemaByTag = new Map(
   runtimeSchema.components.map((component) => [component.$component, component])
@@ -11,14 +33,17 @@ const schemaByTag = new Map(
 const intentVocabulary = new Set(runtimeSchema.intents ?? []);
 
 const knownTags = new Set(schemaByTag.keys());
-const declaredAttributesByTag = new Map();
+const attributesByTag = new Map();
 for (const component of runtimeSchema.components) {
-  declaredAttributesByTag.set(component.$component, Object.keys(component.attributes ?? {}));
+  attributesByTag.set(component.$component, component.attributes ?? {});
   for (const related of component.related ?? []) {
     knownTags.add(related.$component);
-    declaredAttributesByTag.set(related.$component, Object.keys(related.attributes ?? {}));
+    attributesByTag.set(related.$component, related.attributes ?? {});
   }
 }
+const declaredAttributesByTag = new Map(
+  [...attributesByTag].map(([tag, attributes]) => [tag, Object.keys(attributes)])
+);
 
 // Attributes any element may carry. Everything else on an Aihio element has to
 // be declared by its schema: an invented one is not an error the browser
@@ -85,7 +110,10 @@ export function lintMarkup(markup, options = {}) {
   for (const node of elements) {
     issues.push(...collectCommandIssues(node, elementsById, context));
 
-    if (!isAihioTag(node.tagName)) continue;
+    if (!isAihioTag(node.tagName)) {
+      issues.push(...collectLayoutIssues(node, context));
+      continue;
+    }
 
     if (!knownTags.has(node.tagName)) {
       const match = suggestComponent(node.tagName, knownTags);
@@ -112,6 +140,7 @@ export function lintMarkup(markup, options = {}) {
     // annotation on one is still worth checking against the vocabulary, which
     // is why this runs first.
     issues.push(...collectIntentIssues(node, schema, context));
+    issues.push(...collectMarkupIssues(node, context));
 
     if (!schema) continue;
 
@@ -278,12 +307,54 @@ function collectA11yIssues(node, schema, context) {
   return collectA11yRuleViolations(node, schema, astAdapter).map((requirement) =>
     createIssue({
       ruleId: 'a11y-contract',
+      contract: requirement.rule,
       severity: requirement.severity,
       node,
       context,
       message: requirement.requirement,
     })
   );
+}
+
+function collectMarkupIssues(node, context) {
+  return collectMarkupRuleViolations(node, attributesByTag.get(node.tagName), astAdapter).map((violation) =>
+    createIssue({
+      ruleId: violation.ruleId,
+      severity: violation.severity,
+      node,
+      context,
+      message: violation.message,
+      suggestion: violation.suggestion,
+    })
+  );
+}
+
+/*
+ * Layout written as an inline style, which is the shape a model reaches for
+ * when it forgets the layout primitives: it spaces from raw values instead of
+ * the token scale, and a fixed column count squeezes on a narrow screen.
+ * Stylesheet layout is invisible here, so only inline styles are read.
+ */
+function collectLayoutIssues(node, context) {
+  const style = String(getAttribute(node, 'style') ?? '').toLowerCase().replace(/\s+/g, '');
+  const display = style.match(/(?:^|;)display:(grid|inline-grid|flex|inline-flex)(?:;|!|$)/)?.[1];
+  if (!display) return [];
+
+  const isGrid = display.endsWith('grid');
+  const suggestion = isGrid
+    ? '<aihio-grid>'
+    : /(?:^|;)flex-direction:column/.test(style) ? '<aihio-stack>' : '<aihio-cluster>';
+
+  return [
+    createIssue({
+      ruleId: 'hand-rolled-layout',
+      severity: 'warn',
+      node,
+      context,
+      message: `<${node.tagName}> lays out its children with an inline display: ${display}. Use ${suggestion}, which spaces them from the token scale${isGrid ? ' and drops columns as it narrows' : ''}.`,
+      suggestion,
+    }),
+  ];
 }
 
 /*
@@ -429,9 +500,10 @@ function collectCommandIssues(node, elementsById, context) {
  * written as markup (`variant="default"`, `<aihio-dialog>`), present only when
  * the fix is unambiguous enough to apply without reading the message.
  */
-function createIssue({ ruleId, severity, node, context, message, suggestion = null }) {
+function createIssue({ ruleId, severity, node, context, message, suggestion = null, contract = null }) {
   return {
     ruleId,
+    ...(contract ? { contract } : {}),
     severity,
     component: node?.tagName ?? null,
     message,

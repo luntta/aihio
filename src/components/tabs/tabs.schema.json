@@ -43,11 +43,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-tabs>\n  <aihio-tab value=\"a\">A</aihio-tab>\n  <aihio-tab-panel value=\"a\">Content</aihio-tab-panel>\n</aihio-tabs>",
-      "reason": "aihio-tab must sit inside an aihio-tab-list; keyboard navigation is bound to the list."
+      "reason": "aihio-tab must sit inside an aihio-tab-list; keyboard navigation is bound to the list.",
+      "fix": "<aihio-tabs value=\"a\">\n  <aihio-tab-list>\n    <aihio-tab value=\"a\">A</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"a\">Content</aihio-tab-panel>\n</aihio-tabs>",
+      "rule": "missing-required-child"
     },
     {
       "markup": "<aihio-tabs value=\"a\">\n  <aihio-tab-list>\n    <aihio-tab value=\"a\">A</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"b\">Content</aihio-tab-panel>\n</aihio-tabs>",
-      "reason": "Panel value does not match any tab value; the panel will never activate."
+      "reason": "Panel value does not match any tab value; the panel will never activate.",
+      "fix": "<aihio-tabs value=\"a\">\n  <aihio-tab-list>\n    <aihio-tab value=\"a\">A</aihio-tab>\n  </aihio-tab-list>\n  <aihio-tab-panel value=\"a\">Content</aihio-tab-panel>\n</aihio-tabs>",
+      "rule": "tabs-value-pairs"
     }
   ],
   "related": [

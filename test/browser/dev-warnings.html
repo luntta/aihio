@@ -73,6 +73,7 @@
             <aihio-tab-panel value="two">Panel</aihio-tab-panel>
           </aihio-tabs>
           <aihio-toggle id="bad-toggle"></aihio-toggle>
+          <aihio-toggle id="false-toggle" pressed="false">Bold</aihio-toggle>
           <aihio-combobox id="bad-combobox" placeholder="Plan">
             <aihio-option>Pro</aihio-option>
             <aihio-option value="Pro">Pro (annual)</aihio-option>
@@ -127,6 +128,10 @@
         assert(
           warnings.some((message) => message.includes('aihio-combobox') && message.includes('distinct value')),
           'combobox should warn when two options share a value'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-toggle') && message.includes('pressed="false" turns pressed on')),
+          'a boolean attribute written as "false" should warn'
         );
       });
 

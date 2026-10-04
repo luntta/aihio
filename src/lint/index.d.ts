@@ -19,7 +19,12 @@ export interface AihioLintIssue {
     | 'unknown-intent'
     | 'intent-mismatch'
     | 'invalid-command'
-    | 'unknown-attribute';
+    | 'unknown-attribute'
+    | 'boolean-attribute-value'
+    | 'cluster-needs-grow'
+    | 'hand-rolled-layout';
+  /** For a11y-contract issues, the id of the a11yContract rule that was broken, such as button-accessible-name. */
+  contract?: string;
   severity: 'error' | 'warn';
   component: string | null;
   message: string;
@@ -41,3 +46,6 @@ export interface AihioLintOptions {
 }
 
 export function lintMarkup(markup: string, options?: AihioLintOptions): AihioLintResult;
+
+/** Every ruleId an issue can carry. */
+export declare const LINT_RULE_IDS: ReadonlySet<AihioLintIssue['ruleId']>;

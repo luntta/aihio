@@ -311,6 +311,29 @@ test('schema content pass keeps a11y guidance and counterexamples populated for 
   }
 });
 
+test('every counterexample is caught by the rule it names, and its fix is clean', async () => {
+  const schema = JSON.parse(readFileSync(resolve(root, 'dist/schema.json'), 'utf8'));
+  const { lintMarkup } = await import(`${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`);
+  let named = 0;
+
+  for (const component of schema.components) {
+    for (const example of component.counterExamples) {
+      const caught = lintMarkup(example.markup).issues.map((issue) => issue.contract ?? issue.ruleId);
+      if (example.rule) {
+        named += 1;
+        assert.ok(caught.includes(example.rule), `${component.$component}: ${example.markup} should be reported as ${example.rule}, got ${caught.join(', ')}`);
+      } else {
+        assert.deepEqual(caught, [], `${component.$component}: ${example.markup} names no rule but is reported`);
+      }
+      assert.deepEqual(lintMarkup(example.fix).issues, [], `${component.$component}: the fix for ${example.markup} is clean`);
+    }
+  }
+
+  // Most mistakes are machine-checkable; the rest are judgments, and should stay few.
+  const total = schema.components.reduce((sum, component) => sum + component.counterExamples.length, 0);
+  assert.ok(named >= total - 2, `${total - named} counterexamples name no rule`);
+});
+
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 

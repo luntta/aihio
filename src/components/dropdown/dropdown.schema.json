@@ -128,11 +128,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-dropdown>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n</aihio-dropdown>",
-      "reason": "Missing slot=\"trigger\". The dropdown has nothing to open it."
+      "reason": "Missing slot=\"trigger\". The dropdown has nothing to open it.",
+      "fix": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\" variant=\"outline\">Account</aihio-button>\n  <aihio-dropdown-item>Profile</aihio-dropdown-item>\n</aihio-dropdown>",
+      "rule": "missing-required-slot"
     },
     {
       "markup": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\">Menu</aihio-button>\n  <a href=\"/x\">Link</a>\n</aihio-dropdown>",
-      "reason": "Children should be aihio-dropdown-item/separator so keyboard navigation and menuitem roles work. Put the link inside an item: <aihio-dropdown-item><a href=\"/x\">Link</a></aihio-dropdown-item>."
+      "reason": "Children should be aihio-dropdown-item/separator so keyboard navigation and menuitem roles work. Put the link inside an item: <aihio-dropdown-item><a href=\"/x\">Link</a></aihio-dropdown-item>.",
+      "fix": "<aihio-dropdown>\n  <aihio-button slot=\"trigger\">Menu</aihio-button>\n  <aihio-dropdown-item><a href=\"/x\">Link</a></aihio-dropdown-item>\n</aihio-dropdown>",
+      "rule": "invalid-child"
     }
   ],
   "related": [

@@ -56,11 +56,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-avatar src=\"/u.jpg\"></aihio-avatar>",
-      "reason": "Missing alt. Screen readers will announce only the filename."
+      "reason": "Missing alt. Screen readers will announce only the filename.",
+      "fix": "<aihio-avatar src=\"/u.jpg\" alt=\"Jane Doe\"></aihio-avatar>",
+      "rule": "avatar-alt"
     },
     {
       "markup": "<aihio-avatar>JD</aihio-avatar>",
-      "reason": "Avatar renders its own content; passed children are replaced. Use the fallback attribute instead."
+      "reason": "Avatar renders its own content; passed children are replaced. Use the fallback attribute instead.",
+      "fix": "<aihio-avatar fallback=\"JD\" alt=\"Jane Doe\"></aihio-avatar>",
+      "rule": "invalid-child"
     }
   ],
   "examples": [

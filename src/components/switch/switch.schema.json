@@ -137,21 +137,33 @@
         "requirement": "Set name. A switch without a name is omitted from FormData entirely.",
         "severity": "warn",
         "rule": "switch-form-name"
+      },
+      {
+        "when": "the switch is named by a state word (On, Off, Enabled)",
+        "requirement": "Name the switch after the setting it controls. The switch announces its own state, so a switch named \"On\" is read as \"On, switch, on\" and never says what is on.",
+        "severity": "warn",
+        "rule": "switch-state-name"
       }
     ]
   },
   "counterExamples": [
     {
       "markup": "<span>Email notifications</span>\n<aihio-switch name=\"email-notifications\"></aihio-switch>",
-      "reason": "The visible text is not associated with the switch, so it is announced as an unnamed switch. Use aihio-field with <label slot=\"label\">, or wrap both in a <label>."
+      "reason": "The visible text is not associated with the switch, so it is announced as an unnamed switch. Use aihio-field with <label slot=\"label\">, or wrap both in a <label>.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Email notifications</label>\n  <aihio-switch name=\"email-notifications\"></aihio-switch>\n</aihio-field>",
+      "rule": "switch-label"
     },
     {
       "markup": "<aihio-switch aria-label=\"On\" checked></aihio-switch>",
-      "reason": "A switch named by its state is announced as \"On, switch, on\". Name it after the setting it controls."
+      "reason": "A switch named by its state is announced as \"On, switch, on\". Name it after the setting it controls.",
+      "fix": "<aihio-switch aria-label=\"Email notifications\" checked></aihio-switch>",
+      "rule": "switch-state-name"
     },
     {
       "markup": "<aihio-switch checked=\"false\" aria-label=\"Weekly summary\"></aihio-switch>",
-      "reason": "Boolean attributes are on by presence. checked=\"false\" starts the switch on; omit the attribute for off."
+      "reason": "Boolean attributes are on by presence. checked=\"false\" starts the switch on; omit the attribute for off.",
+      "fix": "<aihio-switch aria-label=\"Weekly summary\"></aihio-switch>",
+      "rule": "boolean-attribute-value"
     }
   ],
   "examples": [

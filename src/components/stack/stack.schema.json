@@ -55,11 +55,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-stack gap=\"medium\"><p>One</p></aihio-stack>",
-      "reason": "gap=\"medium\" is not valid. The scale is tight, sm, md, lg."
+      "reason": "gap=\"medium\" is not valid. The scale is tight, sm, md, lg.",
+      "fix": "<aihio-stack gap=\"md\"><p>One</p></aihio-stack>",
+      "rule": "invalid-enum-attribute"
     },
     {
       "markup": "<div style=\"display:flex;flex-direction:column;gap:16px\"><p>One</p></div>",
-      "reason": "Hand-rolled spacing drifts from the token scale. Use aihio-stack so the rhythm stays system-owned."
+      "reason": "Hand-rolled spacing drifts from the token scale. Use aihio-stack so the rhythm stays system-owned.",
+      "fix": "<aihio-stack gap=\"md\"><p>One</p></aihio-stack>",
+      "rule": "hand-rolled-layout"
     }
   ],
   "examples": [

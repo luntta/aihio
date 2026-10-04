@@ -72,15 +72,20 @@
   "counterExamples": [
     {
       "markup": "<aihio-cluster justify=\"space-between\"><aihio-button>Save</aihio-button></aihio-cluster>",
-      "reason": "justify=\"space-between\" is not valid. Use justify=\"between\"."
+      "reason": "justify=\"space-between\" is not valid. Use justify=\"between\".",
+      "fix": "<aihio-cluster justify=\"between\"><aihio-button>Save</aihio-button></aihio-cluster>",
+      "rule": "invalid-enum-attribute"
     },
     {
       "markup": "<aihio-stack><aihio-button>Cancel</aihio-button><aihio-button>Save</aihio-button></aihio-stack>",
-      "reason": "A row of actions belongs in aihio-cluster. aihio-stack stacks them vertically and stretches them to full width."
+      "reason": "A row of actions belongs in aihio-cluster. aihio-stack stacks them vertically and stretches them to full width.",
+      "fix": "<aihio-cluster><aihio-button>Cancel</aihio-button><aihio-button>Save</aihio-button></aihio-cluster>"
     },
     {
-      "markup": "<aihio-card-footer>\n  <aihio-cluster justify=\"end\">\n    <aihio-button type=\"submit\">Save</aihio-button>\n  </aihio-cluster>\n</aihio-card-footer>",
-      "reason": "justify=\"end\" does nothing here: the cluster is a content-sized flex item inside the footer. Add grow so it fills the row."
+      "markup": "<aihio-card-footer>\n  <aihio-cluster justify=\"end\">\n    <aihio-button>Save</aihio-button>\n  </aihio-cluster>\n</aihio-card-footer>",
+      "reason": "justify=\"end\" does nothing here: the cluster is a content-sized flex item inside the footer. Add grow so it fills the row.",
+      "fix": "<aihio-card-footer>\n  <aihio-cluster grow justify=\"end\">\n    <aihio-button>Save</aihio-button>\n  </aihio-cluster>\n</aihio-card-footer>",
+      "rule": "cluster-needs-grow"
     }
   ],
   "examples": [

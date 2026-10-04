@@ -1,5 +1,6 @@
 import runtimeSchemaDocument from './runtime-schema.js';
 import { collectA11yRuleViolations } from './a11y-rules.js';
+import { collectMarkupRuleViolations } from './markup-rules.js';
 import { suggestEnumValue } from './suggestions.js';
 
 export const runtimeSchema = deepFreeze(runtimeSchemaDocument);
@@ -32,6 +33,7 @@ export function collectDevWarnings(element) {
   if (!schema || !element) return [];
   return dedupeWarnings([
     ...collectEnumWarnings(element, schema),
+    ...collectMarkupWarnings(element, schema),
     ...collectA11yWarnings(element, schema),
   ]);
 }
@@ -55,6 +57,14 @@ function collectEnumWarnings(element, schema) {
     });
   }
   return warnings;
+}
+
+function collectMarkupWarnings(element, schema) {
+  return collectMarkupRuleViolations(element, schema.attributes, domAdapter).map((violation) => ({
+    key: `markup:${schema.$component}:${violation.key}`,
+    message: violation.message,
+    severity: violation.severity,
+  }));
 }
 
 function collectA11yWarnings(element, schema) {

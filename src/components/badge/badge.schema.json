@@ -52,11 +52,15 @@
   "counterExamples": [
     {
       "markup": "<aihio-badge><aihio-button>Delete</aihio-button></aihio-badge>",
-      "reason": "Badges are non-interactive labels. Put interactive elements outside the badge."
+      "reason": "Badges are non-interactive labels. Put interactive elements outside the badge.",
+      "fix": "<aihio-cluster gap=\"tight\">\n  <aihio-badge>Draft</aihio-badge>\n  <aihio-button variant=\"ghost\" size=\"sm\">Delete</aihio-button>\n</aihio-cluster>",
+      "rule": "forbidden-descendant"
     },
     {
       "markup": "<aihio-badge variant=\"primary\">New</aihio-badge>",
-      "reason": "variant=\"primary\" is not valid. Use variant=\"default\" for the primary style."
+      "reason": "variant=\"primary\" is not valid. Use variant=\"default\" for the primary style.",
+      "fix": "<aihio-badge variant=\"default\">New</aihio-badge>",
+      "rule": "invalid-enum-attribute"
     }
   ],
   "examples": [

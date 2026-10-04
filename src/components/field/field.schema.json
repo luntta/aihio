@@ -81,17 +81,27 @@
         "requirement": "Provide slot=\"label\" content, or an aria-label on the control. aihio-field wires a label but cannot invent one.",
         "severity": "error",
         "rule": "field-label"
+      },
+      {
+        "when": "the error attribute is written on the field",
+        "requirement": "Write the message in slot=\"error\" and leave the attribute to the field, which sets it from that content. An error attribute with no message marks the field invalid with nothing to announce.",
+        "severity": "error",
+        "rule": "field-error-message"
       }
     ]
   },
   "counterExamples": [
     {
       "markup": "<aihio-field>\n  <aihio-input name=\"email\"></aihio-input>\n</aihio-field>",
-      "reason": "No slot=\"label\", so the control is still unnamed. aihio-field wires a label, it does not invent one."
+      "reason": "No slot=\"label\", so the control is still unnamed. aihio-field wires a label, it does not invent one.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input name=\"email\"></aihio-input>\n</aihio-field>",
+      "rule": "field-label"
     },
     {
       "markup": "<aihio-field error>\n  <span slot=\"label\">Email</span>\n  <aihio-input name=\"email\"></aihio-input>\n</aihio-field>",
-      "reason": "The error attribute is set by the component from slot=\"error\" content. Writing it by hand with no message leaves nothing to announce."
+      "reason": "The error attribute is set by the component from slot=\"error\" content. Writing it by hand with no message leaves nothing to announce.",
+      "fix": "<aihio-field>\n  <span slot=\"label\">Email</span>\n  <aihio-input name=\"email\"></aihio-input>\n  <span slot=\"error\">Enter an email address.</span>\n</aihio-field>",
+      "rule": "field-error-message"
     }
   ],
   "examples": [

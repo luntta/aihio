@@ -156,9 +156,36 @@ console.log(`schema prompt module → ${promptModulePath}`);
 // Component examples and patterns are the markup agents copy, so each one has
 // to be clean under the same linter they are told to run: an example that
 // trips a warning teaches the mistake it demonstrates.
+//
+// Counterexamples are held to the linter in both directions. One that names
+// the rule catching it has to be caught by that rule, and one that names none
+// (a judgment the linter cannot make) has to pass, so a rule that starts
+// catching it has to be named. Every counterexample's fix has to be clean.
 async function validateCanonicalMarkup(canonicalComponents, canonicalPatterns) {
-  const { lintMarkup } = await import(`../lint/index.js?schema-build=${Date.now()}`);
+  const { lintMarkup, LINT_RULE_IDS } = await import(`../lint/index.js?schema-build=${Date.now()}`);
+  const { MARKUP_RULE_IDS } = await import('./markup-rules.js');
+  const knownRules = new Set([...LINT_RULE_IDS, ...A11Y_RULE_IDS, ...MARKUP_RULE_IDS]);
   const failures = [];
+
+  for (const component of canonicalComponents) {
+    (component.counterExamples ?? []).forEach((example, index) => {
+      const id = `${component.$component}/counterexample-${index + 1}`;
+      const { issues } = lintMarkup(example.markup, { source: id });
+      const caught = issues.map((issue) => issue.contract ?? issue.ruleId);
+
+      if (example.rule && !knownRules.has(example.rule)) {
+        failures.push(`${id}: names unknown rule ${JSON.stringify(example.rule)}`);
+      } else if (example.rule && !caught.includes(example.rule)) {
+        failures.push(`${id}: is not reported as ${example.rule} (the linter reports ${caught.join(', ') || 'nothing'})`);
+      } else if (!example.rule && caught.length > 0) {
+        failures.push(`${id}: names no rule, but the linter reports ${caught.join(', ')}; name the one it is about`);
+      }
+
+      for (const issue of lintMarkup(example.fix, { source: `${id}/fix` }).issues) {
+        failures.push(`${id}/fix: ${issue.contract ?? issue.ruleId} at ${issue.path}: ${issue.message}`);
+      }
+    });
+  }
   const candidates = [
     ...canonicalComponents.flatMap((component) =>
       (component.examples ?? []).map((markup, index) => ({
@@ -233,7 +260,11 @@ function stripComponent(component) {
   if (component.composition) stripped.composition = component.composition;
   if (component.a11yContract) stripped.a11yContract = component.a11yContract;
   if (component.counterExamples) {
-    stripped.counterExamples = component.counterExamples.map(({ markup }) => ({ markup }));
+    stripped.counterExamples = component.counterExamples.map(({ markup, fix, rule }) => ({
+      markup,
+      fix,
+      ...(rule ? { rule } : {}),
+    }));
   }
   if (component.related) {
     stripped.related = component.related.map((rel) => ({
@@ -961,7 +992,9 @@ function buildPromptHardRules(doc) {
 
   for (const component of doc.components) {
     for (const example of component.counterExamples ?? []) {
-      lines.push(`- \`${component.$component}\` - avoid \`${compactMarkup(example.markup)}\` - ${example.reason}`);
+      const caughtBy = example.rule ? ` (aihio-lint: ${example.rule})` : '';
+      lines.push(`- \`${component.$component}\` - avoid \`${compactMarkup(example.markup)}\`${caughtBy} - ${example.reason}`);
+      lines.push(`  Instead: \`${compactMarkup(example.fix, 400)}\``);
     }
   }
 

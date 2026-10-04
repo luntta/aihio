@@ -173,6 +173,21 @@ test('issues carry a suggestion an agent can apply without reading the message',
   assert.equal(suggestionFor('<aihio-button variant="outlin">Save</aihio-button>', 'invalid-enum-attribute'), 'variant="outline"');
   assert.equal(suggestionFor('<aihio-dropdwon></aihio-dropdwon>', 'unknown-component'), '<aihio-dropdown>');
 
+  // A link written as a button attribute becomes the link the button wraps.
+  assert.equal(
+    suggestionFor('<aihio-button href="/pricing" target="_blank" variant="outline">See pricing</aihio-button>', 'unknown-attribute'),
+    '<aihio-button variant="outline"><a href="/pricing" target="_blank">See pricing</a></aihio-button>'
+  );
+
+  // Layout written by hand points at the primitive that replaces it.
+  assert.equal(suggestionFor('<div style="display: grid; gap: 1rem">…</div>', 'hand-rolled-layout'), '<aihio-grid>');
+  assert.equal(suggestionFor('<div style="display:flex;flex-direction:column">…</div>', 'hand-rolled-layout'), '<aihio-stack>');
+  assert.equal(suggestionFor('<div style="display: flex">…</div>', 'hand-rolled-layout'), '<aihio-cluster>');
+  assert.equal(
+    suggestionFor('<aihio-card-footer><aihio-cluster justify="between"><aihio-button>Save</aihio-button></aihio-cluster></aihio-card-footer>', 'cluster-needs-grow'),
+    'grow justify="between"'
+  );
+
   // No suggestion rather than a wrong one.
   assert.equal(suggestionFor('<aihio-button icon="plus">Add</aihio-button>', 'unknown-attribute'), undefined);
   assert.equal(suggestionFor('<aihio-button variant="gradient">Go</aihio-button>', 'invalid-enum-attribute'), undefined);
@@ -189,4 +204,30 @@ test('global, aria, data, event, and template attributes are never reported as u
   `;
   const unknown = lintMarkup(markup).issues.filter((issue) => issue.ruleId === 'unknown-attribute');
   assert.deepEqual(unknown, []);
+});
+
+test('a11y-contract issues name the obligation they enforce', async () => {
+  const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
+  const { lintMarkup } = await import(lintUrl);
+  const [issue] = lintMarkup('<aihio-button size="icon">&#x2715;</aihio-button>').issues;
+  assert.equal(issue.ruleId, 'a11y-contract');
+  assert.equal(issue.contract, 'button-accessible-name');
+});
+
+test('a boolean attribute written as "false" is reported, on sub-components too', async () => {
+  const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
+  const { lintMarkup } = await import(lintUrl);
+  const ruleIds = (markup) => lintMarkup(markup).issues.map((issue) => issue.ruleId);
+
+  assert.ok(ruleIds('<aihio-toggle pressed="false">Bold</aihio-toggle>').includes('boolean-attribute-value'));
+  assert.ok(ruleIds('<aihio-switch checked="0" aria-label="Weekly summary"></aihio-switch>').includes('boolean-attribute-value'));
+  assert.ok(ruleIds(`
+    <aihio-tabs value="a">
+      <aihio-tab-list><aihio-tab value="a">A</aihio-tab><aihio-tab value="b" disabled="false">B</aihio-tab></aihio-tab-list>
+      <aihio-tab-panel value="a">A</aihio-tab-panel><aihio-tab-panel value="b">B</aihio-tab-panel>
+    </aihio-tabs>
+  `).includes('boolean-attribute-value'));
+
+  // Presence is what counts, so "true" and a bare attribute are both fine.
+  assert.deepEqual(ruleIds('<aihio-toggle pressed="true">Bold</aihio-toggle><aihio-toggle pressed>Italic</aihio-toggle>'), []);
 });

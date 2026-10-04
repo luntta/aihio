@@ -213,11 +213,21 @@
     },
     "counterExample": {
       "type": "object",
-      "required": ["markup", "reason"],
+      "required": ["markup", "reason", "fix"],
       "additionalProperties": false,
       "properties": {
         "markup": { "type": "string", "minLength": 1 },
-        "reason": { "type": "string", "minLength": 1 }
+        "reason": { "type": "string", "minLength": 1 },
+        "fix": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The same markup, corrected. The build lints it and fails on any issue."
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The lint ruleId, or a11yContract rule id, that catches this mistake. The build fails if the linter does not report it. Omit it only for a judgment the linter cannot make; the build then fails if the linter reports anything."
+        }
       }
     },
     "related": {

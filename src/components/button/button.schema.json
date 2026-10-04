@@ -169,27 +169,39 @@
   "counterExamples": [
     {
       "markup": "<aihio-button variant=\"primary\">Save</aihio-button>",
-      "reason": "variant=\"primary\" is not valid. The primary style is variant=\"default\"."
+      "reason": "variant=\"primary\" is not valid. The primary style is variant=\"default\".",
+      "fix": "<aihio-button variant=\"default\">Save</aihio-button>",
+      "rule": "invalid-enum-attribute"
     },
     {
       "markup": "<aihio-button><aihio-button>Save</aihio-button></aihio-button>",
-      "reason": "Buttons must not be nested. Use sibling buttons or aihio-dropdown for grouped actions."
+      "reason": "Buttons must not be nested. Use sibling buttons or aihio-dropdown for grouped actions.",
+      "fix": "<aihio-cluster>\n  <aihio-button variant=\"outline\">Cancel</aihio-button>\n  <aihio-button>Save</aihio-button>\n</aihio-cluster>",
+      "rule": "forbidden-descendant"
     },
     {
       "markup": "<aihio-button size=\"icon\">&#x2715;</aihio-button>",
-      "reason": "Icon-only button is missing an accessible name. Add aria-label=\"Close\" (or similar)."
+      "reason": "Icon-only button is missing an accessible name. Add aria-label=\"Close\" (or similar).",
+      "fix": "<aihio-button size=\"icon\" aria-label=\"Close\">&#x2715;</aihio-button>",
+      "rule": "button-accessible-name"
     },
     {
       "markup": "<form>\n  <aihio-input name=\"email\" aria-label=\"Email\"></aihio-input>\n</form>\n<aihio-button type=\"submit\">Sign in</aihio-button>",
-      "reason": "A submit button outside the <form> never submits it. Move the button inside the form element."
+      "reason": "A submit button outside the <form> never submits it. Move the button inside the form element.",
+      "fix": "<form>\n  <aihio-input name=\"email\" aria-label=\"Email\"></aihio-input>\n  <aihio-button type=\"submit\">Sign in</aihio-button>\n</form>",
+      "rule": "button-form-owner"
     },
     {
       "markup": "<aihio-button onclick=\"location.href='/pricing'\">See pricing</aihio-button>",
-      "reason": "A button that navigates is announced as a button, shows no URL, cannot be opened in a new tab, and does nothing without script. Put a link inside it: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>."
+      "reason": "A button that navigates is announced as a button, shows no URL, cannot be opened in a new tab, and does nothing without script. Put a link inside it: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>.",
+      "fix": "<aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>",
+      "rule": "button-link-navigation"
     },
     {
       "markup": "<aihio-button href=\"/pricing\">See pricing</aihio-button>",
-      "reason": "aihio-button has no href; nothing reads it. Put the link inside: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>."
+      "reason": "aihio-button has no href; nothing reads it. Put the link inside: <aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>.",
+      "fix": "<aihio-button><a href=\"/pricing\">See pricing</a></aihio-button>",
+      "rule": "unknown-attribute"
     }
   ],
   "examples": [

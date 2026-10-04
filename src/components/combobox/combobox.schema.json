@@ -254,19 +254,27 @@
   "counterExamples": [
     {
       "markup": "<aihio-combobox placeholder=\"Country\">\n  <aihio-option value=\"fi\">Finland</aihio-option>\n</aihio-combobox>",
-      "reason": "Placeholder is not a label. Wrap it in aihio-field with a label slot, or add aria-labelledby or aria-label."
+      "reason": "Placeholder is not a label. Wrap it in aihio-field with a label slot, or add aria-labelledby or aria-label.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Country</label>\n  <aihio-combobox name=\"country\">\n    <aihio-option value=\"fi\">Finland</aihio-option>\n  </aihio-combobox>\n</aihio-field>",
+      "rule": "combobox-label"
     },
     {
       "markup": "<label>\n  Country\n  <aihio-combobox>\n    <aihio-option value=\"fi\">Finland</aihio-option>\n  </aihio-combobox>\n</label>",
-      "reason": "A wrapping <label> takes its name from all of its text, so an open list's options become part of the field's name. Use aihio-field instead."
+      "reason": "A wrapping <label> takes its name from all of its text, so an open list's options become part of the field's name. Use aihio-field instead.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Country</label>\n  <aihio-combobox name=\"country\">\n    <aihio-option value=\"fi\">Finland</aihio-option>\n  </aihio-combobox>\n</aihio-field>",
+      "rule": "combobox-label"
     },
     {
       "markup": "<aihio-combobox aria-label=\"Size\">\n  <option value=\"s\">Small</option>\n  <option value=\"m\">Medium</option>\n</aihio-combobox>",
-      "reason": "Native <option> elements are not read. Use aihio-option."
+      "reason": "Native <option> elements are not read. Use aihio-option.",
+      "fix": "<aihio-combobox aria-label=\"Size\">\n  <aihio-option value=\"s\">Small</aihio-option>\n  <aihio-option value=\"m\">Medium</aihio-option>\n</aihio-combobox>",
+      "rule": "invalid-child"
     },
     {
       "markup": "<aihio-combobox aria-label=\"Plan\">\n  <aihio-option>Pro</aihio-option>\n  <aihio-option value=\"Pro\">Pro (annual)</aihio-option>\n</aihio-combobox>",
-      "reason": "An option without a value uses its label as its value, so both options have the value \"Pro\" and the second can never be told apart from the first."
+      "reason": "An option without a value uses its label as its value, so both options have the value \"Pro\" and the second can never be told apart from the first.",
+      "fix": "<aihio-combobox aria-label=\"Plan\">\n  <aihio-option value=\"pro\">Pro</aihio-option>\n  <aihio-option value=\"pro-annual\">Pro (annual)</aihio-option>\n</aihio-combobox>",
+      "rule": "combobox-option-values"
     }
   ],
   "related": [

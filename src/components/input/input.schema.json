@@ -201,15 +201,21 @@
   "counterExamples": [
     {
       "markup": "<aihio-input placeholder=\"Email\"></aihio-input>",
-      "reason": "Placeholder is not a label. Associate a <label> or add aria-label."
+      "reason": "Placeholder is not a label. Associate a <label> or add aria-label.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input type=\"email\" name=\"email\" placeholder=\"you@example.com\"></aihio-input>\n</aihio-field>",
+      "rule": "input-label"
     },
     {
       "markup": "<aihio-input error></aihio-input>",
-      "reason": "error=true without an aria-describedby message leaves screen reader users without context."
+      "reason": "error=true without an aria-describedby message leaves screen reader users without context.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Email</label>\n  <aihio-input name=\"email\"></aihio-input>\n  <span slot=\"error\">Enter an email address.</span>\n</aihio-field>",
+      "rule": "input-error-description"
     },
     {
       "markup": "<form>\n  <aihio-input aria-label=\"Email\" type=\"email\"></aihio-input>\n</form>",
-      "reason": "No name attribute, so this field submits nothing. Add name=\"email\"."
+      "reason": "No name attribute, so this field submits nothing. Add name=\"email\".",
+      "fix": "<form>\n  <aihio-input aria-label=\"Email\" type=\"email\" name=\"email\"></aihio-input>\n</form>",
+      "rule": "input-form-name"
     }
   ],
   "examples": [

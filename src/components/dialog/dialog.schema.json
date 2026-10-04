@@ -102,15 +102,21 @@
   "counterExamples": [
     {
       "markup": "<aihio-dialog open><p>Delete?</p></aihio-dialog>",
-      "reason": "Missing header and footer. Provide aihio-dialog-title for a name and aihio-dialog-footer for actions."
+      "reason": "Missing header and footer. Provide aihio-dialog-title for a name and aihio-dialog-footer for actions.",
+      "fix": "<aihio-dialog id=\"delete-project-dialog\">\n  <aihio-dialog-header>\n    <aihio-dialog-title>Delete project?</aihio-dialog-title>\n  </aihio-dialog-header>\n  <aihio-dialog-footer>\n    <aihio-button commandfor=\"delete-project-dialog\" command=\"--close\" variant=\"outline\">Cancel</aihio-button>\n    <aihio-button variant=\"destructive\">Delete</aihio-button>\n  </aihio-dialog-footer>\n</aihio-dialog>",
+      "rule": "dialog-accessible-name"
     },
     {
       "markup": "<aihio-dialog><aihio-dialog><p>Nested</p></aihio-dialog></aihio-dialog>",
-      "reason": "Dialogs must not be nested. Close the current dialog before opening another."
+      "reason": "Dialogs must not be nested. Close the current dialog before opening another.",
+      "fix": "<aihio-dialog id=\"first-step\" aria-label=\"Step 1\"><p>Step 1</p></aihio-dialog>\n<aihio-dialog id=\"second-step\" aria-label=\"Step 2\"><p>Step 2</p></aihio-dialog>",
+      "rule": "invalid-child"
     },
     {
       "markup": "<aihio-button commandfor=\"confirm\" command=\"show-modal\">Delete</aihio-button>\n<aihio-dialog id=\"confirm\" aria-label=\"Confirm delete\"></aihio-dialog>",
-      "reason": "Built-in commands such as show-modal only act on a native <dialog>, and this one is inside the component's shadow root, so nothing happens. Use command=\"--open\"."
+      "reason": "Built-in commands such as show-modal only act on a native <dialog>, and this one is inside the component's shadow root, so nothing happens. Use command=\"--open\".",
+      "fix": "<aihio-button commandfor=\"confirm\" command=\"--open\">Delete</aihio-button>\n<aihio-dialog id=\"confirm\" aria-label=\"Confirm delete\"><p>Delete this project?</p></aihio-dialog>",
+      "rule": "invalid-command"
     }
   ],
   "related": [
