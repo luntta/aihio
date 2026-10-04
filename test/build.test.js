@@ -73,7 +73,7 @@ test('semantic token references are generated into dist, as markdown and as JSON
 // colour is wrapped around a variable.
 test('every custom property is --aihio-kebab-case, and every var() resolves', () => {
   const sources = Object.fromEntries(
-    ['dist/aihio.css', 'dist/aihio.js', 'site/assets/docs.css'].map((path) => [path, readFileSync(resolve(root, path), 'utf8')])
+    ['dist/aihio.css', 'dist/aihio.js', 'site/assets/docs.css', 'site/assets/docs.js'].map((path) => [path, readFileSync(resolve(root, path), 'utf8')])
   );
   const defined = new Set();
   for (const text of Object.values(sources)) {
