@@ -1,0 +1,100 @@
+{#- The reference for one element: `api` is a component or sub-component from
+    _data/docs.js, `level` the heading level for its parts. -#}
+{% if api.attributeEntries.length %}
+  <h{{ level }} class="docs-api__heading">Attributes</h{{ level }}>
+  <dl class="docs-api">
+    {% for attribute in api.attributeEntries %}
+      <div class="docs-api__row">
+        <dt><code>{{ attribute.name }}</code></dt>
+        <dd class="docs-api__type">
+          {% if attribute.type == 'enum' %}
+            <span class="docs-api__kind">one of</span>
+            {% for value in attribute.values %}<code>{{ value }}</code>{% endfor %}
+          {% else %}
+            <span class="docs-api__kind">{{ attribute.type }}</span>
+          {% endif %}
+          {% if attribute.hasDefault %}<span class="docs-api__default">default <code>{{ attribute.defaultLabel }}</code></span>{% endif %}
+        </dd>
+        <dd class="docs-api__description">{{ attribute.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if api.propertyEntries.length %}
+  <h{{ level }} class="docs-api__heading">Properties</h{{ level }}>
+  <dl class="docs-api">
+    {% for property in api.propertyEntries %}
+      <div class="docs-api__row">
+        <dt><code>{{ property.name }}</code></dt>
+        <dd class="docs-api__type">
+          <code>{{ property.type }}</code>
+          {% if property.readonly %}<span class="docs-api__default">read-only</span>{% endif %}
+        </dd>
+        <dd class="docs-api__description">{{ property.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if api.methodEntries.length %}
+  <h{{ level }} class="docs-api__heading">Methods</h{{ level }}>
+  <dl class="docs-api">
+    {% for method in api.methodEntries %}
+      <div class="docs-api__row docs-api__row--wide">
+        <dt><code>{{ method.signature }}</code></dt>
+        <dd class="docs-api__description">{{ method.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if api.eventEntries.length %}
+  <h{{ level }} class="docs-api__heading">Events</h{{ level }}>
+  <dl class="docs-api">
+    {% for event in api.eventEntries %}
+      <div class="docs-api__row">
+        <dt><code>{{ event.name }}</code></dt>
+        <dd class="docs-api__type">
+          {% if event.detailEntries.length %}
+            <span class="docs-api__kind">detail</span>
+            <code>{ {% for entry in event.detailEntries %}{{ entry.key }}: {{ entry.type }}{% if not loop.last %}, {% endif %}{% endfor %} }</code>
+          {% endif %}
+          {% if event.cancelable %}<span class="docs-api__default">cancelable</span>{% endif %}
+        </dd>
+        <dd class="docs-api__description">{{ event.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if api.slotEntries.length %}
+  <h{{ level }} class="docs-api__heading">Slots</h{{ level }}>
+  <dl class="docs-api">
+    {% for slot in api.slotEntries %}
+      <div class="docs-api__row">
+        <dt><code>{{ slot.name }}</code></dt>
+        {% if slot.accepts %}
+          <dd class="docs-api__type"><span class="docs-api__kind">accepts</span>{% for accepted in slot.accepts %}<code>{{ accepted }}</code>{% endfor %}</dd>
+        {% endif %}
+        <dd class="docs-api__description">{{ slot.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}
+
+{% if api.commandEntries.length %}
+  <h{{ level }} class="docs-api__heading">Commands</h{{ level }}>
+  <p class="docs-api__intro">
+    Sent from markup: <code>&lt;aihio-button commandfor="id" command="…"&gt;</code>, or a plain
+    <code>&lt;button&gt;</code> with the same attributes.
+  </p>
+  <dl class="docs-api">
+    {% for command in api.commandEntries %}
+      <div class="docs-api__row">
+        <dt><code>{{ command.name }}</code></dt>
+        <dd class="docs-api__description">{{ command.description }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endif %}

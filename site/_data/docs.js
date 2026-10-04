@@ -82,6 +82,63 @@ function hasAncestor(node, tagName) {
   return false;
 }
 
+/** Attributes, properties, methods, events, slots, and commands, as lists for the reference. */
+function toApiEntries(definition, tag) {
+  return {
+    attributeEntries: Object.entries(definition.attributes ?? {}).map(([name, attribute]) => ({
+      name,
+      ...attribute,
+      hasDefault: attribute.default !== undefined,
+      defaultLabel: attribute.default === undefined ? '' : String(attribute.default),
+    })),
+    propertyEntries: Object.entries(definition.properties ?? {}).map(([name, property]) => ({ name, ...property })),
+    methodEntries: Object.entries(definition.methods ?? {}).map(([name, method]) => ({
+      signature: `${name.replace(/\(\)$/, '')}(${(method.parameters ?? [])
+        .map((parameter) => `${parameter.name}${parameter.optional ? '?' : ''}: ${parameter.type}`)
+        .join(', ')})${method.returns ? `: ${method.returns}` : ''}`,
+      description: method.description,
+    })),
+    eventEntries: Object.entries(definition.events ?? {}).map(([name, event]) => ({
+      name,
+      source: tag,
+      ...event,
+      detailEntries: Object.entries(event.detail ?? {}).map(([key, type]) => ({ key, type })),
+    })),
+    slotEntries: Object.entries(definition.slots ?? {}).map(([name, slot]) => ({ name, ...slot })),
+    commandEntries: Object.entries(definition.commands ?? {}).map(([name, command]) => ({ name, ...command })),
+  };
+}
+
+const COMPOSITION_LABELS = {
+  requiredSlots: 'Required slots',
+  allowedSlots: 'Allowed slots',
+  requiredChildren: 'Required children',
+  allowedChildren: 'Allowed children',
+  forbiddenChildren: 'Forbidden descendants',
+  allowedParents: 'Allowed parents',
+  requiredAncestors: 'Required ancestors',
+};
+
+const COMPOSITION_TOKENS = {
+  '*': 'anything',
+  '#text': 'text',
+  '#flow': 'other HTML',
+  '#root': 'not inside another component',
+};
+
+function toCompositionEntries(composition = {}) {
+  return Object.entries(COMPOSITION_LABELS)
+    .filter(([key]) => Array.isArray(composition[key]))
+    .map(([key, label]) => ({
+      label,
+      values: composition[key].length === 0
+        ? [{ text: 'none' }]
+        : composition[key].map((value) => COMPOSITION_TOKENS[value]
+          ? { text: COMPOSITION_TOKENS[value] }
+          : { code: value, url: tagUrls.get(value) ?? null }),
+    }));
+}
+
 /** A token's source, as the CSS variables it reads (per theme for colours). */
 function formatTokenSource(token) {
   const list = (references, value) => (references.length > 0 ? references.join(', ') : value);
@@ -96,6 +153,15 @@ if (!existsSync(schemaPath)) {
 const schema = readJson(schemaPath);
 const pkg = readJson(packagePath);
 const tokens = readJson(tokensPath);
+
+// Where each tag is documented: a component's own page, or a sub-component's
+// section on its parent's page.
+const tagUrls = new Map();
+for (const component of schema.components) {
+  const url = `/components/${tagToSlug(component.$component)}/`;
+  tagUrls.set(component.$component, url);
+  for (const related of component.related ?? []) tagUrls.set(related.$component, `${url}#${related.$component}`);
+}
 
 const semanticTokenGroups = Object.entries(tokens.groups)
   .map(([name, intro]) => ({
@@ -152,36 +218,16 @@ const components = schema.components
       slug,
       name,
       path: `/components/${slug}/`,
-      attributeEntries: Object.entries(component.attributes ?? {}).map(([attribute, definition]) => ({
-        name: attribute,
-        ...definition,
-      })),
-      slotEntries: Object.entries(component.slots ?? {}).map(([slot, definition]) => ({
-        name: slot,
-        ...definition,
-      })),
-      eventEntries: [
-        ...Object.entries(component.events ?? {}).map(([event, definition]) => ({
-          name: event,
-          source: tag,
-          ...definition,
-        })),
-        // Sub-components like aihio-dropdown-item and aihio-tab dispatch their
-        // own events but have no page of their own, so their events would go
-        // undocumented if they were not folded into the parent's list.
-        ...(component.related ?? []).flatMap((related) =>
-          Object.entries(related.events ?? {}).map(([event, definition]) => ({
-            name: event,
-            source: related.$component,
-            ...definition,
-          }))
-        ),
-      ],
-      relatedEntries: (component.related ?? []).map((related) => ({
+      ...toApiEntries(component, tag),
+      compositionEntries: toCompositionEntries(component.composition),
+      // Sub-components (aihio-card-header, aihio-tab, aihio-option) are only
+      // ever used inside their parent, so they are documented on its page,
+      // each under an anchor named for its tag.
+      subComponents: (component.related ?? []).map((related) => ({
         tag: related.$component,
-        slug: tagToSlug(related.$component),
-        name: toTitleCase(tagToSlug(related.$component)),
-        path: `/components/${tagToSlug(related.$component)}/`,
+        anchor: related.$component,
+        description: related.description,
+        ...toApiEntries(related, related.$component),
       })),
       intentsDetailed: (component.intents ?? []).map((intent) => ({
         name: intent,

@@ -67,177 +67,57 @@ eleventyComputed:
   </section>
 {% endif %}
 
-<section class="docs-detail-grid">
-  <div class="docs-detail-grid__main">
-    <aihio-card>
-      <aihio-card-header>
-        <aihio-card-title>Attributes</aihio-card-title>
-        <aihio-card-description>Author-configurable props exposed in the schema.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        {% if component.attributeEntries.length %}
-          <div class="docs-tablewrap">
-          <table class="docs-table">
-            <thead>
-              <tr>
-                <th>Attribute</th>
-                <th>Type</th>
-                <th>Default</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for attribute in component.attributeEntries %}
-                <tr>
-                  <td><code>{{ attribute.name }}</code></td>
-                  <td>
-                    <strong>{{ attribute.type }}</strong>
-                    {% if attribute.values %}
-                      <div class="docs-table__detail">{{ attribute.values | join(', ') }}</div>
-                    {% endif %}
-                  </td>
-                  <td>{% if attribute.default !== undefined %}<code>{{ attribute.default }}</code>{% else %}<span class="docs-muted">None</span>{% endif %}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          </div>
-        {% else %}
-          <p class="docs-muted">This component does not expose authored attributes.</p>
-        {% endif %}
-      </aihio-card-content>
-    </aihio-card>
-
-    <div class="docs-surface-grid">
-      <aihio-card>
-        <aihio-card-header>
-          <aihio-card-title>Slots</aihio-card-title>
-          <aihio-card-description>Named content regions and composition anchors.</aihio-card-description>
-        </aihio-card-header>
-        <aihio-card-content>
-          {% if component.slotEntries.length %}
-            <ul class="docs-list">
-              {% for slot in component.slotEntries %}
-                <li><code>{{ slot.name }}</code></li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="docs-muted">No named slots.</p>
-          {% endif %}
-        </aihio-card-content>
-      </aihio-card>
-
-      <aihio-card>
-        <aihio-card-header>
-          <aihio-card-title>Events</aihio-card-title>
-          <aihio-card-description>Signals emitted by the component at runtime.</aihio-card-description>
-        </aihio-card-header>
-        <aihio-card-content>
-          {% if component.eventEntries.length %}
-            <ul class="docs-list">
-              {% for event in component.eventEntries %}
-                <li>
-                  <code>{{ event.name }}</code>
-                  {% if event.source != component.tag %}
-                    <span class="docs-muted">on <code>{{ event.source }}</code></span>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="docs-muted">No custom events declared.</p>
-          {% endif %}
-        </aihio-card-content>
-      </aihio-card>
+<section id="api">
+  <div class="docs-section-heading">
+    <div>
+      <h2>API</h2>
+      <p>Every attribute, property, method, and event the schema declares for <code>{{ component.tag }}</code>.</p>
     </div>
   </div>
 
-  <aside class="docs-detail-grid__sidebar">
-    <aihio-card>
-      <aihio-card-header>
-        <aihio-card-title>Composition rules</aihio-card-title>
-        <aihio-card-description>Schema-level constraints enforced by docs, linting, and runtime validation.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        {% if component.composition.requiredSlots or component.composition.requiredChildren or component.composition.allowedChildren or component.composition.forbiddenChildren or component.composition.allowedParents or component.composition.requiredAncestors %}
-          <dl class="docs-definition-list">
-            {% if component.composition.requiredSlots %}
-              <div>
-                <dt>Required slots</dt>
-                <dd>{{ component.composition.requiredSlots | join(', ') }}</dd>
-              </div>
-            {% endif %}
-            {% if component.composition.requiredChildren %}
-              <div>
-                <dt>Required children</dt>
-                <dd>{{ component.composition.requiredChildren | join(', ') }}</dd>
-              </div>
-            {% endif %}
-            {% if component.composition.allowedChildren %}
-              <div>
-                <dt>Allowed children</dt>
-                <dd>{{ component.composition.allowedChildren | join(', ') }}</dd>
-              </div>
-            {% endif %}
-            {% if component.composition.forbiddenChildren %}
-              <div>
-                <dt>Forbidden descendants</dt>
-                <dd>{{ component.composition.forbiddenChildren | join(', ') }}</dd>
-              </div>
-            {% endif %}
-            {% if component.composition.allowedParents %}
-              <div>
-                <dt>Allowed parents</dt>
-                <dd>{{ component.composition.allowedParents | join(', ') }}</dd>
-              </div>
-            {% endif %}
-            {% if component.composition.requiredAncestors %}
-              <div>
-                <dt>Required ancestors</dt>
-                <dd>{{ component.composition.requiredAncestors | join(', ') }}</dd>
-              </div>
-            {% endif %}
-          </dl>
-        {% else %}
-          <p class="docs-muted">No additional composition constraints beyond the examples and schema shape.</p>
-        {% endif %}
-      </aihio-card-content>
-    </aihio-card>
+  {% set api = component %}
+  {% set level = 3 %}
+  {% include "partials/api-reference.njk" %}
 
-    <aihio-card>
-      <aihio-card-header>
-        <aihio-card-title>Related patterns</aihio-card-title>
-        <aihio-card-description>Seeded compositions that require this component.</aihio-card-description>
-      </aihio-card-header>
-      <aihio-card-content>
-        {% if component.patternsUsing.length %}
-          <ul class="docs-link-list">
-            {% for pattern in component.patternsUsing %}
-              <li><a class="docs-inline-link" href="{{ pattern.path | docsUrl(page.url) }}">{{ pattern.name }}</a></li>
+  {% if component.compositionEntries.length %}
+    <h3 class="docs-api__heading">Composition</h3>
+    <dl class="docs-api">
+      {% for entry in component.compositionEntries %}
+        <div class="docs-api__row">
+          <dt>{{ entry.label }}</dt>
+          <dd class="docs-api__type">
+            {% for value in entry.values %}
+              {% if value.url %}<a class="docs-code-link" href="{{ value.url | docsUrl(page.url) }}"><code>{{ value.code }}</code></a>
+              {% elif value.code %}<code>{{ value.code }}</code>
+              {% else %}<span class="docs-api__kind">{{ value.text }}</span>{% endif %}
             {% endfor %}
-          </ul>
-        {% else %}
-          <p class="docs-muted">No seeded patterns reference this component yet.</p>
-        {% endif %}
-      </aihio-card-content>
-    </aihio-card>
-
-    {% if component.relatedEntries.length %}
-      <aihio-card>
-        <aihio-card-header>
-          <aihio-card-title>Related components</aihio-card-title>
-          <aihio-card-description>Subcomponents or schema-linked neighbors.</aihio-card-description>
-        </aihio-card-header>
-        <aihio-card-content>
-          <ul class="docs-link-list">
-            {% for related in component.relatedEntries %}
-              <li><a class="docs-inline-link" href="{{ related.path | docsUrl(page.url) }}">{{ related.name }}</a></li>
-            {% endfor %}
-          </ul>
-        </aihio-card-content>
-      </aihio-card>
-    {% endif %}
-  </aside>
+          </dd>
+        </div>
+      {% endfor %}
+    </dl>
+  {% endif %}
 </section>
+
+{% if component.subComponents.length %}
+  <section id="sub-components">
+    <div class="docs-section-heading">
+      <div>
+        <h2>Sub-components</h2>
+        <p>Used only inside <code>{{ component.tag }}</code>, which gives them their roles and keyboard behaviour.</p>
+      </div>
+    </div>
+
+    {% for sub in component.subComponents %}
+      <div class="docs-subcomponent" id="{{ sub.anchor }}">
+        <h3><code>&lt;{{ sub.tag }}&gt;</code></h3>
+        <p class="docs-subcomponent__description">{{ sub.description }}</p>
+        {% set api = sub %}
+        {% set level = 4 %}
+        {% include "partials/api-reference.njk" %}
+      </div>
+    {% endfor %}
+  </section>
+{% endif %}
 
 <section>
   <div class="docs-section-heading">
@@ -304,3 +184,19 @@ eleventyComputed:
     </aihio-tab-panel>
   </aihio-tabs>
 </section>
+
+{% if component.patternsUsing.length %}
+  <section id="patterns">
+    <div class="docs-section-heading">
+      <div>
+        <h2>In patterns</h2>
+        <p>Canonical compositions that use <code>{{ component.tag }}</code>.</p>
+      </div>
+    </div>
+    <ul class="docs-link-row">
+      {% for pattern in component.patternsUsing %}
+        <li><a class="docs-inline-link" href="{{ pattern.path | docsUrl(page.url) }}">{{ pattern.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}

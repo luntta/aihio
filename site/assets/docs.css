@@ -974,6 +974,165 @@ a {
   flex-wrap: wrap;
 }
 
+/* API reference ---------------------------------------------------------- */
+
+/* One row per attribute, property, method, or event: the name in a column of
+   its own, what it takes beside it, and what it does underneath. A list
+   rather than a table, so nothing is cut off when the column narrows. */
+.docs-api__heading {
+  margin: var(--aihio-spacing-8) 0 var(--aihio-spacing-2);
+  font-size: var(--aihio-font-size-base);
+  font-weight: var(--aihio-font-weight-semibold);
+  letter-spacing: var(--aihio-letter-spacing-heading);
+}
+
+.docs-api__heading:first-child,
+.docs-section-heading + .docs-api__heading {
+  margin-top: 0;
+}
+
+.docs-api__intro {
+  max-width: var(--docs-measure);
+  margin: 0 0 var(--aihio-spacing-3);
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-api {
+  margin: 0;
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-api__row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  column-gap: var(--aihio-spacing-6);
+  row-gap: var(--aihio-spacing-1);
+  padding-block: var(--aihio-spacing-3);
+  border-bottom: 1px solid var(--docs-hairline);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-api__row > dt {
+  grid-row: span 2;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.docs-api__row > dd {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+}
+
+/* A signature is too long for the name column, so it takes the whole row. */
+.docs-api__row--wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.docs-api__row--wide > dt {
+  grid-row: auto;
+}
+
+.docs-api__row--wide > dd {
+  grid-column: 1;
+}
+
+.docs-api__type {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--aihio-spacing-1) var(--aihio-spacing-1-5);
+}
+
+.docs-api__kind,
+.docs-api__default {
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-xs);
+}
+
+.docs-api__default {
+  margin-left: auto;
+}
+
+.docs-api__description {
+  color: var(--aihio-color-muted-fg);
+  text-wrap: pretty;
+}
+
+.docs-code-link {
+  text-decoration: none;
+}
+
+.docs-code-link code {
+  text-decoration: underline;
+  text-decoration-color: var(--docs-hairline);
+  text-underline-offset: 0.25em;
+}
+
+.docs-code-link:hover code {
+  text-decoration-color: currentColor;
+}
+
+.docs-subcomponent {
+  padding-block: var(--aihio-spacing-6) var(--aihio-spacing-2);
+  scroll-margin-top: calc(var(--docs-topbar-height) + 1rem);
+}
+
+.docs-subcomponent + .docs-subcomponent {
+  border-top: 1px solid var(--docs-hairline);
+}
+
+.docs-subcomponent:first-of-type {
+  padding-top: 0;
+}
+
+.docs-subcomponent h3 {
+  margin: 0 0 var(--aihio-spacing-2);
+  font-size: var(--aihio-font-size-lg);
+}
+
+.docs-subcomponent__description {
+  max-width: var(--docs-measure);
+  margin: 0 0 var(--aihio-spacing-4);
+  color: var(--aihio-color-muted-fg);
+  font-size: var(--aihio-font-size-sm);
+  line-height: var(--aihio-line-height-relaxed);
+}
+
+.docs-subcomponent:target h3 code {
+  background: var(--aihio-color-control-highlight-bg);
+}
+
+.docs-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aihio-spacing-2) var(--aihio-spacing-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container docs-main (max-width: 36rem) {
+  .docs-api__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-api__row > dt {
+    grid-row: auto;
+  }
+
+  .docs-api__row > dd {
+    grid-column: 1;
+  }
+
+  .docs-api__default {
+    margin-left: 0;
+  }
+}
+
 /* Intents ---------------------------------------------------------------- */
 
 /* A glossary, not a card wall: each intent, what it means, and what serves
