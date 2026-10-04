@@ -2122,6 +2122,22 @@ a {
   }
 }
 
+.docs-theme--drawer {
+  display: none;
+}
+
+@media (max-width: 39.999rem) {
+  .docs-topbar .docs-theme {
+    display: none;
+  }
+
+  .docs-theme--drawer {
+    display: flex;
+    width: fit-content;
+    margin: var(--aihio-spacing-8) var(--aihio-spacing-3) 0;
+  }
+}
+
 @media (max-width: 30rem) {
   .docs-topbar__link,
   .docs-search-trigger__key {

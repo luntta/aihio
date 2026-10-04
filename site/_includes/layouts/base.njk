@@ -111,6 +111,14 @@
           </div>
         {% endfor %}
       </nav>
+
+      {#- On a phone the top bar has no room for the theme switch, so it moves
+          here. Both copies are painted by the same script. -#}
+      <div class="docs-theme docs-theme--drawer" role="group" aria-label="Colour theme">
+        <button class="docs-theme__option" type="button" data-theme-option="light" aria-pressed="false">Light</button>
+        <button class="docs-theme__option" type="button" data-theme-option="dark" aria-pressed="false">Dark</button>
+        <button class="docs-theme__option" type="button" data-theme-option="system" aria-pressed="false">Auto</button>
+      </div>
     </aside>
 
     <main class="docs-main" id="docs-content">
