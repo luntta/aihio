@@ -83,7 +83,7 @@ test('no docs page renders a dialog open on load, and every dialog can be opened
 // The site is built with the components it documents, so its own markup is
 // held to the same linter as everyone else's. Example previews are left out:
 // counterexamples there are wrong on purpose.
-test('the docs site markup outside example previews passes aihio-lint', () => {
+test('the docs site markup outside example previews passes aihio lint', () => {
   const isPreview = (node) => (node.attrs ?? []).some(
     (attr) => attr.name === 'class' && /\bdocs-example__preview\b/.test(attr.value)
   );

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -209,9 +210,7 @@ test('canonical prompt fragment is generated as markdown and as an importable mo
 
 test('built lint API and CLI return structured issues for invalid markup', async () => {
   const lintUrl = `${pathToFileURL(resolve(root, 'dist/lint.js')).href}?t=${Date.now()}`;
-  const cliUrl = `${pathToFileURL(resolve(root, 'dist/aihio-lint.js')).href}?t=${Date.now()}`;
   const { lintMarkup } = await import(lintUrl);
-  const { runCli } = await import(cliUrl);
   const badMarkup = `
     <aihio-button variant="primary" size="icon"></aihio-button>
     <aihio-dropdown>
@@ -230,13 +229,7 @@ test('built lint API and CLI return structured issues for invalid markup', async
 
   try {
     const result = lintMarkup(badMarkup, { source: 'fixture.html' });
-    let cliOutput = '';
-    const cliStatus = runCli({
-      argv: [fixturePath],
-      write: (text) => {
-        cliOutput += text;
-      },
-    });
+    const cli = spawnSync(process.execPath, [resolve(root, 'dist/cli.js'), 'lint', fixturePath], { encoding: 'utf8' });
 
     assert.equal(result.ok, false);
     assert.ok(result.issues.length >= 4, 'lint should report multiple schema-backed issues');
@@ -247,12 +240,42 @@ test('built lint API and CLI return structured issues for invalid markup', async
     assert.ok(result.issues.every((issue) => typeof issue.location.line === 'number' && issue.location.line >= 1));
     assert.ok(result.issues.every((issue) => typeof issue.path === 'string' && issue.path.length > 0));
 
-    assert.equal(cliStatus, 1);
-    const cliResult = JSON.parse(cliOutput);
+    assert.equal(cli.status, 1);
+    const cliResult = JSON.parse(cli.stdout);
     assert.equal(cliResult.ok, false);
     assert.ok(Array.isArray(cliResult.issues) && cliResult.issues.length === result.issues.length);
   } finally {
     rmSync(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('the aihio bin runs lint and mcp when npm starts it through a node_modules/.bin symlink', () => {
+  const binDir = mkdtempSync(resolve(tmpdir(), 'aihio-bin-'));
+  const binPath = resolve(binDir, 'aihio');
+  const fixturePath = resolve(binDir, 'fixture.html');
+  symlinkSync(resolve(root, 'dist/cli.js'), binPath);
+  writeFileSync(fixturePath, '<aihio-button variant="primary">Save</aihio-button>', 'utf8');
+  const run = (args, input) => spawnSync(process.execPath, [binPath, ...args], { encoding: 'utf8', input });
+
+  try {
+    const lint = run(['lint', fixturePath]);
+    assert.equal(lint.status, 1, `expected lint failure, got stdout: ${lint.stdout}`);
+    assert.ok(JSON.parse(lint.stdout).issues.some((issue) => issue.ruleId === 'invalid-enum-attribute'));
+
+    const initialize = { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-11-25' } };
+    const mcp = run(['mcp'], `${JSON.stringify(initialize)}\n`);
+    assert.equal(mcp.status, 0, mcp.stderr);
+    assert.equal(JSON.parse(mcp.stdout).result.serverInfo.name, 'aihio');
+
+    const help = run(['--help']);
+    assert.equal(help.status, 0);
+    assert.match(help.stdout, /^Usage: aihio <command>/);
+    assert.equal(run([]).status, 1, 'a bare aihio prints the usage and fails');
+    const unknown = run(['serve']);
+    assert.equal(unknown.status, 1);
+    assert.match(unknown.stderr, /^Unknown command: serve/);
+  } finally {
+    rmSync(binDir, { recursive: true, force: true });
   }
 });
 
@@ -304,8 +327,8 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./runtime'].types, './dist/runtime.d.ts');
   assert.equal(pkg.exports['./runtime'].default, './dist/runtime.js');
   assert.ok(!pkg.sideEffects.includes('./dist/button.js'), 'granular component imports remain tree-shakeable');
-  assert.match(pkg.bin['aihio-lint'], /^\.?\/?dist\/aihio-lint\.js$/);
-  assert.match(pkg.bin['aihio-mcp'], /^\.?\/?dist\/aihio-mcp\.js$/);
+  assert.deepEqual(Object.keys(pkg.bin), ['aihio'], 'one bin, with mcp and lint as its subcommands');
+  assert.match(pkg.bin.aihio, /^\.?\/?dist\/cli\.js$/);
 });
 
 test('granular component entrypoints do not pull the whole library into the bundle', () => {

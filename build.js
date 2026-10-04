@@ -69,26 +69,15 @@ await esbuild.build({
   minify: false,
 });
 
+// The aihio bin, with the MCP server and the linter as its subcommands.
 await esbuild.build({
-  entryPoints: ['src/lint/cli.js'],
+  entryPoints: ['src/cli.js'],
   bundle: true,
   banner: {
     js: '#!/usr/bin/env node',
   },
   format: 'esm',
-  outfile: 'dist/aihio-lint.js',
-  platform: 'node',
-  minify: true,
-});
-
-await esbuild.build({
-  entryPoints: ['src/mcp/cli.js'],
-  bundle: true,
-  banner: {
-    js: '#!/usr/bin/env node',
-  },
-  format: 'esm',
-  outfile: 'dist/aihio-mcp.js',
+  outfile: 'dist/cli.js',
   platform: 'node',
   minify: true,
 });
@@ -104,4 +93,4 @@ copyFileSync('docs/semantic-tokens.md', 'dist/semantic-tokens.md');
 copyFileSync('docs/tokens.json', 'dist/tokens.json');
 copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
-console.log('build → package, component, lint, MCP, schema runtime, and CSS entrypoints in dist/');
+console.log('build → package, component, lint, CLI, schema runtime, and CSS entrypoints in dist/');

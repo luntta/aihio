@@ -993,7 +993,7 @@ function buildPromptHardRules(doc) {
 
   for (const component of doc.components) {
     for (const example of component.counterExamples ?? []) {
-      const caughtBy = example.rule ? ` (aihio-lint: ${example.rule})` : '';
+      const caughtBy = example.rule ? ` (aihio lint: ${example.rule})` : '';
       lines.push(`- \`${component.$component}\` - avoid \`${compactMarkup(example.markup)}\`${caughtBy} - ${example.reason}`);
       lines.push(`  Instead: \`${compactMarkup(example.fix, 400)}\``);
     }

@@ -28,8 +28,9 @@ description: Connect an agent to Aihio through its MCP server, prompt fragment, 
     <div>
       <h2>Connect an agent</h2>
       <p>
-        <code>aihio-mcp</code> is a local stdio server that ships in the package. With <code>@luntta/aihio</code> installed in
-        the project, add it to the client that writes your UI.
+        The package ships a local stdio server, started with <code>aihio mcp</code>. Add it to the client that writes
+        your UI: <code>npx</code> runs the project's copy of <code>@luntta/aihio</code> when it is installed, and
+        fetches the package otherwise.
       </p>
     </div>
   </div>
@@ -37,16 +38,19 @@ description: Connect an agent to Aihio through its MCP server, prompt fragment, 
   <div class="docs-examples">
     <div class="docs-example">
       <h3 class="docs-example__title">Claude Code</h3>
-      <pre class="docs-code"><code>claude mcp add aihio -- npx aihio-mcp</code></pre>
+      <pre class="docs-code"><code>claude mcp add aihio -- npx -y @luntta/aihio mcp</code></pre>
     </div>
     <div class="docs-example">
       <h3 class="docs-example__title">Any client with a JSON config</h3>
-      <p class="docs-example__description">Claude Desktop, Cursor, VS Code, and other MCP clients take the same entry.</p>
+      <p class="docs-example__description">
+        Claude Desktop, Cursor, and other clients with an <code>mcpServers</code> config take the same entry.
+        VS Code's <code>.vscode/mcp.json</code> takes it under <code>servers</code> instead.
+      </p>
       <pre class="docs-code"><code>{
   "mcpServers": {
     "aihio": {
       "command": "npx",
-      "args": ["aihio-mcp"]
+      "args": ["-y", "@luntta/aihio", "mcp"]
     }
   }
 }</code></pre>

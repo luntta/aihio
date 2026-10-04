@@ -95,8 +95,8 @@ const result = lintMarkup('<aihio-button variant="primary"></aihio-button>');
 ```
 
 ```bash
-aihio-lint ./example.html
-cat ./example.html | aihio-lint -
+npx aihio lint ./example.html
+cat ./example.html | npx aihio lint -
 ```
 
 Alongside the composition and `a11yContract` rules, the linter checks
@@ -106,7 +106,7 @@ that does not declare it. Annotating is optional, but an annotation that is
 present has to be true.
 
 ```bash
-$ aihio-lint badge.html
+$ npx aihio lint badge.html
 <aihio-badge> is annotated data-aihio-intent="primary-action",
 but its schema declares status, labeling, metadata.
 ```
@@ -137,8 +137,9 @@ cluster in a card footer, where it has no room to justify), and
 layout primitives replaces). An `a11y-contract` issue names the obligation it
 enforces in `contract`, such as `button-accessible-name`.
 
-For MCP clients that launch local stdio servers, the package also ships
-`aihio-mcp`. Its tools take an agent from a request to checked markup:
+For MCP clients that launch local stdio servers, the package also ships an MCP
+server, started with `aihio mcp`. Its tools take an agent from a request to
+checked markup:
 
 | Tool | Returns |
 | --- | --- |
@@ -154,11 +155,14 @@ The prompt fragment is served as the MCP prompt `aihio-authoring`.
 {
   "mcpServers": {
     "aihio": {
-      "command": "aihio-mcp"
+      "command": "npx",
+      "args": ["-y", "@luntta/aihio", "mcp"]
     }
   }
 }
 ```
+
+In Claude Code: `claude mcp add aihio -- npx -y @luntta/aihio mcp`.
 
 ## Components
 
@@ -681,7 +685,7 @@ The site uses Aihio components in the docs UI itself and currently includes:
 - `llms.txt`, `llms-full.txt`, and every component page as markdown
 
 The docs checks fail on broken links or fragments, repeated ids, a dialog
-rendered open, and any markup outside an example preview that `aihio-lint`
+rendered open, and any markup outside an example preview that `aihio lint`
 rejects.
 
 ## Development
@@ -694,7 +698,7 @@ npm run docs:build  # Build the Eleventy docs site into _site/
 npm run docs:test   # Validate generated docs HTML assumptions
 npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Run tests, build docs, and validate the docs output
-npm exec aihio-mcp  # Start the local MCP server over stdio
+node dist/cli.js mcp  # Start the local MCP server over stdio
 npm run tokens    # Rebuild tokens and their references (also enforces the contrast contract)
 npm run styles    # Rebuild generated component CSS
 npm run schema    # Rebuild schema only

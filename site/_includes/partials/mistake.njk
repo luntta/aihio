@@ -1,4 +1,4 @@
-{#- One counterexample: the mistake as code with what aihio-lint says about
+{#- One counterexample: the mistake as code with what aihio lint says about
     it, beside the fix rendered live. `mistake` is set by the caller. -#}
 <div class="docs-mistake" id="{{ mistake.id }}">
   <h3 class="docs-example__title">{{ mistake.lead | prose | safe }}</h3>
@@ -10,7 +10,7 @@
       <pre class="docs-code"><code>{{ mistake.markup | highlightHtml | safe }}</code></pre>
       <div class="docs-mistake__lint">
         {% if mistake.issues.length %}
-          <p class="docs-mistake__lint-head">aihio-lint reports</p>
+          <p class="docs-mistake__lint-head">aihio lint reports</p>
           <ul>
             {% for issue in mistake.issues %}
               <li>
@@ -22,7 +22,7 @@
             {% endfor %}
           </ul>
         {% else %}
-          <p class="docs-mistake__lint-head">aihio-lint passes this: it is a judgment the linter cannot make.</p>
+          <p class="docs-mistake__lint-head">aihio lint passes this: it is a judgment the linter cannot make.</p>
         {% endif %}
       </div>
     </div>

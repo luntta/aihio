@@ -207,7 +207,7 @@ export function runServer({
         }
       );
       writeMessage(output, payload);
-      error.write(`[aihio-mcp] ${payload.error.message}: ${payload.error.data?.detail ?? 'unknown'}\n`);
+      error.write(`[aihio mcp] ${payload.error.message}: ${payload.error.data?.detail ?? 'unknown'}\n`);
     }
   }
 }

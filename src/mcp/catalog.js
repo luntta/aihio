@@ -2,7 +2,7 @@
 // components and patterns exist, and which of them fit the thing it was asked
 // to build. The minified runtime schema drops every description to stay small,
 // so the catalogue reads the full one; both are emitted by src/schema/build.js
-// before this module is bundled into dist/aihio-mcp.js.
+// before this module is bundled into dist/cli.js.
 
 import schemaDocument from '../../dist/schema.json' with { type: 'json' };
 import authoringPrompt from '../../dist/prompt.js';

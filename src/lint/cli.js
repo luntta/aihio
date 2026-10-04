@@ -1,10 +1,9 @@
 import { readFileSync } from 'node:fs';
 import process from 'node:process';
-import { pathToFileURL } from 'node:url';
 import { lintMarkup } from './index.js';
 
 export function runCli({
-  argv = process.argv.slice(2),
+  argv = [],
   readFile = (path) => readFileSync(path, 'utf8'),
   readStdin = () => readFileSync(0, 'utf8'),
   write = (text) => process.stdout.write(text),
@@ -22,10 +21,6 @@ export function runCli({
   return result.ok ? 0 : 1;
 }
 
-if (isMainModule()) {
-  process.exit(runCli());
-}
-
 function readMarkup(target, { readFile, readStdin }) {
   if (target === '-' || !target) {
     return {
@@ -41,12 +36,5 @@ function readMarkup(target, { readFile, readStdin }) {
 }
 
 function getUsage() {
-  return 'Usage: aihio-lint [file|-]\n\nPass a file path or \'-\' to read markup from stdin.\n';
-}
-
-function isMainModule() {
-  return Boolean(
-    process.argv[1] &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
-  );
+  return 'Usage: aihio lint [file|-]\n\nPass a file path or \'-\' to read markup from stdin.\n';
 }

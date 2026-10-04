@@ -170,7 +170,7 @@ const schema = readJson(schemaPath);
 const pkg = readJson(packagePath);
 const tokens = readJson(tokensPath);
 // The linter the package ships, run over each counterexample at build time,
-// so the docs print exactly what an agent running aihio-lint would get.
+// so the docs print exactly what an agent running aihio lint would get.
 const { lintMarkup } = await import(pathToFileURL(resolve(root, 'dist/lint.js')).href);
 
 // What the MCP server offers, read from the server itself, and a real answer
@@ -293,7 +293,7 @@ function toComponentMarkdown(component) {
   lines.push('## Mistakes', '');
   for (const mistake of component.counterExamples ?? []) {
     lines.push(`### ${mistake.reason}`, '');
-    lines.push(`Don't${mistake.rule ? ` (aihio-lint: ${mistake.rule})` : ''}:`, '', '```html', mistake.markup, '```', '');
+    lines.push(`Don't${mistake.rule ? ` (aihio lint: ${mistake.rule})` : ''}:`, '', '```html', mistake.markup, '```', '');
     lines.push('Do:', '', '```html', mistake.fix, '```', '');
   }
 

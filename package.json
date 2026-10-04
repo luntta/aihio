@@ -6,8 +6,7 @@
   "main": "./dist/aihio.js",
   "types": "./dist/aihio.d.ts",
   "bin": {
-    "aihio-lint": "dist/aihio-lint.js",
-    "aihio-mcp": "dist/aihio-mcp.js"
+    "aihio": "dist/cli.js"
   },
   "exports": {
     ".": {

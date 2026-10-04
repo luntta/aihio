@@ -13,7 +13,7 @@ export default class Llms {
       '',
       '> An AI-first design system built on native web components, with no runtime dependencies. Every component has a machine-readable schema, and the same build emits a prompt fragment, a linter with fix suggestions, and an MCP server.',
       '',
-      'Generate markup from the prompt fragment, start from a pattern where one fits, and run every snippet through aihio-lint (or the MCP server\'s lint tool) before returning it. An issue with a suggestion is fixed by applying the suggestion.',
+      'Generate markup from the prompt fragment, start from a pattern where one fits, and run every snippet through aihio lint (or the MCP server\'s lint tool) before returning it. An issue with a suggestion is fixed by applying the suggestion.',
       '',
       '## Start here',
       '',
