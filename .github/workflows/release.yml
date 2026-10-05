@@ -1,0 +1,48 @@
+name: Release
+
+# Publishes to npm when a version tag is pushed. npm trusts this workflow by
+# its file name (trusted publishing), so there is no npm token to store or
+# rotate, and every release carries a provenance attestation.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Trusted publishing needs npm 11.5.1 or later, which Node 24 ships with.
+      # No dependency cache: a release builds from a clean install.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Check the tag matches package.json
+        run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run check
+
+      # A version already on npm is skipped: the first one has to be published
+      # by hand, before npm will trust this workflow. A prerelease such as
+      # 2.1.0-beta.0 goes to the next tag rather than latest.
+      - name: Publish
+        run: |
+          spec="$(node -p "require('./package.json').name")@${GITHUB_REF_NAME#v}"
+          if npm view "$spec" version > /dev/null 2>&1; then
+            echo "$spec is already on npm"
+          elif [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            npm publish --tag next
+          else
+            npm publish
+          fi
