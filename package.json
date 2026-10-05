@@ -126,6 +126,7 @@
     "test": "npm run build && node --test test/browser.test.js test/build.test.js test/lint-fixtures.test.js test/lint-parser.test.js test/mcp.test.js",
     "check": "npm test && npm run typecheck && npm run docs:build && npm run docs:test && npm run test:browsers",
     "prepare": "npm run build",
+    "version": "npm run build && git add docs/tokens.json src/schema/runtime-schema.js",
     "test:frameworks:build": "node test/frameworks/build.js",
     "test:browsers": "npm run build && npm run test:frameworks:build && playwright test",
     "typecheck": "npm run build && tsc -p tsconfig.test.json"

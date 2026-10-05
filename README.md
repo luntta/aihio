@@ -191,7 +191,7 @@ Every component ships a JSON schema describing its API — attributes, slots, ev
 
 ```js
 const schema = await fetch('node_modules/@luntta/aihio/dist/schema.json').then(r => r.json());
-// { $schema: "aihio-design-system", version: "2.0.0", components: [...], patterns: [...] }
+// { $schema: "aihio-design-system", version: "...", components: [...], patterns: [...] }
 ```
 
 AI agents can use this schema to understand and generate correct markup without reading documentation. For styling decisions, the semantic token vocabulary is available at `dist/semantic-tokens.md`, and with resolved values at `dist/tokens.json`.
