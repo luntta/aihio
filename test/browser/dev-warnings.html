@@ -192,6 +192,22 @@
         assert(warnings.length === 0, `valid markup should not warn, received: ${warnings.join('\n')}`);
       });
 
+      await runTest('an element removed from the page no longer warns', async () => {
+        sandbox.innerHTML = `<aihio-avatar id="removed-avatar" src="/missing-avatar.jpg"></aihio-avatar>`;
+        const avatar = document.querySelector('#removed-avatar');
+        const image = avatar.querySelector('img');
+        await nextFrame(2);
+
+        avatar.remove();
+        warnings.length = 0;
+        // The image can fail after the avatar has left the page, which makes
+        // the avatar refresh.
+        image.dispatchEvent(new Event('error'));
+        await nextFrame(2);
+
+        assert(warnings.length === 0, `a removed element should not warn, received: ${warnings.join('\n')}`);
+      });
+
       await runTest('an invoked command that its target ignores is reported', async () => {
         sandbox.innerHTML = `
           <aihio-button id="builtin" commandfor="confirm" command="show-modal">Built-in</aihio-button>

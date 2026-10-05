@@ -50,6 +50,11 @@ function handleLifecycle(element, phase) {
     return;
   }
 
+  // A removed element can still refresh, as an avatar does when its image
+  // fails after the avatar has left the page. Its markup is gone, so there
+  // is nothing left to warn about.
+  if (!element.isConnected) return;
+
   if (phase === 'connect') {
     startObserving(element);
   }
