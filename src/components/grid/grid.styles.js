@@ -16,6 +16,10 @@ export default {
       --aihio-grid-gap: var(--aihio-spacing-stack-md);
 
       display: grid;
+      /* The columns come from the grid's own width, so it takes its whole
+         row. Sized to its content instead, as a flex or grid item that is not
+         stretched is, it had no width to divide and laid out one column. */
+      width: 100%;
       gap: var(--aihio-grid-gap);
       grid-template-columns: repeat(
         auto-fill,

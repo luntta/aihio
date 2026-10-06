@@ -397,6 +397,21 @@ test('a card keeps one padding at every edge and between sections, whatever it h
   }
 });
 
+test('a grid lays out its columns inside a parent that does not stretch it', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await page.goto('/test/playwright/fixture.html');
+  const columns = await page.locator('#fixture').evaluate((root) => {
+    const cells = '<div>One</div><div>Two</div><div>Three</div>';
+    root.innerHTML = `
+      <aihio-stack align="start"><aihio-grid columns="3">${cells}</aihio-grid></aihio-stack>
+      <div style="display: grid; justify-items: start"><aihio-grid columns="3">${cells}</aihio-grid></div>
+    `;
+    return [...root.querySelectorAll('aihio-grid')].map((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+  });
+
+  expect(columns).toEqual([3, 3]);
+});
+
 test('representative components have no automated accessibility violations', async ({ page }) => {
   await page.goto('/test/playwright/fixture.html');
   await page.locator('#fixture').evaluate((root) => {
