@@ -6,14 +6,29 @@
 
 export default {
   'aihio-card': `
+    /* The card owns the spacing: one --aihio-card-padding at every edge and
+       between every section. When each section padded itself it left one side
+       open for a neighbour that might not be there, so a header alone had no
+       bottom inset, a footer alone no top, a header over a footer no gap, and
+       a paragraph written straight into the card no inset at all. */
     aihio-card {
       display: flex;
       flex-direction: column;
+      gap: var(--aihio-card-padding);
+      padding: var(--aihio-card-padding);
       border-radius: var(--aihio-radius-surface);
       background-color: var(--aihio-color-surface-bg);
       color: var(--aihio-color-surface-fg);
       border: 1px solid var(--aihio-color-border-subtle);
       box-shadow: var(--aihio-shadow-surface);
+    }
+
+    /* A wrapper around the sections, usually the <form> their submit button
+       belongs to, spaces them the way the card would. */
+    aihio-card > :has(> :is(aihio-card-header, aihio-card-content, aihio-card-footer)) {
+      display: flex;
+      flex-direction: column;
+      gap: inherit;
     }
 
     aihio-card[variant="outline"] {
@@ -24,8 +39,6 @@ export default {
       display: flex;
       flex-direction: column;
       gap: var(--aihio-spacing-stack-tight);
-      padding: var(--aihio-card-padding);
-      padding-bottom: 0;
     }
 
     aihio-card-title {
@@ -44,7 +57,6 @@ export default {
 
     aihio-card-content {
       display: block;
-      padding: var(--aihio-card-padding);
     }
 
     aihio-card-footer {
@@ -54,8 +66,6 @@ export default {
       flex-wrap: wrap;
       align-items: center;
       gap: var(--aihio-spacing-control-gap);
-      padding: var(--aihio-card-padding);
-      padding-top: 0;
     }
 
     @media (forced-colors: active) {

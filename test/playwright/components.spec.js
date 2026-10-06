@@ -337,6 +337,66 @@ test('toggle is a native button: keyboard presses it and a disabled fieldset dis
   await expect(toggle).toBeDisabled();
 });
 
+// Each section used to pad itself on three sides and leave the fourth to its
+// neighbour, so any card missing a section lost an edge or a gap.
+test('a card keeps one padding at every edge and between sections, whatever it holds', async ({ page }) => {
+  await page.goto('/test/playwright/fixture.html');
+  const cards = await page.locator('#fixture').evaluate((root) => {
+    root.innerHTML = `
+      <aihio-card id="header-only">
+        <aihio-card-header><aihio-card-title>Billing</aihio-card-title></aihio-card-header>
+      </aihio-card>
+      <aihio-card id="footer-only">
+        <aihio-card-footer><aihio-button>Save</aihio-button></aihio-card-footer>
+      </aihio-card>
+      <aihio-card id="flow"><p>Open details</p></aihio-card>
+      <aihio-card id="header-footer">
+        <aihio-card-header><aihio-card-title>Delete project</aihio-card-title></aihio-card-header>
+        <aihio-card-footer><aihio-button>Delete</aihio-button></aihio-card-footer>
+      </aihio-card>
+      <aihio-card id="form">
+        <form>
+          <aihio-card-header><aihio-card-title>Sign in</aihio-card-title></aihio-card-header>
+          <aihio-card-content><p>Use your work email.</p></aihio-card-content>
+          <aihio-card-footer><aihio-button type="submit">Sign in</aihio-button></aihio-card-footer>
+        </form>
+      </aihio-card>
+    `;
+    const probe = root.appendChild(document.createElement('div'));
+    probe.style.width = 'var(--aihio-card-padding)';
+    const padding = probe.getBoundingClientRect().width;
+    probe.remove();
+
+    // Measured between the card's inside edge and each section's content, so
+    // the space counts wherever it comes from: the card or the section.
+    const edges = (element, { padded }) => {
+      const style = getComputedStyle(element);
+      const box = element.getBoundingClientRect();
+      const inset = (side) => parseFloat(style[`border${side}Width`]) + (padded ? parseFloat(style[`padding${side}`]) : 0);
+      return { top: box.top + inset('Top'), right: box.right - inset('Right'), bottom: box.bottom - inset('Bottom'), left: box.left + inset('Left') };
+    };
+
+    return [...root.querySelectorAll('aihio-card')].map((card) => {
+      const inside = edges(card, { padded: false });
+      const parts = [...card.children]
+        .flatMap((child) => (child.localName === 'form' ? [...child.children] : [child]))
+        .map((part) => edges(part, { padded: true }));
+      const [first, last] = [parts[0], parts.at(-1)];
+      return {
+        id: card.id,
+        padding,
+        insets: [first.top - inside.top, inside.right - first.right, inside.bottom - last.bottom, first.left - inside.left],
+        gaps: parts.slice(1).map((part, index) => part.top - parts[index].bottom),
+      };
+    });
+  });
+
+  for (const { id, padding, insets, gaps } of cards) {
+    expect(padding, id).toBeGreaterThan(0);
+    for (const space of [...insets, ...gaps]) expect(space, id).toBeCloseTo(padding, 0);
+  }
+});
+
 test('representative components have no automated accessibility violations', async ({ page }) => {
   await page.goto('/test/playwright/fixture.html');
   await page.locator('#fixture').evaluate((root) => {
