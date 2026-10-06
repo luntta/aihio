@@ -1,0 +1,16 @@
+<!-- Sorting written as click handlers on the headers, and a row that
+     navigates on click: none of it reachable from the keyboard. -->
+<aihio-table>
+  <table>
+    <caption>Invoices</caption>
+    <thead>
+      <tr>
+        <th scope="col" onclick="sortTable(0)">Invoice</th>
+        <th scope="col" onclick="sortTable(1)">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr onclick="location.href = '/invoices/1042'"><td>INV-1042</td><td>€1,250.00</td></tr>
+    </tbody>
+  </table>
+</aihio-table>

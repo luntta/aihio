@@ -1,0 +1,40 @@
+<section>
+  <aihio-stack data-aihio-intent="layout" gap="md">
+    <aihio-cluster data-aihio-intent="layout" justify="between">
+      <h2 id="invoice-search-heading">Invoices</h2>
+      <aihio-button data-aihio-intent="primary-action"><a href="/invoices/new">New invoice</a></aihio-button>
+    </aihio-cluster>
+
+    <form role="search" action="/invoices" method="get">
+      <aihio-field data-aihio-intent="form-field">
+        <label slot="label">Search invoices</label>
+        <aihio-input type="search" name="q" value="acme" placeholder="Customer or invoice number"></aihio-input>
+      </aihio-field>
+    </form>
+
+    <aihio-table data-aihio-intent="tabular-data">
+      <table aria-labelledby="invoice-search-heading">
+        <thead>
+          <tr>
+            <th scope="col">Invoice</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Status</th>
+            <th scope="col">Issued</th>
+            <th scope="col" data-numeric>Amount</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="6">
+              <aihio-stack data-aihio-intent="layout" gap="sm" align="start">
+                <p>No invoices match “acme”. Check the spelling, or search by invoice number.</p>
+                <aihio-button data-aihio-intent="navigation" variant="outline" size="sm"><a href="/invoices">Show all invoices</a></aihio-button>
+              </aihio-stack>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </aihio-table>
+  </aihio-stack>
+</section>

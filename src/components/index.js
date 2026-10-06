@@ -3,6 +3,7 @@ import { AihioAvatar } from './avatar/avatar.js';
 import { AihioBadge } from './badge/badge.js';
 import { AihioButton } from './button/button.js';
 import { AihioCluster } from './cluster/cluster.js';
+import { AihioDataGrid } from './data-grid/data-grid.js';
 import { AihioCombobox, AihioOption } from './combobox/combobox.js';
 import {
   AihioCard,
@@ -27,8 +28,10 @@ import {
 import { AihioField } from './field/field.js';
 import { AihioGrid } from './grid/grid.js';
 import { AihioInput } from './input/input.js';
+import { AihioPagination } from './pagination/pagination.js';
 import { AihioStack } from './stack/stack.js';
 import { AihioSwitch } from './switch/switch.js';
+import { AihioTable } from './table/table.js';
 import {
   AihioTab,
   AihioTabList,
@@ -62,12 +65,15 @@ export {
   AihioDropdownSeparator,
 };
 export { AihioCluster };
+export { AihioDataGrid };
 export { AihioCombobox, AihioOption };
 export { AihioField };
 export { AihioGrid };
 export { AihioInput };
+export { AihioPagination };
 export { AihioStack };
 export { AihioSwitch };
+export { AihioTable };
 export {
   AihioTab,
   AihioTabList,

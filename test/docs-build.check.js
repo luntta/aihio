@@ -107,7 +107,8 @@ test('the docs site markup outside example previews passes aihio lint', () => {
 // Every link the site makes goes somewhere: the file exists, and a #fragment
 // names an element on the page it points to. Example previews are skipped;
 // their links (/profile, /pricing) are the example's, and the docs catch them
-// before they navigate.
+// before they navigate. So are inert subtrees, such as the pattern thumbnails,
+// whose links nobody can follow.
 test('every docs link resolves, including its #fragment', () => {
   const idsByPage = new Map();
   const idsOf = (path) => {
@@ -121,7 +122,10 @@ test('every docs link resolves, including its #fragment', () => {
 
   for (const path of listSitePages()) {
     const document = parse(readFileSync(path, 'utf8'));
-    const previews = findElements(document, (node) => /\bdocs-example__preview\b/.test(getAttr(node, 'class') ?? ''));
+    const previews = findElements(
+      document,
+      (node) => /\bdocs-example__preview\b/.test(getAttr(node, 'class') ?? '') || getAttr(node, 'inert') !== null
+    );
     const inPreview = new Set(previews.flatMap((preview) => findElements(preview, () => true)));
 
     for (const link of findElements(document, (node) => node.tagName === 'a' && getAttr(node, 'href') !== null)) {

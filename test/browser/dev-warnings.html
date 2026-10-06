@@ -78,6 +78,24 @@
             <aihio-option>Pro</aihio-option>
             <aihio-option value="Pro">Pro (annual)</aihio-option>
           </aihio-combobox>
+          <aihio-table id="bad-table">
+            <table>
+              <tbody><tr onclick="openInvoice()"><td>INV-1042</td><td>€1,250.00</td></tr></tbody>
+            </table>
+          </aihio-table>
+          <aihio-data-grid id="bad-grid">
+            <table aria-label="Requests">
+              <thead><tr><th scope="col" data-sortable>Request</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </aihio-data-grid>
+          <aihio-pagination id="bad-pagination" page="13" pages="12" href="/invoices?page="></aihio-pagination>
+          <aihio-table id="bad-sort">
+            <table aria-label="Amounts">
+              <thead><tr><th scope="col" aria-sort="asc" data-sortable data-numeric="false">Amount</th></tr></thead>
+              <tbody><tr><td>€1,250.00</td></tr></tbody>
+            </table>
+          </aihio-table>
         `;
         await nextFrame(4);
 
@@ -133,6 +151,42 @@
           warnings.some((message) => message.includes('aihio-toggle') && message.includes('pressed="false" turns pressed on')),
           'a boolean attribute written as "false" should warn'
         );
+        assert(
+          warnings.some((message) => message.includes('aihio-data-grid') && message.includes('Set row-count to how many rows there are')),
+          'a grid should warn when it has no row count'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-data-grid') && message.includes('Give each sortable header a name')),
+          'a grid should warn when a sortable header has no column name'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-pagination') && message.includes('Set pages to how many pages there are')),
+          'a pagination should warn when its page is outside its pages'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-pagination') && message.includes('Put {page} where the page number goes')),
+          'a pagination should warn when its href has no {page}'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-table') && message.includes('Name the table')),
+          'a table should warn when nothing names it'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-table') && message.includes('Name each column with a <th>')),
+          'a table should warn when it has no header cells'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-table') && message.includes('reachable by pointer only')),
+          'a table should warn when a row responds to clicks with nothing to focus'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-table') && message.includes('invalid aria-sort="asc" on <th>') && message.includes('Use aria-sort="ascending"')),
+          'an invalid aria-sort on a header cell should warn with the fix'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-table') && message.includes('data-numeric="false" turns data-numeric on')),
+          'a boolean attribute written as "false" on a header cell should warn'
+        );
       });
 
       await runTest('dev runtime introspection and aria sync remain available', async () => {
@@ -177,6 +231,33 @@
               <aihio-option value="se">Sweden</aihio-option>
             </aihio-combobox>
           </aihio-field>
+
+          <aihio-data-grid id="good-grid" row-count="2" style="--aihio-data-grid-height: 6rem">
+            <table aria-label="Requests">
+              <thead><tr><th scope="col" data-sortable="id">Request</th><th scope="col" data-numeric>Duration</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><a href="#request-1">#1</a></th><td data-numeric>12</td></tr>
+                <tr><th scope="row"><a href="#request-2">#2</a></th><td data-numeric>40</td></tr>
+              </tbody>
+            </table>
+          </aihio-data-grid>
+
+          <aihio-pagination id="good-pagination" page="2" pages="4" href="#invoices-page-{page}" aria-label="Invoice pages"></aihio-pagination>
+
+          <aihio-table id="good-table">
+            <table>
+              <caption>Invoices</caption>
+              <thead>
+                <tr>
+                  <th scope="col" data-sortable aria-sort="ascending">Invoice</th>
+                  <th scope="col" data-numeric>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row"><a href="#invoice-1042">INV-1042</a></th><td data-numeric>€1,250.00</td></tr>
+              </tbody>
+            </table>
+          </aihio-table>
         `;
         await nextFrame(4);
 
@@ -190,6 +271,27 @@
         assert(innerInput.getAttribute('aria-describedby') === 'good-help', 'input host aria-describedby should sync to the inner input');
         assert(panel.getAttribute('aria-label') === 'Confirm archive', 'dialog host aria-label should sync to the panel');
         assert(warnings.length === 0, `valid markup should not warn, received: ${warnings.join('\n')}`);
+      });
+
+      await runTest('a grid warns once its row count passes what browsers can scroll', async () => {
+        sandbox.innerHTML = `
+          <aihio-data-grid id="long-grid" row-count="2" style="--aihio-data-grid-height: 6rem">
+            <table aria-label="Requests">
+              <thead><tr><th scope="col">Request</th></tr></thead>
+              <tbody><tr><td>#1</td></tr><tr><td>#2</td></tr></tbody>
+            </table>
+          </aihio-data-grid>
+        `;
+        await nextFrame(2);
+        assert(warnings.length === 0, `two rows should not warn, received: ${warnings.join('\n')}`);
+
+        // A count set from script, as one fetched from a server is.
+        document.querySelector('#long-grid').rowCount = 2000000;
+        await nextFrame(2);
+        assert(
+          warnings.some((message) => message.includes('aihio-data-grid') && message.includes('Firefox stops a box')),
+          `a grid should warn when its rows pass what browsers can scroll, received: ${warnings.join('\n')}`
+        );
       });
 
       await runTest('an element removed from the page no longer warns', async () => {

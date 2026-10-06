@@ -814,6 +814,65 @@ aihio-combobox {
       }
     }
 
+/* aihio-data-grid */
+/* The grid is a box of its own height that its rows scroll in. It is
+       positioned so the rows' offsets are measured from it. The grid places
+       its rows itself, so the browser's scroll anchoring, which would move
+       the view when a spacer above it changes height, is off. */
+    aihio-data-grid {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: var(--aihio-data-grid-height);
+      overflow: auto;
+      overflow-anchor: none;
+    }
+
+    /* Only the rows in view exist, so nothing may size from them: the
+       columns take their widths from <col> elements or the header cells, and
+       every row is one line high. Text that does not fit ends in an
+       ellipsis rather than wrapping. */
+    aihio-data-grid > table {
+      table-layout: fixed;
+    }
+
+    aihio-data-grid > table > :is(thead, tbody) > tr > :is(th, td) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Cells are focused by the arrow keys, so a cell draws its own ring,
+       inside its edge, where the scroll box cannot clip it. */
+    aihio-data-grid > table > :is(thead, tbody) > tr > :is(th, td):focus-visible {
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: -2px;
+    }
+
+    /* The sections above and below the rendered rows only take up the room
+       of the rows that are not. */
+    aihio-data-grid > table > tbody[data-grid-part] > tr > td {
+      padding: 0;
+      border: 0;
+    }
+
+    @media print {
+      aihio-data-grid {
+        height: auto;
+        overflow: visible;
+      }
+
+      aihio-data-grid > table > thead > tr > th {
+        position: static;
+      }
+    }
+
+    @media (forced-colors: active) {
+      aihio-data-grid > table > :is(thead, tbody) > tr > :is(th, td):focus-visible {
+        outline-color: Highlight;
+      }
+    }
+
 /* aihio-dialog-description */
 aihio-dialog-description {
       display: block;
@@ -1195,6 +1254,151 @@ aihio-input {
       }
     }
 
+/* aihio-pagination */
+aihio-pagination {
+      display: block;
+    }
+
+    /* The list is rendered by the module. Hold its height until then, so the
+       content under it does not jump when it appears. */
+    aihio-pagination:not(:defined) {
+      min-height: var(--aihio-button-height-sm);
+    }
+
+    /* Fewer than two pages: nothing to page through. */
+    aihio-pagination[data-empty] {
+      display: none;
+    }
+
+    aihio-pagination > [data-pagination-part="list"] {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    aihio-pagination > [data-pagination-part="list"] > li {
+      display: flex;
+    }
+
+    /* Drawn as the system's small ghost buttons, square for a number. */
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button),
+    aihio-pagination [data-pagination-part="gap"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      box-sizing: border-box;
+      min-width: var(--aihio-button-height-sm);
+      height: var(--aihio-button-height-sm);
+      margin: 0;
+      padding-inline: var(--aihio-spacing-control-gap);
+      border: 1px solid transparent;
+      border-radius: var(--aihio-radius-interactive-compact);
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-compact);
+      white-space: nowrap;
+    }
+
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button) {
+      background-color: transparent;
+      color: var(--aihio-color-page-fg);
+      font-family: inherit;
+      font-weight: var(--aihio-font-weight-control);
+      font-variant-numeric: tabular-nums;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color var(--aihio-duration-feedback) ease,
+                  color var(--aihio-duration-feedback) ease;
+    }
+
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button):hover {
+      background-color: var(--aihio-color-control-highlight-bg);
+      color: var(--aihio-color-control-highlight-fg);
+    }
+
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button):focus-visible {
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* The current page is marked by a border held to 3:1 and a heavier
+       weight, not by a fill or a colour alone. */
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button)[aria-current="page"] {
+      border-color: var(--aihio-color-field-border);
+      font-weight: var(--aihio-font-weight-heading);
+    }
+
+    aihio-pagination > [data-pagination-part="list"] > li > :is(a, button):is(:disabled, [aria-disabled="true"]) {
+      cursor: not-allowed;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    aihio-pagination [data-pagination-part="gap"] {
+      color: var(--aihio-color-muted-fg);
+      user-select: none;
+    }
+
+    aihio-pagination > [data-pagination-part="status"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* Drawn compact, where the full list does not fit on one line, the
+       controls close up, and Previous and Next keep only their arrows: it
+       then fits a 320px phone. The words stay in the page, out of sight, so
+       their names do not change. */
+    aihio-pagination[data-compact] > [data-pagination-part="list"] {
+      gap: 0;
+    }
+
+    aihio-pagination[data-compact] > [data-pagination-part="list"] > li > :is(a, button) > [data-pagination-part="label"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    @media (forced-colors: active) {
+      aihio-pagination > [data-pagination-part="list"] > li > :is(a, button) {
+        color: LinkText;
+      }
+
+      aihio-pagination > [data-pagination-part="list"] > li > button {
+        color: ButtonText;
+      }
+
+      aihio-pagination > [data-pagination-part="list"] > li > :is(a, button):focus-visible {
+        outline-color: Highlight;
+      }
+
+      aihio-pagination > [data-pagination-part="list"] > li > :is(a, button)[aria-current="page"] {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      aihio-pagination > [data-pagination-part="list"] > li > :is(a, button):is(:disabled, [aria-disabled="true"]) {
+        color: GrayText;
+        opacity: 1;
+      }
+    }
+
 /* aihio-stack */
 aihio-stack {
       display: flex;
@@ -1402,6 +1606,289 @@ aihio-tab-panel {
     }
     aihio-tab-panel[active] {
       display: block;
+    }
+
+/* aihio-table */
+/* --aihio-table-bg is the colour behind the table, which a sticky header
+       paints so rows scroll under it rather than through it. */
+    :is(aihio-table, aihio-data-grid) {
+      --aihio-table-bg: var(--aihio-color-page-bg);
+      --aihio-table-row-hover-bg: var(--aihio-color-muted-bg);
+      --aihio-table-cell-padding-y: var(--aihio-table-cell-padding-y-default);
+    }
+
+    /* The table scrolls inside its own box rather than pushing the page
+       sideways. */
+    aihio-table {
+      --aihio-table-edge-shadow: color-mix(in oklch, var(--aihio-color-page-fg) 16%, transparent);
+      --aihio-table-edge-start: 0 0 transparent;
+      --aihio-table-edge-end: 0 0 transparent;
+
+      display: block;
+      /* Like aihio-grid, it takes its whole row: sized to its content inside
+         a parent that does not stretch it, it would never be narrower than
+         the table and never scroll. */
+      width: 100%;
+      overflow-x: auto;
+      /* A sideways swipe at the edge scrolls nothing else, and does not go
+         back a page. */
+      overscroll-behavior-x: contain;
+      box-shadow: var(--aihio-table-edge-start), var(--aihio-table-edge-end);
+    }
+
+    /* On a raised surface the table sits on that surface, and a hovered row
+       steps back down to the canvas: the same pair of neutrals either way
+       round, both of which keep muted text above 4.5:1. */
+    :is(aihio-card, aihio-dialog) :is(aihio-table, aihio-data-grid) {
+      --aihio-table-bg: var(--aihio-color-surface-bg);
+      --aihio-table-row-hover-bg: var(--aihio-color-page-bg);
+    }
+
+    :is(aihio-table, aihio-data-grid)[density="compact"] {
+      --aihio-table-cell-padding-y: var(--aihio-table-cell-padding-y-compact);
+    }
+
+    /* A shadow inside an edge that has rows scrolled past it, so a table cut
+       off at a column boundary does not look like it ends there. */
+    aihio-table[data-overflow-start] {
+      --aihio-table-edge-start: inset 0.75rem 0 0.75rem -0.75rem var(--aihio-table-edge-shadow);
+    }
+    aihio-table[data-overflow-end] {
+      --aihio-table-edge-end: inset -0.75rem 0 0.75rem -0.75rem var(--aihio-table-edge-shadow);
+    }
+    aihio-table[data-overflow-start]:dir(rtl) {
+      --aihio-table-edge-start: inset -0.75rem 0 0.75rem -0.75rem var(--aihio-table-edge-shadow);
+    }
+    aihio-table[data-overflow-end]:dir(rtl) {
+      --aihio-table-edge-end: inset 0.75rem 0 0.75rem -0.75rem var(--aihio-table-edge-shadow);
+    }
+
+    aihio-table[sticky-header] {
+      max-height: var(--aihio-table-max-height);
+      overflow: auto;
+    }
+
+    /* Cells, not the rows or the header group, carry the borders and stick:
+       a collapsed border belongs to the table and scrolls away from a sticky
+       cell, and sticky table rows are not supported everywhere. */
+    :is(aihio-table, aihio-data-grid) > table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: var(--aihio-font-size-body-sm);
+      line-height: var(--aihio-line-height-body);
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > caption {
+      caption-side: top;
+      padding: 0 var(--aihio-table-cell-padding-x) var(--aihio-spacing-stack-sm);
+      text-align: start;
+      font-size: var(--aihio-font-size-body);
+      font-weight: var(--aihio-font-weight-heading);
+      line-height: var(--aihio-line-height-compact);
+      letter-spacing: var(--aihio-letter-spacing-heading);
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+      padding: var(--aihio-table-cell-padding-y) var(--aihio-table-cell-padding-x);
+      border-bottom: 1px solid var(--aihio-color-border-subtle);
+      text-align: start;
+      vertical-align: middle;
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th {
+      font-weight: var(--aihio-font-weight-control);
+      color: var(--aihio-color-muted-fg);
+      white-space: nowrap;
+    }
+
+    /* The cell that names its row reads as the row's key. */
+    :is(aihio-table, aihio-data-grid) > table > tbody > tr > th,
+    :is(aihio-table, aihio-data-grid) > table > tfoot > tr > :is(th, td) {
+      font-weight: var(--aihio-font-weight-control);
+    }
+
+    /* A record's name, a figure, and a date read as one token: broken at a
+       hyphen ("INV-" over "1042") or a comma they stop scanning down the
+       column. They hold together and the table scrolls instead; text in
+       other cells still wraps, so a column of descriptions stays readable. */
+    :is(aihio-table, aihio-data-grid) > table > tbody > tr > th,
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td)[data-numeric],
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td) time {
+      white-space: nowrap;
+    }
+
+    /* The last row needs no divider beneath it; a footer's totals keep the
+       one above them. */
+    :is(aihio-table, aihio-data-grid) > table > tbody:last-child > tr:last-child > :is(th, td),
+    :is(aihio-table, aihio-data-grid) > table > tfoot > tr:last-child > :is(th, td) {
+      border-bottom: 0;
+    }
+
+    /* Figures line up by place value: end-aligned, in tabular digits. */
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td)[data-numeric] {
+      text-align: end;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* A link in a cell inherits the text colour, so the underline is what
+       marks it as a link. Controls drawn as links (aihio-button, a menu item)
+       style their own. */
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td) > a {
+      color: inherit;
+      text-decoration-line: underline;
+      text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+      text-underline-offset: 0.2em;
+    }
+    :is(aihio-table, aihio-data-grid) > table > :is(thead, tbody, tfoot) > tr > :is(th, td) > a:hover {
+      text-decoration-color: currentColor;
+    }
+
+    @media (hover: hover) {
+      :is(aihio-table, aihio-data-grid) > table > tbody:not([data-grid-part]) > tr:hover {
+        background-color: var(--aihio-table-row-hover-bg);
+      }
+    }
+
+    :is(aihio-table[sticky-header], aihio-data-grid) > table > thead > tr > th {
+      position: sticky;
+      /* Rows of a header below the first stick under the rows above them;
+         the element measures them. */
+      top: var(--aihio-table-sticky-top, 0px);
+      z-index: 1;
+      background-color: var(--aihio-table-bg);
+    }
+
+    /* Stale rows while new ones load. aria-busy on the table says the same
+       to assistive technology. */
+    :is(aihio-table, aihio-data-grid)[loading] > table > tbody {
+      opacity: 0.5;
+      transition: opacity var(--aihio-duration-feedback) ease;
+    }
+    :is(aihio-table, aihio-data-grid)[loading] {
+      cursor: progress;
+    }
+
+    /* A sortable header is its button: the cell's padding moves onto the
+       button, so the whole cell sorts and the header is exactly as tall as
+       its neighbours. */
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th:has(> [data-table-part="sort"]) {
+      padding: 0;
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"] {
+      display: flex;
+      align-items: center;
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      padding: var(--aihio-table-cell-padding-y) var(--aihio-table-cell-padding-x);
+      border: 0;
+      border-radius: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      text-align: inherit;
+      white-space: inherit;
+      cursor: pointer;
+      transition: color var(--aihio-duration-feedback-fast) ease;
+    }
+
+    /* Inset, so the scroll box never clips the ring of a header at its
+       edge. */
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"]:focus-visible {
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: -2px;
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"]:hover,
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th:is([aria-sort="ascending"], [aria-sort="descending"]) {
+      color: var(--aihio-color-page-fg);
+    }
+
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"] > [data-table-part="label"] {
+      min-width: 0;
+    }
+
+    /* In a numeric column the indicator goes before the label, so the label
+       lines up with the figures beneath it. */
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[data-numeric] > [data-table-part="sort"] {
+      flex-direction: row-reverse;
+    }
+
+    /* Both chevrons while the column is not sorted; the one for the order
+       when it is, centred. The direction reads from the shape, not only the
+       colour. */
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"] > [data-table-part="sort-icon"] {
+      flex: none;
+    }
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"] > [data-table-part="sort-icon"] > path {
+      transform-box: fill-box;
+      transition: transform var(--aihio-duration-feedback) ease;
+    }
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[aria-sort="ascending"] [data-table-part="sort-icon"] > [data-direction="ascending"] {
+      transform: translateY(3px);
+    }
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[aria-sort="descending"] [data-table-part="sort-icon"] > [data-direction="descending"] {
+      transform: translateY(-3px);
+    }
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[aria-sort="ascending"] [data-table-part="sort-icon"] > [data-direction="descending"],
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[aria-sort="descending"] [data-table-part="sort-icon"] > [data-direction="ascending"] {
+      visibility: hidden;
+    }
+
+    /* Before the element upgrades a sortable header has no button yet. Hold
+       the indicator's room so the column does not widen when it appears. */
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[data-sortable]:not(:has(> [data-table-part="sort"]))::after,
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[data-sortable][data-numeric]:not(:has(> [data-table-part="sort"]))::before {
+      content: '';
+      display: inline-block;
+      width: calc(16px + var(--aihio-spacing-cluster-gap-tight));
+    }
+    :is(aihio-table, aihio-data-grid) > table > thead > tr > th[data-sortable][data-numeric]:not(:has(> [data-table-part="sort"]))::after {
+      content: none;
+    }
+
+    :is(aihio-table, aihio-data-grid) > [data-table-part="status"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* On paper there is nothing to scroll: every row prints, under a header
+       the browser repeats on each page. */
+    @media print {
+      aihio-table,
+      aihio-table[sticky-header] {
+        max-height: none;
+        overflow: visible;
+        box-shadow: none;
+      }
+
+      aihio-table[sticky-header] > table > thead > tr > th {
+        position: static;
+      }
+    }
+
+    /* The sort buttons are drawn as the system's buttons, ButtonText on
+       ButtonFace, which is what marks them as controls once the row
+       dividers and hover fills are gone. */
+    @media (forced-colors: active) {
+      :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"] {
+        color: ButtonText;
+      }
+
+      :is(aihio-table, aihio-data-grid) > table > thead > tr > th > [data-table-part="sort"]:focus-visible {
+        outline-color: Highlight;
+      }
     }
 
 /* aihio-toggle */

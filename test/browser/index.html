@@ -525,6 +525,59 @@
       assert(input.value === 'Finland', 'reset should restore the default label');
     });
 
+    await runTest('table sorts by a header button, keeps aria-sort on the th, and announces', async () => {
+      sandbox.innerHTML = `
+        <aihio-table id="invoices">
+          <table>
+            <caption>Invoices</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-sortable="invoice">Invoice</th>
+                <th scope="col" data-sortable="amount" data-numeric>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">INV-1043</th><td data-numeric>€980.50</td></tr>
+              <tr><th scope="row">INV-1042</th><td data-numeric>€1,250.00</td></tr>
+              <tr><th scope="row">INV-1044</th><td data-numeric>€12,400.00</td></tr>
+            </tbody>
+          </table>
+        </aihio-table>
+      `;
+      await nextFrame(2);
+
+      const host = sandbox.querySelector('#invoices');
+      const [invoice, amount] = host.table.tHead.rows[0].cells;
+      const order = () => [...host.table.tBodies[0].rows].map((row) => row.cells[0].textContent.trim()).join(' ');
+      const status = host.querySelector(':scope > [role="status"]');
+      let sorted = null;
+      host.addEventListener('aihio-sort', (event) => {
+        sorted = event.detail;
+      });
+
+      const button = amount.querySelector(':scope > button[data-table-part="sort"]');
+      assert(button, 'a sortable header should get a sort button');
+      assert(button.type === 'button', 'the sort button should never submit a form');
+      assert(button.textContent.trim() === 'Amount', 'the header text should move into the button');
+      assert(!invoice.hasAttribute('aria-sort') && !amount.hasAttribute('aria-sort'), 'nothing is sorted yet');
+
+      button.click();
+      assert(amount.getAttribute('aria-sort') === 'ascending', 'the th, not the button, should carry aria-sort');
+      assert(order() === 'INV-1043 INV-1042 INV-1044', `figures should sort as numbers, got ${order()}`);
+      assert(sorted?.column === 'amount' && sorted?.direction === 'ascending', 'aihio-sort should name the column and direction');
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      assert(status.textContent === 'Sorted by Amount, ascending', `the sort should be announced, got "${status.textContent}"`);
+
+      invoice.querySelector('button').click();
+      assert(invoice.getAttribute('aria-sort') === 'ascending', 'the newly sorted header should carry aria-sort');
+      assert(!amount.hasAttribute('aria-sort'), 'only one header should carry aria-sort');
+      assert(order() === 'INV-1042 INV-1043 INV-1044', `text should sort in order, got ${order()}`);
+
+      invoice.querySelector('button').click();
+      assert(invoice.getAttribute('aria-sort') === 'descending', 'a second activation should sort descending');
+      assert(order() === 'INV-1044 INV-1043 INV-1042', `descending should reverse the order, got ${order()}`);
+    });
+
     const failed = results.some((result) => !result.pass);
     document.body.dataset.status = failed ? 'fail' : 'pass';
     resultsNode.textContent = JSON.stringify(results, null, 2);

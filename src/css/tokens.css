@@ -121,6 +121,11 @@
   --aihio-card-padding: 1.5rem;
   --aihio-dialog-width: 32rem;
   --aihio-dialog-padding: 1.5rem;
+  --aihio-data-grid-height: min(32rem, 75dvh);
+  --aihio-table-cell-padding-y-default: var(--aihio-spacing-3);
+  --aihio-table-cell-padding-y-compact: var(--aihio-spacing-1-5);
+  --aihio-table-cell-padding-x: var(--aihio-spacing-3);
+  --aihio-table-max-height: min(32rem, 75dvh);
 
   /* Semantic */
   --aihio-color-overlay-scrim: oklch(0 0 0 / 0.8);

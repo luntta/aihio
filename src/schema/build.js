@@ -72,6 +72,19 @@ for (const dir of readdirSync(componentsDir, { withFileTypes: true })) {
     }
   }
 
+  // Native elements are the platform's own tags. A hyphenated name is a
+  // custom element, which belongs in related.
+  for (const [tag, element] of Object.entries(schema.nativeElements ?? {})) {
+    if (!/^[a-z][a-z0-9]*$/.test(tag)) {
+      errors.push(`${schemaPath}/nativeElements: ${JSON.stringify(tag)} is not a native HTML tag name`);
+    }
+    for (const [name, attr] of Object.entries(element.attributes ?? {})) {
+      if (attr.type === 'enum' && !Array.isArray(attr.values)) {
+        errors.push(`${schemaPath}/nativeElements/${tag}/attributes/${name}: enum attribute requires "values" array`);
+      }
+    }
+  }
+
   // Only custom commands reach an element that is not a <dialog> or popover,
   // and the platform defines a custom command as one that starts with --.
   for (const name of Object.keys(schema.commands ?? {})) {
@@ -252,6 +265,11 @@ function stripComponent(component) {
     }));
   }
   if (component.commands) stripped.commands = Object.keys(component.commands);
+  if (component.nativeElements) {
+    stripped.nativeElements = mapEntries(component.nativeElements, ({ attributes }) => ({
+      ...(attributes ? { attributes: mapEntries(attributes, stripAttribute) } : {}),
+    }));
+  }
   if (component.properties) {
     stripped.properties = mapEntries(component.properties, ({ type, readonly }) => ({
       type,
@@ -663,6 +681,10 @@ function toTypeDeclarations(doc) {
     '  readonly?: boolean;',
     '}',
     '',
+    'export interface AihioRuntimeNativeElementSchema {',
+    '  attributes?: Record<string, AihioRuntimeAttributeSchema>;',
+    '}',
+    '',
     'export interface AihioRuntimeComposition {',
     '  allowedParents?: readonly string[];',
     '  requiredAncestors?: readonly string[];',
@@ -706,6 +728,7 @@ function toTypeDeclarations(doc) {
     '  events?: Record<string, AihioRuntimeEventSchema>;',
     '  methods?: Record<string, AihioRuntimeMethodSchema>;',
     '  properties?: Record<string, AihioRuntimePropertySchema>;',
+    '  nativeElements?: Record<string, AihioRuntimeNativeElementSchema>;',
     '  composition?: AihioRuntimeComposition;',
     '  a11yContract?: AihioRuntimeA11yContract;',
     '  counterExamples?: readonly AihioRuntimeCounterExample[];',
@@ -900,6 +923,9 @@ function buildPromptComponentInventory(doc) {
     lines.push(`- \`${component.$component}\` - ${component.description}`);
     lines.push(`  Intents: ${formatList(component.intents, 'none')}.`);
     lines.push(`  Attributes: ${formatAttributeSummary(component.attributes)}.`);
+    if (component.nativeElements) {
+      lines.push(`  Native elements: ${formatNativeElementSummary(component.nativeElements)}.`);
+    }
     lines.push(`  Slots: ${formatNamedKeys(component.slots)}.`);
     lines.push(`  Methods: ${formatMethodSummary(component.methods)}.`);
     if (component.commands) {
@@ -1252,6 +1278,12 @@ function formatAttributeSummary(attributes) {
 
       return `\`${name}=${attr.type}\``;
     })
+    .join(', ');
+}
+
+function formatNativeElementSummary(nativeElements) {
+  return Object.entries(nativeElements)
+    .map(([tag, element]) => `\`<${tag}>\` (${formatAttributeSummary(element.attributes)})`)
     .join(', ');
 }
 

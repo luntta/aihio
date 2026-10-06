@@ -269,6 +269,14 @@ function toComponentMarkdown(component) {
   };
 
   reference('', component);
+  const nativeElements = Object.entries(component.nativeElements ?? {});
+  if (nativeElements.length) {
+    lines.push('## Native elements', '', `<${component.$component}> reads these attributes on the native elements inside it.`, '');
+    for (const [tag, element] of nativeElements) {
+      lines.push(`### <${tag}>`, '', sentence(element.description), '');
+      reference(`<${tag}>`, element, '####');
+    }
+  }
   for (const related of component.related ?? []) {
     lines.push(`## <${related.$component}>`, '', sentence(related.description), '');
     reference(`<${related.$component}>`, related, '###');
@@ -443,6 +451,14 @@ const components = schema.components
       thumbnail: showcase[tag]?.thumbnail ?? null,
       markdown: toComponentMarkdown(component),
       compositionEntries: toCompositionEntries(component.composition),
+      // The native elements a component enhances (a <th> in aihio-table), with
+      // the attributes it reads on them.
+      nativeElementEntries: Object.entries(component.nativeElements ?? {}).map(([elementTag, element]) => ({
+        tag: elementTag,
+        anchor: `${slug}-native-${elementTag}`,
+        description: element.description,
+        ...toApiEntries(element, elementTag),
+      })),
       // Sub-components (aihio-card-header, aihio-tab, aihio-option) are only
       // ever used inside their parent, so they are documented on its page,
       // each under an anchor named for its tag.

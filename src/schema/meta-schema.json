@@ -61,6 +61,11 @@
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/property" }
     },
+    "nativeElements": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/nativeElement" },
+      "description": "Native HTML elements the component enhances rather than replaces, keyed by tag name, with the attributes it reads on them (aihio-table reads data-sortable on a <th>). The linter holds them to the same enum and boolean rules as the component's own attributes."
+    },
     "composition": { "$ref": "#/$defs/composition" },
     "a11yContract": { "$ref": "#/$defs/a11yContract" },
     "counterExamples": {
@@ -94,6 +99,18 @@
         },
         "default": {},
         "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "nativeElement": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/attribute" }
+        }
       }
     },
     "slot": {

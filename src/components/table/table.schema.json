@@ -1,0 +1,234 @@
+{
+  "$component": "aihio-table",
+  "version": "1.0.0",
+  "description": "A data table: records in rows and columns, compared by scanning down a column. It wraps a native <table> and gives it the system's styles, sortable columns, and a scroll box the keyboard can reach when the table is too wide for the screen. Use it for records people compare (invoices, members, deployments); use aihio-grid of cards for a few summaries, and never a table for layout. For more rows than a page can hold, show one page at a time with aihio-pagination, or use aihio-data-grid.",
+  "intents": [
+    "tabular-data"
+  ],
+  "attributes": {
+    "density": {
+      "type": "enum",
+      "values": [
+        "default",
+        "compact"
+      ],
+      "default": "default",
+      "description": "Row spacing. compact fits more rows on screen, for dense data that people scan."
+    },
+    "sticky-header": {
+      "type": "boolean",
+      "default": false,
+      "description": "Keeps the header in view while the rows scroll. The table scrolls inside its own box, which grows to --aihio-table-max-height (min(32rem, 75dvh) unless you set it) before its rows scroll."
+    },
+    "manual-sort": {
+      "type": "boolean",
+      "default": false,
+      "description": "Leaves the order of the rows to your code. A click on a sortable header still marks it with aria-sort, announces it, and fires aihio-sort, but the rows stay as rendered: sort them yourself, as a framework re-rendering from state or a request to the server does. Without it the table reorders its own rows."
+    },
+    "loading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marks the rows as stale while new ones load, such as after a sort sent to the server: they are dimmed, and the table has aria-busy."
+    },
+    "sort-ascending-text": {
+      "type": "string",
+      "default": "Sorted by {column}, ascending",
+      "description": "Announced after sorting a column ascending, with {column} for the header's text. For localisation (e.g. \"Lajiteltu: {column}, nouseva\")."
+    },
+    "sort-descending-text": {
+      "type": "string",
+      "default": "Sorted by {column}, descending",
+      "description": "Announced after sorting a column descending, with {column} for the header's text."
+    }
+  },
+  "nativeElements": {
+    "th": {
+      "description": "A header cell. In <thead> it names a column; in a body row, with scope=\"row\", it names the row.",
+      "attributes": {
+        "data-sortable": {
+          "type": "string",
+          "description": "Makes the column sortable: the header's content becomes a button that sorts the rows by it, ascending first and then descending. The value names the column for aihio-sort and sort(), and can be left empty when nothing reads it. Only on a <th> in <thead>."
+        },
+        "aria-sort": {
+          "type": "enum",
+          "values": [
+            "ascending",
+            "descending",
+            "none",
+            "other"
+          ],
+          "description": "The order the rows are in. Write it on the header the rows are sorted by when the page loads; without manual-sort the table puts the rows in that order. The table moves it from header to header as people sort."
+        },
+        "data-numeric": {
+          "type": "boolean",
+          "default": false,
+          "description": "Lines a column of figures up by place value: end-aligned, in tabular digits. Put it on the column's header and on each of its cells."
+        },
+        "data-sort-value": {
+          "type": "string",
+          "description": "What a row header sorts by, when its text does not sort the way it reads. See <td>."
+        }
+      }
+    },
+    "td": {
+      "description": "A data cell.",
+      "attributes": {
+        "data-sort-value": {
+          "type": "string",
+          "description": "What the cell sorts by when its text does not sort the way it reads, such as a priority (\"High\" before \"Low\") or a date written out. A <time datetime> in the cell is read the same way, so a date marked up as one needs nothing more. Figures written for the page's language (\"€1,250.50\") are read as numbers without it."
+        },
+        "data-numeric": {
+          "type": "boolean",
+          "default": false,
+          "description": "Lines the figure up with the rest of its column. See <th>."
+        }
+      }
+    }
+  },
+  "properties": {
+    "table": {
+      "type": "HTMLTableElement | null",
+      "readonly": true,
+      "description": "The <table> the element enhances."
+    }
+  },
+  "methods": {
+    "sort()": {
+      "description": "Sorts by the column whose data-sortable value, or header text, is column: ascending unless direction says otherwise. It moves aria-sort to that header and, without manual-sort, reorders the rows. Like a value set from script, it fires no aihio-sort and announces nothing.",
+      "parameters": [
+        {
+          "name": "column",
+          "type": "string"
+        },
+        {
+          "name": "direction",
+          "type": "'ascending' | 'descending'",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "events": {
+    "aihio-sort": {
+      "description": "Fired when the person sorts by a column, once its header carries the new aria-sort and, without manual-sort, the rows are in their new order. column is the header's data-sortable value, or its text when that is empty. Not fired by sort().",
+      "detail": {
+        "column": "string",
+        "direction": "'ascending' | 'descending'"
+      },
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "requiredChildren": [
+      "table"
+    ],
+    "allowedChildren": [
+      "table"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "It stays a native <table>: rows, columns, and header cells keep the platform's table semantics, so screen reader table navigation names the column and row of every cell, and nothing is re-created with ARIA roles",
+      "A sortable header's content moves into a <button> inside the <th>, which carries aria-sort, so the header keeps its role and the button sorts; the new order is announced in a polite status region",
+      "The first activation sorts ascending and the next descending; rows with no value go last either way, ties keep their order, a column of figures compares as numbers (read the way the page's language writes them), and text compares in the page's language with digits in numeric order (\"Item 2\" before \"Item 10\")",
+      "Rows are moved with moveBefore() where the browser has it, so focus and state inside a row survive a sort; elsewhere focus is put back after the move",
+      "A table wider than its box (or, with sticky-header, taller) scrolls inside it, and the box becomes a tab stop and a region named by the caption, so the keyboard can scroll it and a screen reader says what it is; when it fits again it is neither",
+      "The sort button's focus ring is drawn inside the header cell, so the scroll box never clips it",
+      "loading sets aria-busy on the table while the rows are stale",
+      "Sorting is by a button, not a click handler on the cell, and the sort indicator changes shape, not only colour; under forced colours the sort buttons are drawn as system buttons"
+    ],
+    "required": [
+      {
+        "when": "the table has no caption, aria-label, or aria-labelledby",
+        "requirement": "Name the table: a <caption> as its first child, aria-labelledby pointing at the visible heading above it, or aria-label. An unnamed table is announced only as \"table\", and so is the scroll box it gets on a narrow screen.",
+        "severity": "error",
+        "rule": "table-accessible-name"
+      },
+      {
+        "when": "the table has no <th> cells",
+        "requirement": "Name each column with a <th> in a <thead> row, and each row with <th scope=\"row\"> where one cell identifies it. Bold text in an ordinary cell is not a header.",
+        "severity": "error",
+        "rule": "table-header-cells"
+      },
+      {
+        "when": "a row, header, or cell responds to clicks and holds no link or button",
+        "requirement": "Sort with data-sortable on the <th>, and put a link or button in the row for anything else, such as a link in the cell that names it. A click handler on a row or cell is reachable by pointer only.",
+        "severity": "error",
+        "rule": "table-click-handler"
+      },
+      {
+        "when": "manual-sort is set and a sortable header has no column name",
+        "requirement": "Give each sortable header a name, data-sortable=\"amount\", so aihio-sort says which column to sort by without depending on the header's wording.",
+        "severity": "warn",
+        "rule": "table-sort-column-name"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-table>\n  <table>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "reason": "An unnamed table is announced only as \"table\". On a narrow screen it also scrolls inside a box with no name. Give it a <caption>, or point aria-labelledby at the heading above it.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "table-accessible-name"
+    },
+    {
+      "markup": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <tr>\n      <td><strong>Invoice</strong></td>\n      <td><strong>Amount</strong></td>\n    </tr>\n    <tr>\n      <td>INV-1042</td>\n      <td>€1,250.00</td>\n    </tr>\n  </table>\n</aihio-table>",
+      "reason": "Bold text in an ordinary cell looks like a header but is not one. A screen reader moving down a column cannot say which column it is in. Put the column names in <th> cells in a <thead>.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "table-header-cells"
+    },
+    {
+      "markup": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" onclick=\"sortBy('invoice')\">Invoice</th>\n        <th scope=\"col\" onclick=\"sortBy('amount')\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "reason": "A header that sorts on click cannot be reached with the keyboard, and never says which way it sorts. data-sortable gives the header a real button, sets aria-sort, and announces the new order.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"invoice\">Invoice</th>\n        <th scope=\"col\" data-sortable=\"amount\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "table-click-handler"
+    },
+    {
+      "markup": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr onclick=\"location.href = '/invoices/1042'\">\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "reason": "A row that opens on click is not a link. The keyboard cannot reach it, a screen reader does not announce it, and it cannot be opened in a new tab. Link the cell that names the row.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\"><a href=\"/invoices/1042\">INV-1042</a></th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "table-click-handler"
+    },
+    {
+      "markup": "<aihio-table>\n  <aihio-table-header>\n    <aihio-table-row>\n      <aihio-table-head>Invoice</aihio-table-head>\n    </aihio-table-row>\n  </aihio-table-header>\n  <aihio-table-body>\n    <aihio-table-row>\n      <aihio-table-cell>INV-1042</aihio-table-cell>\n    </aihio-table-row>\n  </aihio-table-body>\n</aihio-table>",
+      "reason": "There are no row or cell components. aihio-table wraps a native <table>, whose rows and cells are what a screen reader navigates and what the HTML parser keeps in order.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>INV-1042</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "unknown-component"
+    },
+    {
+      "markup": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" sortable>Invoice</th>\n        <th scope=\"col\" sortable data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "reason": "Nothing reads a sortable attribute on a <th>. The table reads data-sortable, and makes that header a sort button.",
+      "fix": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable>Invoice</th>\n        <th scope=\"col\" data-sortable data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>",
+      "rule": "table-sortable-header"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Records with a caption",
+      "description": "Each column is named by a <th> in <thead>, and the cell that names each row is a <th scope=\"row\">. data-numeric lines figures up by place value, and a <tfoot> holds the totals.",
+      "markup": "<aihio-table>\n  <table>\n    <caption>Invoices</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Invoice</th>\n        <th scope=\"col\">Customer</th>\n        <th scope=\"col\">Status</th>\n        <th scope=\"col\" data-numeric>Amount</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">INV-1042</th>\n        <td>Northwind Traders</td>\n        <td><aihio-badge variant=\"success\">Paid</aihio-badge></td>\n        <td data-numeric>€1,250.00</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">INV-1043</th>\n        <td>Fabrikam</td>\n        <td><aihio-badge variant=\"warning\">Due</aihio-badge></td>\n        <td data-numeric>€980.50</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">INV-1044</th>\n        <td>Contoso</td>\n        <td><aihio-badge variant=\"destructive\">Overdue</aihio-badge></td>\n        <td data-numeric>€12,400.00</td>\n      </tr>\n    </tbody>\n    <tfoot>\n      <tr>\n        <th scope=\"row\" colspan=\"3\">Total</th>\n        <td data-numeric>€14,630.50</td>\n      </tr>\n    </tfoot>\n  </table>\n</aihio-table>"
+    },
+    {
+      "title": "Sortable columns",
+      "description": "data-sortable makes a header a sort button. The rows load sorted by the header with aria-sort. A <time datetime> sorts by its machine-readable value, and data-sort-value gives a priority an order its words do not have.",
+      "markup": "<aihio-table>\n  <table>\n    <caption>Deployments</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"service\">Service</th>\n        <th scope=\"col\" data-sortable=\"priority\">Priority</th>\n        <th scope=\"col\" data-sortable=\"deployed\" aria-sort=\"descending\">Deployed</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (s)</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">api-gateway</th>\n        <td data-sort-value=\"1\">High</td>\n        <td><time datetime=\"2026-10-05T14:20\">5 Oct, 14:20</time></td>\n        <td data-numeric>42.5</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">billing-worker</th>\n        <td data-sort-value=\"3\">Low</td>\n        <td><time datetime=\"2026-10-04T09:05\">4 Oct, 09:05</time></td>\n        <td data-numeric>118.0</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">search-indexer</th>\n        <td data-sort-value=\"2\">Medium</td>\n        <td><time datetime=\"2026-09-29T17:45\">29 Sep, 17:45</time></td>\n        <td data-numeric>7.25</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>"
+    },
+    {
+      "title": "Compact, with a sticky header",
+      "description": "density=\"compact\" fits more rows on screen, and sticky-header keeps the column names in view as they scroll. --aihio-table-max-height sets how tall the box grows first.",
+      "markup": "<aihio-table density=\"compact\" sticky-header style=\"--aihio-table-max-height: 16rem\">\n  <table>\n    <caption>Requests</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Time</th>\n        <th scope=\"col\">Method</th>\n        <th scope=\"col\">Path</th>\n        <th scope=\"col\" data-numeric>Status</th>\n        <th scope=\"col\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:02\">09:41:02</time></td>\n        <td>GET</td>\n        <td>/api/projects</td>\n        <td data-numeric>200</td>\n        <td data-numeric>38</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:03\">09:41:03</time></td>\n        <td>GET</td>\n        <td>/api/projects/42</td>\n        <td data-numeric>200</td>\n        <td data-numeric>21</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:07\">09:41:07</time></td>\n        <td>POST</td>\n        <td>/api/deployments</td>\n        <td data-numeric>201</td>\n        <td data-numeric>412</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:09\">09:41:09</time></td>\n        <td>GET</td>\n        <td>/api/deployments/97</td>\n        <td data-numeric>200</td>\n        <td data-numeric>17</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:12\">09:41:12</time></td>\n        <td>PATCH</td>\n        <td>/api/projects/42</td>\n        <td data-numeric>200</td>\n        <td data-numeric>64</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:15\">09:41:15</time></td>\n        <td>GET</td>\n        <td>/api/members</td>\n        <td data-numeric>200</td>\n        <td data-numeric>29</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:18\">09:41:18</time></td>\n        <td>DELETE</td>\n        <td>/api/tokens/7</td>\n        <td data-numeric>204</td>\n        <td data-numeric>33</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:21\">09:41:21</time></td>\n        <td>GET</td>\n        <td>/api/billing</td>\n        <td data-numeric>503</td>\n        <td data-numeric>1204</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:22\">09:41:22</time></td>\n        <td>GET</td>\n        <td>/api/billing</td>\n        <td data-numeric>200</td>\n        <td data-numeric>88</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:30\">09:41:30</time></td>\n        <td>POST</td>\n        <td>/api/invites</td>\n        <td data-numeric>422</td>\n        <td data-numeric>45</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:31\">09:41:31</time></td>\n        <td>POST</td>\n        <td>/api/invites</td>\n        <td data-numeric>201</td>\n        <td data-numeric>97</td>\n      </tr>\n      <tr>\n        <td><time datetime=\"2026-10-06T09:41:36\">09:41:36</time></td>\n        <td>GET</td>\n        <td>/api/audit</td>\n        <td data-numeric>200</td>\n        <td data-numeric>143</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>"
+    },
+    {
+      "title": "Sorted by your code",
+      "description": "manual-sort leaves the rows to you: listen for aihio-sort and render them sorted by event.detail.column and event.detail.direction, as a framework re-rendering from state or a request to the server does. The table still marks the header and announces the sort.",
+      "markup": "<aihio-table manual-sort>\n  <table>\n    <caption>Customers</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"name\" aria-sort=\"ascending\">Name</th>\n        <th scope=\"col\" data-sortable=\"plan\">Plan</th>\n        <th scope=\"col\" data-sortable=\"seats\" data-numeric>Seats</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\">Contoso</th>\n        <td>Business</td>\n        <td data-numeric>120</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">Fabrikam</th>\n        <td>Team</td>\n        <td data-numeric>18</td>\n      </tr>\n      <tr>\n        <th scope=\"row\">Northwind Traders</th>\n        <td>Enterprise</td>\n        <td data-numeric>740</td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>"
+    },
+    {
+      "title": "Links and row actions",
+      "description": "The cell that names each row links to it, and each row's menu is named for its row, so a screen reader can tell the menus apart.",
+      "markup": "<aihio-table>\n  <table>\n    <caption>Team members</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Name</th>\n        <th scope=\"col\">Role</th>\n        <th scope=\"col\">Actions</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"row\"><a href=\"/team/ada\">Ada Lovelace</a></th>\n        <td>Owner</td>\n        <td>\n          <aihio-dropdown align=\"end\">\n            <aihio-button slot=\"trigger\" variant=\"ghost\" size=\"icon\" aria-label=\"Actions for Ada Lovelace\">&#x22ef;</aihio-button>\n            <aihio-dropdown-item>Change role</aihio-dropdown-item>\n            <aihio-dropdown-item>Remove from team</aihio-dropdown-item>\n          </aihio-dropdown>\n        </td>\n      </tr>\n      <tr>\n        <th scope=\"row\"><a href=\"/team/grace\">Grace Hopper</a></th>\n        <td>Admin</td>\n        <td>\n          <aihio-dropdown align=\"end\">\n            <aihio-button slot=\"trigger\" variant=\"ghost\" size=\"icon\" aria-label=\"Actions for Grace Hopper\">&#x22ef;</aihio-button>\n            <aihio-dropdown-item>Change role</aihio-dropdown-item>\n            <aihio-dropdown-item>Remove from team</aihio-dropdown-item>\n          </aihio-dropdown>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</aihio-table>"
+    }
+  ]
+}

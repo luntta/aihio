@@ -23,6 +23,7 @@ export const LINT_RULE_IDS = new Set([
   'unknown-attribute',
   'boolean-attribute-value',
   'cluster-needs-grow',
+  'table-sortable-header',
   'hand-rolled-layout',
 ]);
 
@@ -145,6 +146,7 @@ export function lintMarkup(markup, options = {}) {
     if (!schema) continue;
 
     issues.push(...collectEnumIssues(node, schema, context));
+    issues.push(...collectNativeElementIssues(node, schema, context));
     issues.push(...collectCompositionIssues(node, schema, context));
     issues.push(...collectA11yIssues(node, schema, context));
   }
@@ -156,10 +158,10 @@ export function lintMarkup(markup, options = {}) {
   };
 }
 
-function collectEnumIssues(node, schema, context) {
+function collectEnumIssues(node, schema, context, attributes = schema.attributes) {
   const issues = [];
 
-  for (const [name, attr] of Object.entries(schema.attributes ?? {})) {
+  for (const [name, attr] of Object.entries(attributes ?? {})) {
     if (attr.type !== 'enum') continue;
     if (!hasAttribute(node, name)) continue;
 
@@ -180,6 +182,37 @@ function collectEnumIssues(node, schema, context) {
   }
 
   return issues;
+}
+
+/*
+ * The native elements a component enhances (a <th> in aihio-table) carry
+ * attributes it reads, so they are held to the same enum and boolean rules as
+ * its own. Only elements the component owns are checked: those with no other
+ * Aihio element between them and it.
+ */
+function collectNativeElementIssues(node, schema, context) {
+  const issues = [];
+
+  for (const [tag, element] of Object.entries(schema.nativeElements ?? {})) {
+    const attributes = element.attributes ?? {};
+    const owned = findDescendants(node, (child) => child.tagName === tag && nearestAihioAncestor(child) === node);
+
+    for (const child of owned) {
+      issues.push(...collectEnumIssues(child, schema, context, attributes));
+      issues.push(...collectMarkupIssues(child, context, attributes));
+    }
+  }
+
+  return issues;
+}
+
+function nearestAihioAncestor(node) {
+  let current = node.parent;
+  while (current?.type === 'element') {
+    if (isAihioTag(current.tagName)) return current;
+    current = current.parent;
+  }
+  return null;
 }
 
 function collectCompositionIssues(node, schema, context) {
@@ -316,12 +349,12 @@ function collectA11yIssues(node, schema, context) {
   );
 }
 
-function collectMarkupIssues(node, context) {
-  return collectMarkupRuleViolations(node, attributesByTag.get(node.tagName), astAdapter).map((violation) =>
+function collectMarkupIssues(node, context, attributes = attributesByTag.get(node.tagName)) {
+  return collectMarkupRuleViolations(node, attributes, astAdapter).map((violation) =>
     createIssue({
       ruleId: violation.ruleId,
       severity: violation.severity,
-      node,
+      node: violation.node ?? node,
       context,
       message: violation.message,
       suggestion: violation.suggestion,

@@ -1,0 +1,149 @@
+{
+  "$component": "aihio-pagination",
+  "version": "1.0.0",
+  "description": "Navigation between the pages of a long list (a pager): previous and next, the first and last page, and the pages around the current one. With href each page is a link with its own address; without it each page is a button your code answers. Use it under a table, search results, or a grid of cards when the whole list is too long to show at once.",
+  "intents": [
+    "navigation"
+  ],
+  "attributes": {
+    "page": {
+      "type": "number",
+      "default": 1,
+      "description": "The current page, from 1."
+    },
+    "pages": {
+      "type": "number",
+      "description": "How many pages there are. With fewer than two there is nothing to page through, and nothing is shown."
+    },
+    "href": {
+      "type": "string",
+      "description": "The address of a page, with {page} where its number goes: \"/invoices?page={page}\". With it each page is a link that can open in a new tab and needs no script of yours. Without it each page is a button, and picking one sets page."
+    },
+    "previous-text": {
+      "type": "string",
+      "default": "Previous",
+      "description": "The previous page control's text. For localisation."
+    },
+    "next-text": {
+      "type": "string",
+      "default": "Next",
+      "description": "The next page control's text. For localisation."
+    },
+    "page-text": {
+      "type": "string",
+      "default": "Page {page}",
+      "description": "Each page's accessible name, with {page} for its number, and what is announced when a button changes the page. For localisation (e.g. \"Sivu {page}\")."
+    }
+  },
+  "properties": {
+    "page": {
+      "type": "number",
+      "description": "Get or set the current page. Setting it fires no aihio-page."
+    },
+    "pages": {
+      "type": "number",
+      "description": "Get or set how many pages there are."
+    }
+  },
+  "events": {
+    "aihio-page": {
+      "description": "Fired when the person picks a page, before it opens: a link then navigates, and a button sets page. Call preventDefault() to open it yourself, as a client-side router does. A click that opens a link in a new tab or window is left to the browser.",
+      "detail": {
+        "page": "number"
+      },
+      "cancelable": true,
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "A navigation landmark, named \"Pagination\" unless you name it with aria-label or aria-labelledby",
+      "The current page carries aria-current=\"page\", and is drawn with a border held to 3:1 and a heavier weight, not a colour alone",
+      "Each page is named \"Page 4\" (page-text) rather than \"4\", so a list of the page's links still says what each one is",
+      "Previous and next carry rel=\"prev\" and rel=\"next\". On the first and last page they stay in place, disabled and out of the tab order, so the row does not shift",
+      "Past seven pages the list keeps the first and last page and the pages beside the current one, with gaps hidden from screen readers, so its length never changes as the page does. Where seven do not fit on one line, in a narrow column or on a phone, it keeps the current page alone, five slots rather than seven",
+      "In a list with role=\"list\", which Safari otherwise drops once the bullets are removed",
+      "A button that changes the page announces the new page in a polite status region, and focus stays on the control that was used, or moves to the current page when that control is now disabled",
+      "A click that opens a link in a new tab or window is left to the browser",
+      "Drawn that compactly, previous and next show only their arrows; their names do not change",
+      "Forced colours: the current page is drawn in Highlight, and disabled controls in GrayText"
+    ],
+    "required": [
+      {
+        "when": "pages is missing or not a whole number, or page is outside 1 to pages",
+        "requirement": "Set pages to how many pages there are, and page to the current one, counting from 1.",
+        "severity": "error",
+        "rule": "pagination-pages"
+      },
+      {
+        "when": "href is set without {page}",
+        "requirement": "Put {page} where the page number goes in href. Without it every page links to the same address.",
+        "severity": "error",
+        "rule": "pagination-href"
+      },
+      {
+        "when": "more than one aihio-pagination is on the page",
+        "requirement": "Name each one after the list it pages through, aria-label=\"Invoice pages\", so the landmarks can be told apart.",
+        "severity": "warn",
+        "rule": "pagination-label"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-pagination current=\"3\" total=\"12\" href=\"/invoices?page={page}\"></aihio-pagination>",
+      "reason": "The current page is page and the number of pages is pages. Nothing reads current or total, so this shows nothing.",
+      "fix": "<aihio-pagination page=\"3\" pages=\"12\" href=\"/invoices?page={page}\"></aihio-pagination>",
+      "rule": "unknown-attribute"
+    },
+    {
+      "markup": "<aihio-pagination page=\"3\" pages=\"12\" href=\"/invoices?page=\"></aihio-pagination>",
+      "reason": "Without {page} in href every page links to the same address.",
+      "fix": "<aihio-pagination page=\"3\" pages=\"12\" href=\"/invoices?page={page}\"></aihio-pagination>",
+      "rule": "pagination-href"
+    },
+    {
+      "markup": "<aihio-pagination page=\"0\" pages=\"12\" href=\"/invoices?page={page}\"></aihio-pagination>",
+      "reason": "Pages count from 1. Page 0 is not a page, so no page is marked current.",
+      "fix": "<aihio-pagination page=\"1\" pages=\"12\" href=\"/invoices?page={page}\"></aihio-pagination>",
+      "rule": "pagination-pages"
+    },
+    {
+      "markup": "<aihio-pagination page=\"1\" pages=\"4\" href=\"/invoices?page={page}\"></aihio-pagination>\n<aihio-pagination page=\"2\" pages=\"9\" href=\"/payments?page={page}\"></aihio-pagination>",
+      "reason": "Two landmarks both named \"Pagination\" cannot be told apart in a screen reader's list of landmarks. Name each after the list it pages through.",
+      "fix": "<aihio-pagination page=\"1\" pages=\"4\" href=\"/invoices?page={page}\" aria-label=\"Invoice pages\"></aihio-pagination>\n<aihio-pagination page=\"2\" pages=\"9\" href=\"/payments?page={page}\" aria-label=\"Payment pages\"></aihio-pagination>",
+      "rule": "pagination-label"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Pages with their own address",
+      "description": "With href each page is a link: it can open in a new tab or be bookmarked, and needs no script of yours.",
+      "markup": "<aihio-pagination page=\"4\" pages=\"12\" href=\"/invoices?page={page}\" aria-label=\"Invoice pages\"></aihio-pagination>"
+    },
+    {
+      "title": "Many pages",
+      "description": "Past seven pages the list keeps the first and last and the pages beside the current one, and stays seven long.",
+      "markup": "<aihio-pagination page=\"57\" pages=\"4000\" href=\"/requests?page={page}\" aria-label=\"Request pages\"></aihio-pagination>"
+    },
+    {
+      "title": "Pages your code swaps in",
+      "description": "Without href each page is a button. Picking one sets page and fires aihio-page with the page to show; call preventDefault() to set page yourself, from state.",
+      "markup": "<aihio-pagination page=\"1\" pages=\"5\" aria-label=\"Result pages\"></aihio-pagination>"
+    },
+    {
+      "title": "Under a table",
+      "description": "The table shows one page of the records, sorted by your code or the server with manual-sort, and says which ones it shows.",
+      "markup": "<aihio-stack gap=\"md\">\n  <aihio-table manual-sort>\n    <table aria-label=\"Invoices\">\n      <thead>\n        <tr>\n          <th scope=\"col\" data-sortable=\"invoice\" aria-sort=\"ascending\">Invoice</th>\n          <th scope=\"col\" data-sortable=\"amount\" data-numeric>Amount</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr><th scope=\"row\"><a href=\"/invoices/1051\">INV-1051</a></th><td data-numeric>€480.00</td></tr>\n        <tr><th scope=\"row\"><a href=\"/invoices/1052\">INV-1052</a></th><td data-numeric>€2,150.00</td></tr>\n        <tr><th scope=\"row\"><a href=\"/invoices/1053\">INV-1053</a></th><td data-numeric>€95.20</td></tr>\n      </tbody>\n    </table>\n  </aihio-table>\n  <aihio-cluster justify=\"between\">\n    <p>Showing 51–53 of 53 invoices</p>\n    <aihio-pagination page=\"3\" pages=\"3\" href=\"/invoices?page={page}\" aria-label=\"Invoice pages\"></aihio-pagination>\n  </aihio-cluster>\n</aihio-stack>"
+    },
+    {
+      "title": "In another language",
+      "description": "previous-text, next-text, and page-text put the controls in the page's language; name the landmark in it too.",
+      "markup": "<aihio-pagination page=\"2\" pages=\"6\" href=\"/laskut?sivu={page}\" aria-label=\"Laskujen sivut\" previous-text=\"Edellinen\" next-text=\"Seuraava\" page-text=\"Sivu {page}\"></aihio-pagination>"
+    }
+  ]
+}

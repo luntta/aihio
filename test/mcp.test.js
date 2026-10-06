@@ -116,6 +116,25 @@ test('MCP discovery tools lead from a request to lint-clean pattern markup', () 
   assert.equal(found.patterns[0].id, 'destructive-confirmation');
   assert.equal(found.components[0].tag, 'aihio-dialog');
 
+  // A table asked for in any of the ways people ask for one.
+  for (const query of ['sortable table of invoices', 'list of users with columns I can sort', 'show records in rows and columns']) {
+    const table = call('find', { query }).structuredContent;
+    assert.equal(table.components[0].tag, 'aihio-table', query);
+    assert.equal(table.patterns[0].id, 'data-table', query);
+  }
+
+  // A list too long for one page: a grid that renders what is in view, or pages.
+  for (const query of ['virtual scrolling list of a hundred thousand log lines', 'large dataset grid', 'spreadsheet-like grid with keyboard navigation']) {
+    assert.equal(call('find', { query }).structuredContent.components[0].tag, 'aihio-data-grid', query);
+  }
+  for (const query of ['pagination', 'page through search results', 'next and previous page links', 'pager for a list of orders']) {
+    assert.equal(call('find', { query }).structuredContent.components[0].tag, 'aihio-pagination', query);
+  }
+  // "Table" matches aihio-table by name; its description points on to both.
+  const virtualized = call('find', { query: 'virtualized table' }).structuredContent.components;
+  assert.deepEqual(new Set(virtualized.slice(0, 2).map((component) => component.tag)), new Set(['aihio-table', 'aihio-data-grid']));
+  assert.match(virtualized.find((component) => component.tag === 'aihio-table').description, /aihio-pagination, or use aihio-data-grid/);
+
   const byIntent = call('find', { query: 'destructive-action' }).structuredContent;
   assert.equal(byIntent.intent.name, 'destructive-action');
   assert.ok(byIntent.components.some((component) => component.tag === 'aihio-button'));

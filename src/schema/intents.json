@@ -27,6 +27,7 @@
     "labeling": "Short label or tag attached to other content.",
     "metadata": "Ancillary descriptive text (titles, descriptions, captions).",
     "tabs": "Switches between sibling panels using a row of triggers.",
+    "tabular-data": "Records laid out in rows and columns, compared by scanning down a column (a data table).",
     "dismissible": "Can be closed or hidden by the user."
   }
 }

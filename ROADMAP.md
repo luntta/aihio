@@ -123,6 +123,23 @@ docs show what the schema knows.
 - [x] The dropdown accessibility test waits for the menu's fade-in before axe measures it; mid-fade, partly transparent text failed contrast intermittently
 - [ ] Two dropdown browser tests (typeahead, link items) fail intermittently under a full parallel run, when a timer fires late; they pass alone and failed the same way before this phase
 
+## Phase 11 — Tables
+
+Records compared across columns had nothing in the system to reach for: a
+model asked for a sortable table wrote one from scratch, with click handlers
+on the headers that no keyboard reaches.
+
+- [x] `aihio-table` wraps a native `<table>`, keeping the platform's table semantics: the system's styles, `density`, `data-numeric` figures aligned by place value, row names, figures, and dates that do not wrap, and a scroll box that becomes a named, focusable region when the table is too wide, with shadows at the edges that hide rows, and `sticky-header`
+- [x] Sorting by `data-sortable` header buttons, with `aria-sort` as the order: rows load in it, re-sort when script sets it, and take their place when added. Figures and text compare in the page's language, `<time datetime>` and `data-sort-value` give machine-readable keys, the sort is announced, and `manual-sort` leaves the rows to a framework or the server
+- [x] Rows move with `moveBefore()` where there is one, so focus inside a row survives, and only ever to just before another row, so React, Vue, and Svelte still find the rows they rendered; all three are exercised in the browser suite
+- [x] `nativeElements` in the schema: the attributes a component reads on the native elements it enhances, carried into the minified schema, types, prompt, docs, and the linter's enum and boolean rules
+- [x] Linter: `table-accessible-name`, `table-header-cells`, `table-click-handler`, `table-sort-column-name`, and `table-sortable-header`, with suggestions for other systems' table components and attributes (`<aihio-table-row>` → `<tr>`, `aria-sort="asc"` → `"ascending"`)
+- [x] A `data-table` pattern: search, a sortable table with row links, statuses, and row menus, pagination by link, and a no-results variation
+- [x] `aihio-pagination` for pages of a long list: links with `href` (or buttons without it), `aria-current="page"` marked at 3:1 and by weight, a window of seven that never changes length, and a compact form wherever the full one does not fit on one line
+- [x] `aihio-data-grid` for 100,000 rows and more: only the rows in view are rendered, by your code on `aihio-range`, around spacers that keep the scroll height; the WAI-ARIA data grid keyboard with focus that waits for rows not rendered yet; `aria-rowcount` and `aria-rowindex`; sorting shared with `aihio-table` through `src/components/sort-headers.js`. First rows in ~20ms, any scroll position in under 30ms, Control+End in ~5ms
+- [ ] Row selection: a select-all checkbox with a mixed state, shift-click ranges, and an announced count, that does not fight a framework holding the checkboxes' state in its own
+- [ ] Data grid: rows of more than one line, and more than about 389,000 rows. Firefox stops a box's height at 17.9 million pixels (Chromium and WebKit at 33.5 million), so rows past it cannot be scrolled to; lint and the dev build warn above 350,000
+
 ## Sequencing notes
 
 - Phase 1 is the keystone. Everything else depends on its format.

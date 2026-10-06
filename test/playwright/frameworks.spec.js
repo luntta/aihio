@@ -35,4 +35,88 @@ for (const framework of ['react', 'vue', 'svelte']) {
     await expect(page.locator('body')).toHaveAttribute('data-combobox-value', 'cherry');
     await expect(input).toHaveValue('Cherry');
   });
+
+  test(`${framework} sorts a manual-sort table's rows from state, and its header keeps one button`, async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(`/test/frameworks/framework.html?framework=${framework}`);
+    await expect(page.locator('body')).toHaveAttribute('data-status', 'ready');
+
+    const table = page.locator('#framework-manual-table');
+    const header = table.getByRole('columnheader', { name: 'Fruit name' });
+    const rows = () => table.locator('tbody th').allTextContents();
+
+    // The framework rewrote the header's text after the table took it into
+    // a button: the new text is in the one button.
+    await expect(header.getByRole('button')).toHaveCount(1);
+    await expect(header.getByRole('button')).toHaveText('Fruit name');
+    await expect(header).toHaveAttribute('aria-sort', 'ascending');
+    expect(await rows()).toEqual(['Banana', 'Cherry', 'Date']);
+
+    await header.getByRole('button').click();
+    await expect(header).toHaveAttribute('aria-sort', 'descending');
+    await expect.poll(rows).toEqual(['Date', 'Cherry', 'Banana']);
+    await header.getByRole('button').click();
+    await expect.poll(rows).toEqual(['Banana', 'Cherry', 'Date']);
+    await expect(header).toHaveAttribute('aria-sort', 'ascending');
+    expect(errors).toEqual([]);
+  });
+
+  test(`${framework} renders the rows a data grid asks for, from 100,000, and sorts them`, async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(`/test/frameworks/framework.html?framework=${framework}`);
+    await expect(page.locator('body')).toHaveAttribute('data-status', 'ready');
+
+    const grid = page.locator('#framework-grid');
+    const firstRow = grid.locator('tbody:not([data-grid-part]) tr').first();
+    await expect(firstRow).toHaveText('Item 1');
+    await expect(firstRow).toHaveAttribute('aria-rowindex', '2');
+    await expect(grid.locator('table')).toHaveAttribute('aria-rowcount', '100001');
+
+    // Halfway down, the framework renders the rows there, and each says
+    // which row it is.
+    await grid.evaluate((element) => { element.scrollTop = element.scrollHeight / 2; });
+    await expect.poll(async () => Number(await firstRow.getAttribute('aria-rowindex'))).toBeGreaterThan(40000);
+    const [index, text] = await firstRow.evaluate((row) => [Number(row.getAttribute('aria-rowindex')), row.textContent]);
+    expect(text).toBe(`Item ${index - 1}`);
+
+    // The keyboard reaches the last row, which the framework renders on the way.
+    await grid.getByRole('button', { name: 'Item' }).focus();
+    await page.keyboard.press('Control+End');
+    await expect.poll(() => page.evaluate(() => document.activeElement.textContent)).toBe('Item 100000');
+
+    // A sort: the framework reorders its rows, the grid asks for the top again.
+    await page.keyboard.press('Control+Home');
+    await page.keyboard.press('Enter');
+    await expect(grid.getByRole('columnheader', { name: 'Item' })).toHaveAttribute('aria-sort', 'descending');
+    await expect(firstRow).toHaveText('Item 100000');
+    expect(errors).toEqual([]);
+  });
+
+  test(`${framework} keeps adding and removing rows in a table that sorts them itself`, async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(`/test/frameworks/framework.html?framework=${framework}`);
+    await expect(page.locator('body')).toHaveAttribute('data-status', 'ready');
+
+    const table = page.locator('#framework-auto-table');
+    const rows = () => table.locator('tbody th').allTextContents();
+    const sort = table.getByRole('button', { name: 'Item' });
+    expect(await rows()).toEqual(['Fig', 'Banana', 'Cherry']);
+
+    await sort.click();
+    await sort.click();
+    expect(await rows()).toEqual(['Fig', 'Cherry', 'Banana']);
+
+    // The framework appends; the table puts the new row in its place.
+    await page.locator('#framework-add-item').click();
+    await expect.poll(rows).toEqual(['Grape', 'Fig', 'Cherry', 'Banana']);
+    // And the framework can still find its rows wherever they have moved.
+    await page.locator('#framework-remove-item').click();
+    await expect.poll(rows).toEqual(['Grape', 'Fig', 'Banana']);
+    await sort.click();
+    expect(await rows()).toEqual(['Banana', 'Fig', 'Grape']);
+    expect(errors).toEqual([]);
+  });
 }

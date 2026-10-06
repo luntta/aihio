@@ -32,7 +32,8 @@ export function collectDevWarnings(element) {
   const schema = describe(element);
   if (!schema || !element) return [];
   return dedupeWarnings([
-    ...collectEnumWarnings(element, schema),
+    ...collectEnumWarnings(element, schema.attributes),
+    ...collectNativeElementWarnings(element, schema),
     ...collectMarkupWarnings(element, schema),
     ...collectA11yWarnings(element, schema),
   ]);
@@ -44,19 +45,43 @@ export function formatDevWarning(element, warning) {
   return `[aihio] ${tag}: ${severity}${warning.message}`;
 }
 
-function collectEnumWarnings(element, schema) {
+/** `on` names the native element the attributes are on, when they are not the host's. */
+function collectEnumWarnings(element, attributes, on = '') {
   const warnings = [];
-  for (const [name, attr] of Object.entries(schema.attributes ?? {})) {
+  for (const [name, attr] of Object.entries(attributes ?? {})) {
     if (attr.type !== 'enum' || !element.hasAttribute?.(name)) continue;
     const value = element.getAttribute(name);
     if (attr.values?.includes(value)) continue;
     const suggestion = suggestEnumValue(value, attr.values);
     warnings.push({
-      key: `enum:${name}:${value}`,
-      message: `invalid ${name}="${value}". ${suggestion ? `Use ${name}="${suggestion}". ` : ''}Expected one of: ${attr.values.join(', ')}.`,
+      key: `enum:${on}${name}:${value}`,
+      message: `invalid ${name}="${value}"${on ? ` on <${on}>` : ''}. ${suggestion ? `Use ${name}="${suggestion}". ` : ''}Expected one of: ${attr.values.join(', ')}.`,
     });
   }
   return warnings;
+}
+
+/** The native elements the component enhances, held to the same rules as its own attributes. */
+function collectNativeElementWarnings(element, schema) {
+  const warnings = [];
+  for (const [tag, definition] of Object.entries(schema.nativeElements ?? {})) {
+    for (const child of element.querySelectorAll?.(tag) ?? []) {
+      if (nearestAihioAncestor(child) !== element) continue;
+      warnings.push(...collectEnumWarnings(child, definition.attributes, tag));
+      warnings.push(...collectMarkupRuleViolations(child, definition.attributes, domAdapter).map((violation) => ({
+        key: `markup:${tag}:${violation.key}`,
+        message: `<${tag}>: ${violation.message}`,
+        severity: violation.severity,
+      })));
+    }
+  }
+  return warnings;
+}
+
+function nearestAihioAncestor(element) {
+  let current = element.parentElement;
+  while (current && !current.localName.startsWith('aihio-')) current = current.parentElement;
+  return current;
 }
 
 function collectMarkupWarnings(element, schema) {

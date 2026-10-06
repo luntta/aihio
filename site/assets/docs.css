@@ -734,6 +734,13 @@ a {
   width: 100%;
 }
 
+/* The preview is a raised surface, so a table drawn on it takes the surface
+   pair, as it does in a card. */
+.docs-component-card__preview :is(aihio-table, aihio-data-grid) {
+  --aihio-table-bg: var(--aihio-color-surface-bg);
+  --aihio-table-row-hover-bg: var(--aihio-color-page-bg);
+}
+
 .docs-component-card__body {
   display: flex;
   flex: 1;
@@ -1430,7 +1437,7 @@ a {
   padding-top: 0;
 }
 
-.docs-subcomponent h3 {
+.docs-subcomponent :is(h3, h4) {
   margin: 0 0 var(--aihio-spacing-2);
   font-size: var(--aihio-font-size-lg);
 }
@@ -1443,7 +1450,7 @@ a {
   line-height: var(--aihio-line-height-relaxed);
 }
 
-.docs-subcomponent:target h3 code {
+.docs-subcomponent:target :is(h3, h4) code {
   background: var(--aihio-color-control-highlight-bg);
 }
 

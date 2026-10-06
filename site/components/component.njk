@@ -116,6 +116,23 @@ eleventyComputed:
   {% set level = 3 %}
   {% include "partials/api-reference.njk" %}
 
+  {% if component.nativeElementEntries.length %}
+    <h3 class="docs-api__heading">Native elements</h3>
+    <p class="docs-api__intro">
+      <code>{{ component.tag }}</code> enhances these elements rather than replacing them, and reads these attributes
+      on them. The linter checks them like its own.
+    </p>
+    {% for element in component.nativeElementEntries %}
+      <div class="docs-subcomponent" id="{{ element.anchor }}">
+        <h4><code>&lt;{{ element.tag }}&gt;</code></h4>
+        <p class="docs-subcomponent__description">{{ element.description | prose | safe }}</p>
+        {% set api = element %}
+        {% set level = 5 %}
+        {% include "partials/api-reference.njk" %}
+      </div>
+    {% endfor %}
+  {% endif %}
+
   {% if component.compositionEntries.length %}
     <h3 class="docs-api__heading">Composition</h3>
     <dl class="docs-api">

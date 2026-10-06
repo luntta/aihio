@@ -1,0 +1,107 @@
+<section>
+  <aihio-stack data-aihio-intent="layout" gap="md">
+    <aihio-cluster data-aihio-intent="layout" justify="between">
+      <h2 id="invoices-heading">Invoices</h2>
+      <aihio-button data-aihio-intent="primary-action"><a href="/invoices/new">New invoice</a></aihio-button>
+    </aihio-cluster>
+
+    <form role="search" action="/invoices" method="get">
+      <aihio-field data-aihio-intent="form-field">
+        <label slot="label">Search invoices</label>
+        <aihio-input type="search" name="q" placeholder="Customer or invoice number"></aihio-input>
+      </aihio-field>
+    </form>
+
+    <aihio-table data-aihio-intent="tabular-data">
+      <table aria-labelledby="invoices-heading">
+        <thead>
+          <tr>
+            <th scope="col" data-sortable="invoice">Invoice</th>
+            <th scope="col" data-sortable="customer">Customer</th>
+            <th scope="col" data-sortable="status">Status</th>
+            <th scope="col" data-sortable="issued" aria-sort="descending">Issued</th>
+            <th scope="col" data-sortable="amount" data-numeric>Amount</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href="/invoices/1046">INV-1046</a></th>
+            <td>Wide World Importers</td>
+            <td data-sort-value="3"><aihio-badge data-aihio-intent="status" variant="secondary">Draft</aihio-badge></td>
+            <td><time datetime="2026-10-02">2 Oct 2026</time></td>
+            <td data-numeric>€3,200.00</td>
+            <td>
+              <aihio-dropdown data-aihio-intent="menu" align="end">
+                <aihio-button slot="trigger" variant="ghost" size="icon" aria-label="Actions for INV-1046">&#x22ef;</aihio-button>
+                <aihio-dropdown-item>Edit draft</aihio-dropdown-item>
+                <aihio-dropdown-item>Download PDF</aihio-dropdown-item>
+              </aihio-dropdown>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/invoices/1045">INV-1045</a></th>
+            <td>Adventure Works</td>
+            <td data-sort-value="2"><aihio-badge data-aihio-intent="status" variant="warning">Due</aihio-badge></td>
+            <td><time datetime="2026-09-30">30 Sep 2026</time></td>
+            <td data-numeric>€640.00</td>
+            <td>
+              <aihio-dropdown data-aihio-intent="menu" align="end">
+                <aihio-button slot="trigger" variant="ghost" size="icon" aria-label="Actions for INV-1045">&#x22ef;</aihio-button>
+                <aihio-dropdown-item>Send reminder</aihio-dropdown-item>
+                <aihio-dropdown-item>Download PDF</aihio-dropdown-item>
+              </aihio-dropdown>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/invoices/1044">INV-1044</a></th>
+            <td>Contoso</td>
+            <td data-sort-value="1"><aihio-badge data-aihio-intent="status" variant="destructive">Overdue</aihio-badge></td>
+            <td><time datetime="2026-09-12">12 Sep 2026</time></td>
+            <td data-numeric>€12,400.00</td>
+            <td>
+              <aihio-dropdown data-aihio-intent="menu" align="end">
+                <aihio-button slot="trigger" variant="ghost" size="icon" aria-label="Actions for INV-1044">&#x22ef;</aihio-button>
+                <aihio-dropdown-item>Send reminder</aihio-dropdown-item>
+                <aihio-dropdown-item>Download PDF</aihio-dropdown-item>
+              </aihio-dropdown>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/invoices/1043">INV-1043</a></th>
+            <td>Fabrikam</td>
+            <td data-sort-value="4"><aihio-badge data-aihio-intent="status" variant="success">Paid</aihio-badge></td>
+            <td><time datetime="2026-09-04">4 Sep 2026</time></td>
+            <td data-numeric>€980.50</td>
+            <td>
+              <aihio-dropdown data-aihio-intent="menu" align="end">
+                <aihio-button slot="trigger" variant="ghost" size="icon" aria-label="Actions for INV-1043">&#x22ef;</aihio-button>
+                <aihio-dropdown-item>Download PDF</aihio-dropdown-item>
+                <aihio-dropdown-item>Issue refund</aihio-dropdown-item>
+              </aihio-dropdown>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="/invoices/1042">INV-1042</a></th>
+            <td>Northwind Traders</td>
+            <td data-sort-value="4"><aihio-badge data-aihio-intent="status" variant="success">Paid</aihio-badge></td>
+            <td><time datetime="2026-08-29">29 Aug 2026</time></td>
+            <td data-numeric>€1,250.00</td>
+            <td>
+              <aihio-dropdown data-aihio-intent="menu" align="end">
+                <aihio-button slot="trigger" variant="ghost" size="icon" aria-label="Actions for INV-1042">&#x22ef;</aihio-button>
+                <aihio-dropdown-item>Download PDF</aihio-dropdown-item>
+                <aihio-dropdown-item>Issue refund</aihio-dropdown-item>
+              </aihio-dropdown>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </aihio-table>
+
+    <aihio-cluster data-aihio-intent="layout" justify="between">
+      <p>Showing 1–5 of 42 invoices</p>
+      <aihio-pagination data-aihio-intent="navigation" page="1" pages="9" href="/invoices?page={page}" aria-label="Invoice pages"></aihio-pagination>
+    </aihio-cluster>
+  </aihio-stack>
+</section>

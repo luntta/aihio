@@ -102,7 +102,7 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 16);
+  assert.equal(components.length, 19);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
 
@@ -120,7 +120,7 @@ test('schema output includes the seeded patterns library with inlined markup', (
   const components = new Set(schema.components.map((component) => component.$component));
 
   assert.deepEqual(patternIds, sorted);
-  assert.equal(patternIds.length, 8);
+  assert.equal(patternIds.length, 9);
   assert.equal(patternIds[0], 'auth-form');
   assert.equal(patternIds.at(-1), 'toast-alert-stack');
 
@@ -320,7 +320,7 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
-  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'combobox', 'dialog', 'dropdown', 'field', 'input', 'stack', 'tabs', 'toggle']) {
+  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'combobox', 'data-grid', 'dialog', 'dropdown', 'field', 'input', 'pagination', 'stack', 'table', 'tabs', 'toggle']) {
     assert.equal(pkg.exports[`./${component}`].types, `./dist/${component}.d.ts`);
     assert.equal(pkg.exports[`./${component}`].default, `./dist/${component}.js`);
   }
@@ -333,9 +333,45 @@ test('package exports include generated declaration entrypoints', () => {
 
 test('granular component entrypoints do not pull the whole library into the bundle', () => {
   const button = readFileSync(resolve(root, 'dist/button.js'), 'utf8');
+  const table = readFileSync(resolve(root, 'dist/table.js'), 'utf8');
 
   assert.ok(Buffer.byteLength(button) < 15_000, 'button entry stays below its focused bundle budget');
   assert.doesNotMatch(button, /aihio-dialog|aihio-tabs|aihio-dropdown/);
+  assert.ok(Buffer.byteLength(table) < 15_000, 'table entry stays below its focused bundle budget');
+  assert.doesNotMatch(table, /aihio-dialog|aihio-tabs|aihio-dropdown|aihio-button/);
+  // The grid carries a keyboard model and its virtualization, so its budget
+  // is larger; what each budget catches is an entry that pulls in the rest.
+  for (const [name, budget] of [['pagination', 15_000], ['data-grid', 20_000]]) {
+    const entry = readFileSync(resolve(root, `dist/${name}.js`), 'utf8');
+    assert.ok(Buffer.byteLength(entry) < budget, `${name} entry stays below its focused bundle budget`);
+    assert.doesNotMatch(entry, /aihio-dialog|aihio-tabs|aihio-dropdown|aihio-button/);
+  }
+});
+
+// aihio-table enhances a native <table>, so part of its API is attributes on
+// native elements (data-sortable on a <th>). They are as much a part of the
+// contract as its own attributes, everywhere the contract is read.
+test('the native elements a component enhances are part of its contract', async () => {
+  const schema = JSON.parse(readFileSync(resolve(root, 'dist/schema.json'), 'utf8'));
+  const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
+  const declarations = readFileSync(resolve(root, 'dist/aihio.d.ts'), 'utf8');
+  const prompt = readFileSync(resolve(root, 'dist/aihio.prompt.md'), 'utf8');
+  const table = schema.components.find((component) => component.$component === 'aihio-table');
+  const minifiedTable = minified.components.find((component) => component.$component === 'aihio-table');
+
+  assert.equal(table.nativeElements.th.attributes['data-sortable'].type, 'string');
+  assert.deepEqual(minifiedTable.nativeElements.th.attributes['aria-sort'], {
+    type: 'enum',
+    values: ['ascending', 'descending', 'none', 'other'],
+  });
+  assert.equal(minifiedTable.nativeElements.th.description, undefined, 'prose is stripped for agents');
+  assert.match(declarations, /nativeElements\?: Record<string, AihioRuntimeNativeElementSchema>;/);
+  assert.match(prompt, /Native elements: `<th>` \(`data-sortable=string`, `aria-sort=ascending\|descending\|none\|other`, `data-numeric`, `data-sort-value=string`\)/);
+
+  const { validate } = await import(pathToFileURL(resolve(root, 'src/schema/validate.js')).href);
+  const metaSchema = JSON.parse(readFileSync(resolve(root, 'src/schema/meta-schema.json'), 'utf8'));
+  const errors = validate(metaSchema, { ...table, nativeElements: { th: { attributes: {} } } });
+  assert.ok(errors.some((error) => error.message.includes('description')), 'a native element has to say what it is');
 });
 
 test('schema output exposes intent vocabulary and every component carries required AI-first fields', () => {
@@ -405,9 +441,9 @@ test('every counterexample is caught by the rule it names, and its fix is clean'
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 16);
+  assert.equal(minified.components.length, 19);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
-  assert.equal(minified.patterns.length, 8);
+  assert.equal(minified.patterns.length, 9);
 
   for (const component of minified.components) {
     assert.equal(component.description, undefined, `${component.$component} description stripped`);

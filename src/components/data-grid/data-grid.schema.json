@@ -1,0 +1,235 @@
+{
+  "$component": "aihio-data-grid",
+  "version": "1.0.0",
+  "description": "A virtualized data table for large datasets, more rows than a page can hold (thousands to hundreds of thousands): one scrolling box in which only the rows in view are rendered, by your code, when the grid asks for them. Arrow keys move between cells as in a spreadsheet, and the grid tells assistive technology how many rows there are and which ones it shows. Find in page, printing, and reading the rows in a screen reader's browse mode only reach the rendered rows; when people need those, use aihio-table with aihio-pagination instead.",
+  "intents": [
+    "tabular-data"
+  ],
+  "attributes": {
+    "row-count": {
+      "type": "number",
+      "description": "How many rows there are in all. Setting it, as when a filter changes the rows, asks for the rows in view again."
+    },
+    "density": {
+      "type": "enum",
+      "values": [
+        "default",
+        "compact"
+      ],
+      "default": "default",
+      "description": "Row height. compact fits more rows in the box."
+    },
+    "loading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marks the rows as stale while new ones load: they are dimmed, and the table has aria-busy."
+    },
+    "sort-ascending-text": {
+      "type": "string",
+      "default": "Sorted by {column}, ascending",
+      "description": "Announced after sorting a column ascending, with {column} for the header's text. For localisation."
+    },
+    "sort-descending-text": {
+      "type": "string",
+      "default": "Sorted by {column}, descending",
+      "description": "Announced after sorting a column descending, with {column} for the header's text."
+    }
+  },
+  "nativeElements": {
+    "th": {
+      "description": "A header cell. The grid uses its one header row for column headers, and keeps it in view.",
+      "attributes": {
+        "data-sortable": {
+          "type": "string",
+          "description": "Makes the column sortable: the header's content becomes a button, and a click fires aihio-sort for your code to sort the rows by this name."
+        },
+        "aria-sort": {
+          "type": "enum",
+          "values": [
+            "ascending",
+            "descending",
+            "none",
+            "other"
+          ],
+          "description": "The order your rows are in. The grid moves it from header to header as people sort."
+        },
+        "data-numeric": {
+          "type": "boolean",
+          "default": false,
+          "description": "Lines a column of figures up by place value. Put it on the header and on each of the column's cells."
+        }
+      }
+    },
+    "td": {
+      "description": "A data cell, one line high: text that does not fit ends in an ellipsis.",
+      "attributes": {
+        "data-numeric": {
+          "type": "boolean",
+          "default": false,
+          "description": "Lines the figure up with the rest of its column."
+        }
+      }
+    }
+  },
+  "properties": {
+    "table": {
+      "type": "HTMLTableElement | null",
+      "readonly": true,
+      "description": "The <table> the element enhances."
+    },
+    "body": {
+      "type": "HTMLTableSectionElement | null",
+      "readonly": true,
+      "description": "The <tbody> your code renders the rows into. The grid keeps a section of its own above and below it, so table.tBodies[0] is not it."
+    },
+    "start": {
+      "type": "number",
+      "readonly": true,
+      "description": "The first row asked for, counting from 0."
+    },
+    "end": {
+      "type": "number",
+      "readonly": true,
+      "description": "The row after the last one asked for."
+    },
+    "rowCount": {
+      "type": "number",
+      "description": "Get or set row-count."
+    }
+  },
+  "methods": {
+    "scrollToRow()": {
+      "description": "Scrolls so the row at index, counting from 0, is at the top of the view, and asks for the rows there.",
+      "parameters": [
+        {
+          "name": "index",
+          "type": "number"
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "events": {
+    "aihio-range": {
+      "description": "Asks for rows: render the rows from start up to (not including) end into body, in order, replacing those there. Fired when the grid connects, when its rows in view change, when row-count is set, and after a sort. Rows fetched for a range that is no longer start to end should be dropped.",
+      "detail": {
+        "start": "number",
+        "end": "number"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-sort": {
+      "description": "Fired when the person sorts by a column, once its header carries the new aria-sort. Sort your rows by column; the grid then scrolls to the top and asks for the rows again with aihio-range.",
+      "detail": {
+        "column": "string",
+        "direction": "'ascending' | 'descending'"
+      },
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "requiredChildren": [
+      "table"
+    ],
+    "allowedChildren": [
+      "table"
+    ]
+  },
+  "a11yContract": {
+    "handled": [
+      "The native <table> becomes a grid with aria-rowcount for every row there is, and each rendered row carries aria-rowindex, so a screen reader says \"row 51,034 of 100,001\" while only the rows in view exist",
+      "The grid is one tab stop. Arrow keys move between cells, Page Up and Page Down by the rows in view, Home and End to the ends of a row, and Control+Home and Control+End to the first and last cell",
+      "Moving to a row that is not rendered scrolls it into view, waits for your code to render it, and then focuses it",
+      "A cell holding one link or button is focused on that control; a cell holding several is entered with Enter or F2 and left with Escape. Every other control in the grid is out of the tab order",
+      "Keys pressed in a text field or an open menu inside a cell are left to it",
+      "If the row holding focus scrolls away and your code removes it, focus moves to the header of the same column rather than to the page",
+      "The header stays in view, and sorts the way aihio-table's does: a button in the <th>, aria-sort on the <th>, and the new order announced in a polite status region",
+      "Columns take their widths from <col> elements or the header cells, so they do not change as rows come and go, and each row is one line high",
+      "Cells draw their focus ring inside their edge, where the scroll box cannot clip it",
+      "loading sets aria-busy on the table while the rows are stale"
+    ],
+    "required": [
+      {
+        "when": "row-count is missing or not a whole number",
+        "requirement": "Set row-count to how many rows there are in all. The grid asks for rows by number, and sizes its scroll box from the count.",
+        "severity": "error",
+        "rule": "data-grid-row-count"
+      },
+      {
+        "when": "row-count is above 350,000",
+        "requirement": "Narrow the rows with a filter, or show them a page at a time with aihio-table and aihio-pagination. Firefox stops a box's height at 17.9 million pixels, about 389,000 rows of the default height, and rows past it cannot be scrolled to.",
+        "severity": "warn",
+        "rule": "data-grid-row-limit"
+      },
+      {
+        "when": "the table has no caption, aria-label, or aria-labelledby",
+        "requirement": "Name the table: a <caption>, aria-labelledby pointing at the visible heading above it, or aria-label.",
+        "severity": "error",
+        "rule": "table-accessible-name"
+      },
+      {
+        "when": "the table has no <th> cells",
+        "requirement": "Name each column with a <th> in the <thead> row.",
+        "severity": "error",
+        "rule": "table-header-cells"
+      },
+      {
+        "when": "a sortable header has no column name",
+        "requirement": "Give each sortable header a name, data-sortable=\"duration\", so aihio-sort says which column to sort by without depending on the header's wording.",
+        "severity": "warn",
+        "rule": "table-sort-column-name"
+      },
+      {
+        "when": "people need to find text in the page, print every row, or read the rows in a screen reader's browse mode",
+        "requirement": "Use aihio-table with aihio-pagination instead. A grid has only the rows in view in the page, and those are all that find in page, printing, and browse mode reach.",
+        "severity": "warn"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-data-grid>\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "reason": "Without row-count the grid does not know how many rows there are, so it asks for none and its scroll box has no height to scroll.",
+      "fix": "<aihio-data-grid row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "rule": "data-grid-row-count"
+    },
+    {
+      "markup": "<aihio-data-grid row-count=\"100000\">\n  <table>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "reason": "An unnamed grid is announced only as \"grid\", which says nothing about what its hundred thousand rows are.",
+      "fix": "<aihio-data-grid row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "rule": "table-accessible-name"
+    },
+    {
+      "markup": "<aihio-table row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-table>",
+      "reason": "aihio-table renders every row it is given, so it has no row count. A table of more rows than a page can hold is aihio-data-grid, or aihio-table with aihio-pagination.",
+      "fix": "<aihio-data-grid row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "rule": "unknown-attribute"
+    },
+    {
+      "markup": "<aihio-data-grid row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable>Request</th>\n        <th scope=\"col\" data-sortable>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "reason": "Without a column name aihio-sort reports the header's text, which changes when the page is translated.",
+      "fix": "<aihio-data-grid row-count=\"100000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"duration\">Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "rule": "table-sort-column-name"
+    },
+    {
+      "markup": "<aihio-data-grid row-count=\"2000000\">\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>",
+      "reason": "Firefox stops a box's height at 17.9 million pixels, about 389,000 rows of the default height. The scroll ends there, before the rows do, and neither scrolling nor the keyboard reaches the rest.",
+      "fix": "<aihio-table manual-sort>\n  <table aria-label=\"Requests\">\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\" aria-sort=\"ascending\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><th scope=\"row\">#1</th><td>GET</td><td>/api/items/0</td><td data-numeric>200</td><td data-numeric>12</td></tr>\n    </tbody>\n  </table>\n</aihio-table>\n<aihio-pagination page=\"1\" pages=\"80000\" href=\"/requests?page={page}\" aria-label=\"Request pages\"></aihio-pagination>",
+      "rule": "data-grid-row-limit"
+    }
+  ],
+  "examples": [
+    {
+      "title": "A hundred thousand rows",
+      "description": "The rows live in script. aihio-range asks for the ones in view and the script renders them into body; aihio-sort asks for them in a new order. Try the arrow keys, Page Down, and Control+End.",
+      "markup": "<aihio-data-grid id=\"requests-grid\" row-count=\"100000\" density=\"compact\">\n  <table aria-label=\"Requests\">\n    <colgroup>\n      <col style=\"width: 8rem\">\n      <col style=\"width: 6rem\">\n      <col>\n      <col style=\"width: 6rem\">\n      <col style=\"width: 9rem\">\n    </colgroup>\n    <thead>\n      <tr>\n        <th scope=\"col\" data-sortable=\"id\" aria-sort=\"ascending\">Request</th>\n        <th scope=\"col\" data-sortable=\"method\">Method</th>\n        <th scope=\"col\" data-sortable=\"path\">Path</th>\n        <th scope=\"col\" data-sortable=\"status\" data-numeric>Status</th>\n        <th scope=\"col\" data-sortable=\"duration\" data-numeric>Duration (ms)</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>\n<script type=\"module\">\n  const grid = document.getElementById('requests-grid');\n  const methods = ['GET', 'POST', 'PATCH', 'DELETE'];\n  const rows = Array.from({ length: 100000 }, (_, index) => ({\n    id: index + 1,\n    method: methods[index % 4],\n    path: `/api/items/${(index * 7919) % 100000}`,\n    status: [200, 201, 204, 404, 500][index % 5],\n    duration: (index * 37) % 1500,\n  }));\n\n  function render(start, end) {\n    grid.body.replaceChildren(...rows.slice(start, end).map((row) => {\n      const tr = document.createElement('tr');\n      tr.innerHTML = `<th scope=\"row\">#${row.id}</th><td>${row.method}</td><td>${row.path}</td><td data-numeric>${row.status}</td><td data-numeric>${row.duration}</td>`;\n      return tr;\n    }));\n  }\n\n  grid.addEventListener('aihio-range', (event) => render(event.detail.start, event.detail.end));\n  grid.addEventListener('aihio-sort', (event) => {\n    const { column, direction } = event.detail;\n    const order = direction === 'ascending' ? 1 : -1;\n    rows.sort((a, b) => (a[column] > b[column] ? 1 : a[column] < b[column] ? -1 : 0) * order);\n  });\n  render(grid.start, grid.end);\n</script>"
+    },
+    {
+      "title": "Rows from a server",
+      "description": "Fetch the rows asked for, and mark the grid loading while they come. A response for rows no longer in view is dropped: the person has scrolled on.",
+      "markup": "<aihio-data-grid id=\"orders-grid\" row-count=\"25000\">\n  <table aria-label=\"Orders\">\n    <colgroup>\n      <col style=\"width: 8rem\">\n      <col>\n      <col style=\"width: 9rem\">\n    </colgroup>\n    <thead>\n      <tr>\n        <th scope=\"col\">Order</th>\n        <th scope=\"col\">Customer</th>\n        <th scope=\"col\" data-numeric>Total</th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</aihio-data-grid>\n<script type=\"module\">\n  const grid = document.getElementById('orders-grid');\n\n  // Stands in for fetch('/api/orders?start=...&end=...').\n  const fetchOrders = (start, end) => new Promise((resolve) => setTimeout(() => resolve(\n    Array.from({ length: end - start }, (_, offset) => ({\n      id: 70000 + start + offset,\n      customer: `Customer ${((start + offset) * 31) % 997}`,\n      total: (((start + offset) * 7349) % 100000) / 100,\n    }))\n  ), 150));\n\n  async function load(start, end) {\n    grid.setAttribute('loading', '');\n    const orders = await fetchOrders(start, end);\n    if (start !== grid.start || end !== grid.end) return;\n    grid.body.replaceChildren(...orders.map((order) => {\n      const tr = document.createElement('tr');\n      tr.innerHTML = `<th scope=\"row\">#${order.id}</th><td>${order.customer}</td><td data-numeric>€${order.total.toFixed(2)}</td>`;\n      return tr;\n    }));\n    grid.removeAttribute('loading');\n  }\n\n  grid.addEventListener('aihio-range', (event) => load(event.detail.start, event.detail.end));\n  load(grid.start, grid.end);\n</script>"
+    }
+  ]
+}

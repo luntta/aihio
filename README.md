@@ -54,7 +54,7 @@ if (!customElements.get(AihioButton.tag)) {
 }
 ```
 
-The same form is available for all 15 top-level components. Import
+The same form is available for all 19 top-level components. Import
 `aihio/runtime` when schema inspection is needed without importing component
 implementations.
 
@@ -132,7 +132,8 @@ lintMarkup('<aihio-modal></aihio-modal>').issues[0].suggestion;
 A few rules catch markup that is valid but does not do what it says:
 `boolean-attribute-value` (`pressed="false"` turns a toggle on: a boolean
 attribute is on whenever it is present), `cluster-needs-grow` (a justified
-cluster in a card footer, where it has no room to justify), and
+cluster in a card footer, where it has no room to justify),
+`table-sortable-header` (`<th sortable>`, which nothing reads), and
 `hand-rolled-layout` (an inline `display: grid` or `flex` that one of the
 layout primitives replaces). An `a11y-contract` issue names the obligation it
 enforces in `contract`, such as `button-accessible-name`.
@@ -175,6 +176,9 @@ In Claude Code: `claude mcp add aihio -- npx -y @luntta/aihio mcp`.
 | `aihio-button` | Button with 6 variants (default, secondary, outline, ghost, link, destructive) and 4 sizes; wraps an `<a href>` to draw a link as a button |
 | `aihio-input` | Text input with size variants and error state |
 | `aihio-switch` | On/off setting (a real `<input type="checkbox" role="switch">`) that submits with its form |
+| `aihio-table` | Data table around a native `<table>`: sortable columns, figures aligned by place value, and a scroll box the keyboard can reach |
+| `aihio-data-grid` | Data grid for more rows than a page can hold: renders only the rows in view, with the WAI-ARIA grid keyboard |
+| `aihio-pagination` | Previous, next, and the pages around the current one, as links (with `href`) or buttons |
 | `aihio-combobox` | Filterable single-select field with keyboard navigation, async options, and optional free text |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
 | `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
@@ -188,6 +192,12 @@ In Claude Code: `claude mcp add aihio -- npx -y @luntta/aihio mcp`.
 ## AI-First
 
 Every component ships a JSON schema describing its API — attributes, slots, events, example markup, and now a seeded patterns library for multi-component page sections. The merged schema is available at `dist/schema.json`.
+
+A component that enhances native markup rather than replacing it also declares
+the attributes it reads on those elements, under `nativeElements`:
+`data-sortable` on the `<th>` of an `aihio-table`, for instance. They are in
+the minified schema, the prompt fragment, and the docs, and the linter holds
+them to the same enum and boolean rules as the component's own attributes.
 
 ```js
 const schema = await fetch('node_modules/@luntta/aihio/dist/schema.json').then(r => r.json());
@@ -342,6 +352,141 @@ A dialog opens and closes from markup, with no script, through the platform's
 - The declared commands are part of the schema (`commands`), so
   `Aihio.describe('aihio-dialog').commands` lists them.
 
+## Tables
+
+`aihio-table` wraps a native `<table>` rather than replacing it, so rows,
+columns, and header cells keep the platform's table semantics, the ones screen
+reader table navigation is built on, and a server-rendered table is styled and
+readable before the module loads:
+
+```html
+<aihio-table>
+  <table>
+    <caption>Invoices</caption>
+    <thead>
+      <tr>
+        <th scope="col" data-sortable="invoice">Invoice</th>
+        <th scope="col" data-sortable="issued" aria-sort="descending">Issued</th>
+        <th scope="col" data-sortable="amount" data-numeric>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"><a href="/invoices/1044">INV-1044</a></th>
+        <td><time datetime="2026-09-12">12 Sep 2026</time></td>
+        <td data-numeric>€12,400.00</td>
+      </tr>
+    </tbody>
+  </table>
+</aihio-table>
+```
+
+- `data-sortable` on a `<th>` makes its column sortable. The header's content
+  moves into a `<button>` inside the `<th>`, which keeps its role and carries
+  `aria-sort`, and the new order is announced in a polite status region. The
+  first activation sorts ascending, the next descending.
+- Rows sort by value. A column of figures compares as numbers, read the way the
+  page's `lang` writes them (`€1,250.50`, `1 250,50 €`); text compares in that
+  language, with digits in numeric order (`Item 2` before `Item 10`); a
+  `<time datetime>` sorts by its machine-readable value; and `data-sort-value`
+  gives a cell an order its words do not have (`High` before `Low`). Rows with
+  no value go last either way, and ties keep their order, so sorting by one
+  column and then another is a two-level sort.
+- `aria-sort` is the order. Write it on the header the rows are sorted by and
+  the table puts them in that order when it loads; set it from script and they
+  re-sort; add or replace rows under it and they take their place. Edits
+  inside a row do not move it.
+- `data-numeric` lines a column of figures up by place value. A row's name,
+  a figure, and a date never wrap; the table scrolls instead.
+- Too wide for its box, the table scrolls inside it, and the box becomes a tab
+  stop and a region named by the caption, so the keyboard can reach it; a
+  shadow marks each edge with rows scrolled past it. `sticky-header` keeps the
+  header in view while the rows scroll in a box up to `--aihio-table-max-height`
+  tall.
+
+When a framework renders the rows from state, or the server sorts them, add
+`manual-sort`. A click still marks the header, announces the sort, and fires
+`aihio-sort` with the column's `data-sortable` name and the direction, but the
+rows stay as rendered, for your code to put in order. Without it the table
+moves its own rows: with `moveBefore()` where the browser has it, so focus
+inside a row survives a sort, and only ever to just before another row, so a
+framework that rendered them still finds them where its list starts and ends.
+
+The table sits on the page canvas; inside `aihio-card` and `aihio-dialog` it
+takes the raised surface. Anywhere else, set `--aihio-table-bg` to the colour
+behind it, which a sticky header paints.
+
+### More rows than a page can hold
+
+`aihio-table` renders every row it is given, and every row costs the browser
+layout: a few thousand are comfortable, and at 100,000 a plain `<table>` takes
+seconds to render and seconds more for each sort. There are two answers.
+
+**Pages**, with `aihio-pagination`. Your code or the server sorts the whole
+list and the table shows one page of it, with `manual-sort`. Everything stays
+in the page: find in page, printing, and a screen reader's table navigation
+all work. Prefer it when people need those.
+
+```html
+<aihio-pagination page="3" pages="4000" href="/invoices?page={page}" aria-label="Invoice pages"></aihio-pagination>
+```
+
+- With `href` each page is a link, with rel="prev" and rel="next", that can open
+  in a new tab; without it each page is a button. `aihio-page` fires first and is
+  cancelable, so a client-side router can take over.
+- The current page carries `aria-current="page"` and is drawn with a border at
+  3:1 and a heavier weight. Past seven pages the list keeps the first, the last,
+  and the pages around the current one, so its length never changes; where that
+  does not fit on one line it draws compact.
+
+**One scrolling list**, with `aihio-data-grid`. Only the rows in view are in
+the page, so 100,000 rows render in about 20ms and a jump to any scroll position
+takes 10–30ms, but your code renders them: the grid asks with `aihio-range`.
+
+```html
+<aihio-data-grid row-count="100000">
+  <table aria-label="Requests">
+    <colgroup><col style="width: 8rem"><col></colgroup>
+    <thead>
+      <tr>
+        <th scope="col" data-sortable="id" aria-sort="ascending">Request</th>
+        <th scope="col" data-sortable="path">Path</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</aihio-data-grid>
+```
+
+```js
+const render = (start, end) => grid.body.replaceChildren(...rows.slice(start, end).map(renderRow));
+grid.addEventListener('aihio-range', ({ detail }) => render(detail.start, detail.end));
+grid.addEventListener('aihio-sort', ({ detail: { column, direction } }) => {
+  sortRows(column, direction);   // the grid then asks for the top rows again
+});
+render(grid.start, grid.end);    // the rows it asked for before you listened
+```
+
+- It follows the WAI-ARIA data grid pattern: the `<table>` is a grid with
+  `aria-rowcount` for every row and `aria-rowindex` on each rendered one, there
+  is one tab stop, and arrow keys, Page Up and Down, Home, End, and
+  Control+Home and End move between cells. Moving to a row that is not rendered
+  scrolls to it, waits for your code to render it, and focuses it.
+- Render into `grid.body`: the grid keeps a section of its own above and below
+  it, which give the box the height of every row. Rows are one line high, and
+  columns take their widths from `<col>` or the header cells, so neither changes
+  as rows come and go.
+- In a framework, keep the range in state and render
+  `rows.slice(start, end)`; React, Vue, and Svelte are exercised in the browser
+  suite. Drop a server response for a range that is no longer `grid.start` to
+  `grid.end`.
+- Find in page, printing, and a screen reader's browse mode reach only the
+  rendered rows. That is the price of the scroll, and why pages come first.
+- Firefox stops a box's height at 17.9 million pixels, which is about 389,000
+  rows of the default height (526,000 compact); Chromium and WebKit stop at
+  33.5 million. Rows past it cannot be scrolled to, so lint and the dev build
+  warn when `row-count` is above 350,000. Page longer lists.
+
 ## Layout
 
 Four primitives keep page composition inside the token system instead of in
@@ -379,6 +524,9 @@ Every event a component dispatches carries an `aihio-` prefix:
 | `aihio-before-close` | `aihio-dialog`, `aihio-dropdown` | `{ reason }` |
 | `aihio-select` | `aihio-dropdown-item` | `{ value }` |
 | `aihio-tab-select` | `aihio-tab` | `{ value }` |
+| `aihio-sort` | `aihio-table`, `aihio-data-grid` | `{ column, direction }` |
+| `aihio-range` | `aihio-data-grid` | `{ start, end }` |
+| `aihio-page` | `aihio-pagination` | `{ page }` |
 
 They all bubble and are composed, which is exactly why the prefix matters: an
 unprefixed `close`, `toggle`, `select`, or `input` reaching a listener higher up

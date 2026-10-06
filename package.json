@@ -53,6 +53,10 @@
       "types": "./dist/combobox.d.ts",
       "default": "./dist/combobox.js"
     },
+    "./data-grid": {
+      "types": "./dist/data-grid.d.ts",
+      "default": "./dist/data-grid.js"
+    },
     "./dialog": {
       "types": "./dist/dialog.d.ts",
       "default": "./dist/dialog.js"
@@ -73,6 +77,10 @@
       "types": "./dist/input.d.ts",
       "default": "./dist/input.js"
     },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "default": "./dist/pagination.js"
+    },
     "./stack": {
       "types": "./dist/stack.d.ts",
       "default": "./dist/stack.js"
@@ -80,6 +88,10 @@
     "./switch": {
       "types": "./dist/switch.d.ts",
       "default": "./dist/switch.js"
+    },
+    "./table": {
+      "types": "./dist/table.d.ts",
+      "default": "./dist/table.js"
     },
     "./tabs": {
       "types": "./dist/tabs.d.ts",

@@ -73,6 +73,9 @@ export default {
     },
     thumbnail: '<aihio-combobox aria-label="Country" value="fi"><aihio-option value="fi">Finland</aihio-option><aihio-option value="se">Sweden</aihio-option></aihio-combobox>',
   },
+  'aihio-data-grid': {
+    thumbnail: '<aihio-data-grid row-count="3" density="compact" style="--aihio-data-grid-height: auto"><table aria-label="Requests preview"><thead><tr><th scope="col" data-sortable="id" aria-sort="ascending">Request</th><th scope="col" data-numeric>Duration</th></tr></thead><tbody><tr><th scope="row">#1</th><td data-numeric>38</td></tr><tr><th scope="row">#2</th><td data-numeric>412</td></tr><tr><th scope="row">#3</th><td data-numeric>17</td></tr></tbody></table></aihio-data-grid>',
+  },
   'aihio-dialog': {
     thumbnail: '<aihio-button commandfor="thumbnail-dialog" command="--open" variant="outline">Open dialog</aihio-button><aihio-dialog id="thumbnail-dialog"><aihio-dialog-header><aihio-dialog-title>A dialog</aihio-dialog-title><aihio-dialog-description>Opened from markup, with no script.</aihio-dialog-description></aihio-dialog-header><aihio-dialog-footer><aihio-button commandfor="thumbnail-dialog" command="--close">Close</aihio-button></aihio-dialog-footer></aihio-dialog>',
   },
@@ -95,6 +98,9 @@ export default {
     },
     thumbnail: '<aihio-input aria-label="Search" placeholder="Search…"></aihio-input>',
   },
+  'aihio-pagination': {
+    thumbnail: '<aihio-pagination page="3" pages="12" href="#pagination-thumbnail-{page}" aria-label="Pagination preview"></aihio-pagination>',
+  },
   'aihio-stack': {
     variants: {
       gap: (value) => `<aihio-stack gap="${value}">${boxes(3)}</aihio-stack>`,
@@ -103,6 +109,13 @@ export default {
   },
   'aihio-switch': {
     thumbnail: '<aihio-field><label slot="label">Email notifications</label><aihio-switch name="thumbnail-notifications" checked></aihio-switch></aihio-field>',
+  },
+  'aihio-table': {
+    layout: 'stack',
+    variants: {
+      density: (value) => `<aihio-table density="${value}"><table><caption>${title(value)} density</caption><thead><tr><th scope="col">Service</th><th scope="col" data-numeric>Requests</th></tr></thead><tbody><tr><th scope="row">api-gateway</th><td data-numeric>12,480</td></tr><tr><th scope="row">billing-worker</th><td data-numeric>3,215</td></tr></tbody></table></aihio-table>`,
+    },
+    thumbnail: '<aihio-table density="compact"><table aria-label="Invoices"><thead><tr><th scope="col" data-sortable aria-sort="ascending">Invoice</th><th scope="col">Status</th><th scope="col" data-numeric>Amount</th></tr></thead><tbody><tr><th scope="row">INV-1042</th><td><aihio-badge variant="success">Paid</aihio-badge></td><td data-numeric>€1,250.00</td></tr><tr><th scope="row">INV-1043</th><td><aihio-badge variant="warning">Due</aihio-badge></td><td data-numeric>€980.50</td></tr></tbody></table></aihio-table>',
   },
   'aihio-tabs': {
     thumbnail: '<aihio-tabs value="general"><aihio-tab-list><aihio-tab value="general">General</aihio-tab><aihio-tab value="billing">Billing</aihio-tab></aihio-tab-list><aihio-tab-panel value="general">General settings</aihio-tab-panel><aihio-tab-panel value="billing">Billing settings</aihio-tab-panel></aihio-tabs>',

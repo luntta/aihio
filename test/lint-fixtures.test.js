@@ -127,6 +127,54 @@ const fixtures = [
       { ruleId: 'a11y-contract', component: 'aihio-switch' },
     ],
   },
+  {
+    file: 'table-without-name.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-table' },
+    ],
+  },
+  {
+    // The table a model writes when it reaches for a sortable table from
+    // scratch: click handlers on the headers, and a row that navigates.
+    file: 'table-hand-rolled-sort.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-table' },
+    ],
+  },
+  {
+    file: 'data-grid-without-row-count.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-data-grid' },
+    ],
+  },
+  {
+    // The table renders every row it is given; a row count is the grid's.
+    file: 'table-row-count.html',
+    expectedIssues: [
+      { ruleId: 'unknown-attribute', component: 'aihio-table' },
+    ],
+  },
+  {
+    file: 'pagination-invented-attributes.html',
+    expectedIssues: [
+      { ruleId: 'unknown-attribute', component: 'aihio-pagination' },
+      { ruleId: 'a11y-contract', component: 'aihio-pagination' },
+    ],
+  },
+  {
+    file: 'pagination-href-without-page.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-pagination' },
+    ],
+  },
+  {
+    // Row and cell components, the shape shadcn/ui's Table is written in.
+    file: 'table-shadcn-rows.html',
+    expectedIssues: [
+      { ruleId: 'unknown-component', component: 'aihio-table-row' },
+      { ruleId: 'missing-required-child', component: 'aihio-table' },
+    ],
+  },
 ];
 
 test('known-bad markup fixtures are caught by the built linter', async () => {
@@ -188,6 +236,39 @@ test('issues carry a suggestion an agent can apply without reading the message',
     'grow justify="between"'
   );
 
+  // A table: its own vocabulary, the parts other systems make components of,
+  // and attributes on the native cells it reads.
+  const table = (head, host = '') => `<aihio-table${host}><table><caption>Invoices</caption><thead><tr>${head}</tr></thead><tbody><tr><td>1</td></tr></tbody></table></aihio-table>`;
+  assert.equal(suggestionFor('<aihio-data-table></aihio-data-table>', 'unknown-component'), '<aihio-table>');
+  assert.equal(suggestionFor('<aihio-table><aihio-table-row></aihio-table-row></aihio-table>', 'unknown-component'), '<tr>');
+  assert.equal(suggestionFor(table('<th>Invoice</th>', ' density="dense"'), 'invalid-enum-attribute'), 'density="compact"');
+  assert.equal(suggestionFor(table('<th>Invoice</th>', ' sticky'), 'unknown-attribute'), 'sticky-header');
+  assert.equal(suggestionFor(table('<th aria-sort="asc" data-sortable>Invoice</th>'), 'invalid-enum-attribute'), 'aria-sort="ascending"');
+  assert.equal(suggestionFor(table('<th sortable>Invoice</th>'), 'table-sortable-header'), 'data-sortable');
+  assert.equal(suggestionFor(table('<th data-sort="invoice">Invoice</th>'), 'table-sortable-header'), 'data-sortable="invoice"');
+
+  // Pagination: the names other pagers give the page, the count, and the URL.
+  assert.equal(suggestionFor('<aihio-pagination current="3" pages="9"></aihio-pagination>', 'unknown-attribute'), 'page');
+  assert.equal(suggestionFor('<aihio-pagination page="3" total="9"></aihio-pagination>', 'unknown-attribute'), 'pages');
+  assert.equal(suggestionFor('<aihio-pagination page="3" pages="9" url="/x?page={page}"></aihio-pagination>', 'unknown-attribute'), 'href');
+  assert.equal(suggestionFor('<aihio-pager></aihio-pager>', 'unknown-component'), '<aihio-pagination>');
+
+  // The grid: the names of virtualized tables elsewhere, and of its count.
+  assert.equal(suggestionFor('<aihio-virtual-table></aihio-virtual-table>', 'unknown-component'), '<aihio-data-grid>');
+  assert.equal(suggestionFor('<aihio-datagrid></aihio-datagrid>', 'unknown-component'), '<aihio-data-grid>');
+  assert.equal(suggestionFor('<aihio-data-grid rows="5000"><table aria-label="Rows"><thead><tr><th>A</th></tr></thead></table></aihio-data-grid>', 'unknown-attribute'), 'row-count');
+  assert.deepEqual(
+    lintMarkup('<aihio-data-grid :row-count="rows.length"><table aria-label="Rows"><thead><tr><th>A</th></tr></thead></table></aihio-data-grid>').issues,
+    [],
+    'a bound row-count is set at runtime'
+  );
+
+  // A template binding is a value set at runtime, not a missing one.
+  const pagination = (attributes) => lintMarkup(`<aihio-pagination ${attributes}></aihio-pagination>`).issues.map((issue) => issue.contract ?? issue.ruleId);
+  assert.deepEqual(pagination(':page="page" :pages="pageCount"'), []);
+  assert.deepEqual(pagination('page="{page}" pages="{pageCount}"'), []);
+  assert.deepEqual(pagination('page="13" pages="12"'), ['pagination-pages']);
+
   // No suggestion rather than a wrong one.
   assert.equal(suggestionFor('<aihio-button icon="plus">Add</aihio-button>', 'unknown-attribute'), undefined);
   assert.equal(suggestionFor('<aihio-button variant="gradient">Go</aihio-button>', 'invalid-enum-attribute'), undefined);
@@ -226,6 +307,13 @@ test('a boolean attribute written as "false" is reported, on sub-components too'
       <aihio-tab-list><aihio-tab value="a">A</aihio-tab><aihio-tab value="b" disabled="false">B</aihio-tab></aihio-tab-list>
       <aihio-tab-panel value="a">A</aihio-tab-panel><aihio-tab-panel value="b">B</aihio-tab-panel>
     </aihio-tabs>
+  `).includes('boolean-attribute-value'));
+
+  // And on the native cells a component reads.
+  assert.ok(ruleIds(`
+    <aihio-table>
+      <table><caption>Invoices</caption><thead><tr><th scope="col" data-numeric="false">Amount</th></tr></thead></table>
+    </aihio-table>
   `).includes('boolean-attribute-value'));
 
   // Presence is what counts, so "true" and a bare attribute are both fine.

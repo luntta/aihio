@@ -1,0 +1,14 @@
+{
+  "id": "data-table",
+  "name": "Data Table",
+  "intents": ["tabular-data", "status", "menu", "primary-action", "navigation", "form-field", "layout"],
+  "description": "A list of records to compare and sort: a heading with the primary action, a search form, a table whose columns sort, whose row headers link to each record, and whose rows carry a status and a menu of actions, and aihio-pagination by link. The table is named by the section's heading, and on a narrow screen it scrolls inside its own box.",
+  "requiredComponents": ["aihio-table", "aihio-button", "aihio-field", "aihio-input", "aihio-stack", "aihio-cluster"],
+  "variations": [
+    {
+      "id": "no-results",
+      "name": "No Results",
+      "description": "A search that matched nothing keeps the column headers, says so in a row spanning them, and links back to every record."
+    }
+  ]
+}

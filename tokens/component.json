@@ -44,5 +44,24 @@
   "dialog": {
     "width": { "$value": "32rem", "$type": "dimension" },
     "padding": { "$value": "1.5rem", "$type": "dimension" }
+  },
+  "data-grid": {
+    "height": {
+      "$value": "min(32rem, 75dvh)",
+      "$type": "dimension",
+      "$description": "How tall a data grid is: the box its rows scroll in."
+    }
+  },
+  "table": {
+    "cell-padding-y": {
+      "default": { "$value": "{spacing.3}", "$type": "dimension" },
+      "compact": { "$value": "{spacing.1-5}", "$type": "dimension" }
+    },
+    "cell-padding-x": { "$value": "{spacing.3}", "$type": "dimension" },
+    "max-height": {
+      "$value": "min(32rem, 75dvh)",
+      "$type": "dimension",
+      "$description": "How tall a table with sticky-header grows before its rows scroll under the header."
+    }
   }
 }

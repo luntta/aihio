@@ -12,6 +12,8 @@ export const A11Y_RULE_IDS = new Set([
   'combobox-form-name',
   'combobox-label',
   'combobox-option-values',
+  'data-grid-row-count',
+  'data-grid-row-limit',
   'dialog-accessible-name',
   'dropdown-trigger-name',
   'field-error-message',
@@ -19,13 +21,22 @@ export const A11Y_RULE_IDS = new Set([
   'input-label',
   'input-error-description',
   'input-form-name',
+  'pagination-href',
+  'pagination-label',
+  'pagination-pages',
   'switch-form-name',
   'switch-label',
   'switch-state-name',
+  'table-accessible-name',
+  'table-click-handler',
+  'table-header-cells',
+  'table-sort-column-name',
   'tabs-value-pairs',
   'toggle-accessible-name',
   'toggle-state-name',
 ]);
+
+const DATA_GRID_ROW_LIMIT = 350000;
 
 const RULES = {
   'alert-announced-content': (node, api) =>
@@ -102,6 +113,17 @@ const RULES = {
     return false;
   },
 
+  // The grid asks for rows by number, so it has to know how many there are.
+  // A count bound by a template is set at runtime.
+  'data-grid-row-count': (node, api) =>
+    !isBound(node, 'row-count', api) && wholeNumber(api.attr(node, 'row-count')) === null,
+
+  // Firefox stops a box's height at 17.9 million pixels (Chromium and WebKit
+  // at 33.5 million), and the scroll ends there: about 389,000 rows of the
+  // default height. The limit leaves room for rows a little taller.
+  'data-grid-row-limit': (node, api) =>
+    (wholeNumber(api.attr(node, 'row-count')) ?? 0) > DATA_GRID_ROW_LIMIT,
+
   'dialog-accessible-name': (node, api) =>
     ownedDescendants(node, 'aihio-dialog-title', 'aihio-dialog', api).length === 0 &&
     !hasNonEmptyAttribute(node, 'aria-label', api),
@@ -146,12 +168,72 @@ const RULES = {
   'input-form-name': (node, api) =>
     api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
 
+  'pagination-href': (node, api) =>
+    api.hasAttr(node, 'href') && !String(api.attr(node, 'href')).includes('{page}'),
+
+  // Several unnamed navigation landmarks, or several with one name, cannot be
+  // told apart in a screen reader's list of landmarks.
+  'pagination-label': (node, api) => {
+    const all = descendants(api.root(node), api).filter((candidate) => api.tag(candidate) === 'aihio-pagination');
+    if (all.length < 2) return false;
+    const name = landmarkName(node, api);
+    return !name || all.some((other) => other !== node && landmarkName(other, api) === name);
+  },
+
+  // A value bound by a template (:pages="total") is set at runtime, and is
+  // not judged here.
+  'pagination-pages': (node, api) => {
+    if (isBound(node, 'pages', api)) return false;
+    const pages = wholeNumber(api.attr(node, 'pages'));
+    if (pages === null) return true;
+    if (pages < 1 || !api.hasAttr(node, 'page') || isBound(node, 'page', api)) return false;
+    const page = wholeNumber(api.attr(node, 'page'));
+    return page === null || page < 1 || page > pages;
+  },
+
   'switch-form-name': (node, api) =>
     api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
 
   'switch-label': (node, api) => !hasAssociatedLabel(node, api),
 
   'switch-state-name': (node, api) => STATE_NAME.test(labelText(node, api)),
+
+  'table-accessible-name': (node, api) => {
+    const table = ownTable(node, api);
+    if (!table) return false;
+    const caption = api.children(table).find((child) => api.tag(child) === 'caption');
+    if (caption && normalizeText(api.text(caption)).length > 0) return false;
+    return !hasNonEmptyAttribute(table, 'aria-label', api) && !referencesExistingIds(table, 'aria-labelledby', api);
+  },
+
+  // A row or cell that holds a link or button already has a keyboard path,
+  // so a click handler that widens its target for the pointer is left alone.
+  'table-click-handler': (node, api) => {
+    const table = ownTable(node, api);
+    if (!table) return false;
+    const rows = tableRows(table, api);
+    return [...rows, ...rows.flatMap((row) => rowCells(row, api))].some(
+      (element) =>
+        CLICK_HANDLER_ATTRIBUTES.some((name) => api.hasAttr(element, name)) &&
+        !descendants(element, api).some((child) => INTERACTIVE_TAGS.has(api.tag(child)))
+    );
+  },
+
+  // A table with no cells yet, still to be filled by script, is not judged.
+  'table-header-cells': (node, api) => {
+    const table = ownTable(node, api);
+    const cells = table ? tableRows(table, api).flatMap((row) => rowCells(row, api)) : [];
+    return cells.length > 0 && cells.every((cell) => api.tag(cell) !== 'th');
+  },
+
+  // A grid's rows are always sorted by your code, as manual-sort's are.
+  'table-sort-column-name': (node, api) => {
+    if (!api.hasAttr(node, 'manual-sort') && api.tag(node) !== 'aihio-data-grid') return false;
+    const table = ownTable(node, api);
+    return Boolean(table) && headerCells(table, api).some(
+      (cell) => api.hasAttr(cell, 'data-sortable') && normalizeText(api.attr(cell, 'data-sortable')).length === 0
+    );
+  },
 
   'tabs-value-pairs': (node, api) => !hasExactTabValuePairs(node, api),
 
@@ -180,6 +262,20 @@ const BUTTON_ONLY_ATTRIBUTES = [
 
 // Click handlers, including template bindings, which parse as attributes too.
 const CLICK_HANDLER_ATTRIBUTES = ['onclick', '@click', 'v-on:click', 'x-on:click'];
+
+// Elements the keyboard reaches on their own.
+const INTERACTIVE_TAGS = new Set([
+  'a',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'aihio-button',
+  'aihio-combobox',
+  'aihio-input',
+  'aihio-switch',
+  'aihio-toggle',
+]);
 
 // A click handler that changes the page: the shape of a link written as a
 // button.
@@ -216,6 +312,52 @@ function labelText(node, api) {
 
   const label = findAncestor(node, 'label', api);
   return label ? normalizeText(api.text(label)) : '';
+}
+
+/** What a landmark is called: its aria-label, or the ids it is labelled by. */
+function landmarkName(node, api) {
+  return normalizeText(api.attr(node, 'aria-label')) || normalizeText(api.attr(node, 'aria-labelledby'));
+}
+
+/** Whether a template binds the attribute (:name, v-bind:name, [name], {name}). */
+function isBound(node, name, api) {
+  return [`:${name}`, `v-bind:${name}`, `[${name}]`, `[attr.${name}]`, `bind:${name}`].some((form) => api.hasAttr(node, form)) ||
+    /^\s*\{.*\}\s*$/.test(api.attr(node, name) ?? '');
+}
+
+function wholeNumber(value) {
+  const text = String(value ?? '').trim();
+  return /^\d+$/.test(text) ? Number(text) : null;
+}
+
+/** The <table> an aihio-table enhances: its first <table> child. */
+function ownTable(node, api) {
+  return api.children(node).find((child) => api.tag(child) === 'table') ?? null;
+}
+
+/**
+ * A table's own rows, in its sections or (for a table built in script)
+ * directly under it. Rows of a table nested in a cell belong to that table.
+ */
+function tableRows(table, api) {
+  return api.children(table).flatMap((child) => {
+    const tag = api.tag(child);
+    if (tag === 'tr') return [child];
+    if (tag !== 'thead' && tag !== 'tbody' && tag !== 'tfoot') return [];
+    return api.children(child).filter((row) => api.tag(row) === 'tr');
+  });
+}
+
+function rowCells(row, api) {
+  return api.children(row).filter((cell) => api.tag(cell) === 'th' || api.tag(cell) === 'td');
+}
+
+function headerCells(table, api) {
+  return api.children(table)
+    .filter((child) => api.tag(child) === 'thead')
+    .flatMap((head) => api.children(head).filter((row) => api.tag(row) === 'tr'))
+    .flatMap((row) => rowCells(row, api))
+    .filter((cell) => api.tag(cell) === 'th');
 }
 
 /** The control aihio-button delegates to: its first <button> or <a> child. */
