@@ -284,9 +284,9 @@ for (const theme of ['light', 'dark']) {
     await page.keyboard.press('Tab');
     await page.keyboard.press('ArrowDown');
 
-    // #after is the page's bare <button>, only there to tab to. The reset gives
-    // it the page's text colour over the browser's own button background, which
-    // WebKit leaves light in the dark theme.
+    // #after is the page's bare <button>, only there to tab to. In the dark
+    // theme WebKit paints it dark, but computes its background as light grey,
+    // and axe, which reads computed colours, reports contrast that is not there.
     const results = await new AxeBuilder({ page }).include('#fixture').exclude('#after').analyze();
     expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target) }))).toEqual([]);
   });
