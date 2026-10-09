@@ -94,6 +94,39 @@ test('a Finnish page writes and reads dates the Finnish way', async ({ page }) =
   await expect(day(page, '2026-10-09')).toHaveAttribute('aria-label', 'perjantaina 9. lokakuuta 2026');
 });
 
+test.describe('in a browser set to British English', () => {
+  test.use({ locale: 'en-GB' });
+
+  test('a page whose lang names no region writes and reads dates the British way', async ({ page }) => {
+    // The fixture page is lang="en"; the second field names its region.
+    await mount(page, `
+      <aihio-date-picker id="due" aria-label="Due date"></aihio-date-picker>
+      <aihio-date-picker id="us" aria-label="Due date (US)" lang="en-US"></aihio-date-picker>
+    `);
+    await expect(field(page)).toHaveAttribute('placeholder', 'dd/mm/yyyy');
+    await expect(field(page, 'us')).toHaveAttribute('placeholder', 'mm/dd/yyyy');
+
+    await field(page).fill('09/10/2026');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#due')).toHaveJSProperty('value', '2026-10-09');
+    await expect(field(page)).toHaveValue('09/10/2026');
+
+    await toggle(page).click();
+    await expect(popup(page).locator('th').first()).toHaveText('Mon');
+  });
+});
+
+test.describe('in a browser set to Finnish', () => {
+  test.use({ locale: 'fi-FI' });
+
+  test('a page in English takes no region from another language', async ({ page }) => {
+    await mount(page, '<aihio-date-picker id="due" aria-label="Due date"></aihio-date-picker>');
+    await expect(field(page)).toHaveAttribute('placeholder', 'mm/dd/yyyy');
+    await toggle(page).click();
+    await expect(popup(page).locator('th').first()).toHaveText('Sun');
+  });
+});
+
 test('text that is not a date is kept to be corrected, and the field is invalid until it is', async ({ page }) => {
   await mount(page, `
     <form id="form">

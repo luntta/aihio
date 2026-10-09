@@ -9,6 +9,9 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
+    // The date components take the region from the browser where the page's
+    // lang names none, so every machine runs the suite as the same visitor.
+    locale: 'en-US',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

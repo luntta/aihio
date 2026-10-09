@@ -118,7 +118,9 @@ const locales = new Map();
  * the value is a Gregorian date, and the grid lays out Gregorian months.
  */
 export function calendarLocale(lang) {
-  const key = lang ?? '';
+  // The browser's languages can fill in the region, so they are part of the
+  // key, and a change to them in the browser's settings is not missed.
+  const key = `${lang ?? ''} ${visitorLanguages().join()}`;
   let locale = locales.get(key);
   if (!locale) {
     locale = buildLocale(lang);
@@ -128,7 +130,8 @@ export function calendarLocale(lang) {
 }
 
 function buildLocale(lang) {
-  const tag = resolveTag(lang);
+  const requested = withVisitorRegion(lang);
+  const tag = resolveTag(requested);
   const format = (options) => new Intl.DateTimeFormat(tag, { ...options, calendar: 'gregory', timeZone: 'UTC' });
 
   // Two-digit days and months and a four-digit year: every date the same
@@ -169,7 +172,7 @@ function buildLocale(lang) {
 
     /** The day the week starts on, from 0 for Sunday. */
     get firstDay() {
-      firstDay ??= firstDayOf(tag);
+      firstDay ??= firstDayOf(requested, tag);
       return firstDay;
     },
 
@@ -231,6 +234,44 @@ function buildLocale(lang) {
   };
 }
 
+/**
+ * The page's language, in the visitor's region when the page names none.
+ * Most English pages say only "en", which CLDR reads as American English: a
+ * reader in Britain would type 09/10/2026 and get 10 September. A browser
+ * that asks for the same language in a region lends it, so "en" is British
+ * English to a browser set to en-GB, and stays American to one that asks only
+ * for fi-FI. A region the page names is kept, and so is the page's script:
+ * "zh" read in Taiwan is still Simplified Chinese, with Taiwan's week.
+ */
+function withVisitorRegion(lang) {
+  const page = localeOf(lang);
+  if (!page || page.region) return lang;
+  const script = page.maximize().script;
+  for (const preferred of visitorLanguages()) {
+    const visitor = localeOf(preferred);
+    if (visitor?.language !== page.language || !visitor.region) continue;
+    const regional = new Intl.Locale(lang, { region: visitor.region });
+    // A region can bring a script of its own: zh-TW is Traditional.
+    if (regional.maximize().script === script) return regional.toString();
+    return new Intl.Locale(lang, { script, region: visitor.region }).toString();
+  }
+  return lang;
+}
+
+/** The languages the browser asks pages for, the one it prefers first. */
+function visitorLanguages() {
+  return globalThis.navigator?.languages ?? [];
+}
+
+function localeOf(tag) {
+  try {
+    return tag ? new Intl.Locale(tag) : null;
+  } catch {
+    // A malformed tag, or no Intl.Locale.
+    return null;
+  }
+}
+
 function resolveTag(lang) {
   try {
     return new Intl.DateTimeFormat(lang || undefined).resolvedOptions().locale;
@@ -240,9 +281,17 @@ function resolveTag(lang) {
   }
 }
 
-function firstDayOf(tag) {
+/**
+ * The week is the region's, so it is read from the tag asked for: Intl writes
+ * dates for a region it has no data for in the language's own way, resolving
+ * zh-Hans-TW to zh-Hans, but the week is still Taiwan's. A language Intl does
+ * not know is written the browser's way, and takes the browser's week.
+ */
+function firstDayOf(requested, tag) {
   try {
-    const locale = new Intl.Locale(tag);
+    const resolved = new Intl.Locale(tag);
+    const asked = localeOf(requested);
+    const locale = asked?.language === resolved.language ? asked : resolved;
     const info = locale.getWeekInfo?.() ?? locale.weekInfo;
     // Intl counts from 1 for Monday to 7 for Sunday.
     if (info?.firstDay) return info.firstDay % 7;

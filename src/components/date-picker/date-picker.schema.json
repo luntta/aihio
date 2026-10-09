@@ -83,7 +83,7 @@
         "sat",
         "sun"
       ],
-      "description": "The day the calendar's weeks start on. Defaults to the page's language: Monday in Finland, Sunday in the US, Saturday in Egypt."
+      "description": "The day the calendar's weeks start on. Defaults to the page's language and region: Monday in Finland, Sunday in the US, Saturday in Egypt. Where lang names no region (en), the browser's region for that language fills it in."
     },
     "choose-text": {
       "type": "string",
@@ -246,12 +246,12 @@
   "a11yContract": {
     "handled": [
       "A real text <input> to type into, and a real <button> with aria-haspopup=\"dialog\", aria-expanded, and aria-controls that opens the calendar. The button is named \"Choose date\" followed by the field's label, and described by the chosen date in words",
-      "Typed dates are read in the page's language (the closest lang): 9.10.2026 in Finland, 10/9/2026 in the US, and 2026-10-09 anywhere, with any separator, a month name (\"9 Oct 2026\", \"9. lokakuuta\"), two-digit years, no year (this year), the language's own digits, or no separators at all (09102026). The placeholder is the format, written the language's way (mm/dd/yyyy, pp.kk.vvvv, tt.mm.jjjj)",
+      "Typed dates are read in the page's language (the closest lang): 9.10.2026 in Finland, 10/9/2026 in the US, and 2026-10-09 anywhere, with any separator, a month name (\"9 Oct 2026\", \"9. lokakuuta\"), two-digit years, no year (this year), the language's own digits, or no separators at all (09102026). Where lang names no region (en), the browser's region for that language fills it in, so a browser set to en-GB reads 9/10/2026 as 9 October; a region lang names is kept. The placeholder is the format, written the language's way (mm/dd/yyyy, pp.kk.vvvv, tt.mm.jjjj)",
       "Text that is not a date is kept to be corrected, not thrown away, and the field reports it through native validation; so does a date outside min and max or one isDateDisabled rules out, with a localisable message",
       "The calendar is a dialog named \"Choose date\" and the field's label. Focus moves into its grid on the chosen date, or today, and goes back to the button (or the field, when Alt+ArrowDown opened it) when a date is picked or Escape closes it. Focus leaving the field closes it",
       "The grid is a <table role=\"grid\"> with one tab stop. Arrow keys move a day or a week (mirrored right to left), Home and End go to the ends of the week, Page Up and Page Down move a month and, with Shift, a year; Enter or Space picks the day",
       "Each day is named by its full date (\"Friday, October 9, 2026\") and carries aria-selected for the chosen date, aria-current=\"date\" for today, and aria-disabled for a day outside min and max or ruled out by isDateDisabled, which is struck through, not only greyed",
-      "Previous and next month buttons and native month and year selects head the grid; a step is announced in a polite status region. Weeks start on the language's first day, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl",
+      "Previous and next month buttons and native month and year selects head the grid; a step is announced in a polite status region. Weeks start on the first day of the language's region, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl",
       "Escape on a closed field is left alone, so a surrounding dialog still closes. Keys pressed while an IME is composing are left to the IME",
       "The date submits as YYYY-MM-DD through a hidden input under name; required, form reset, <fieldset disabled>, and the form attribute behave natively",
       "The calendar renders in the top layer, flips above the field when there is more room there, and stays inside the visual viewport; on touch screens its days are larger",

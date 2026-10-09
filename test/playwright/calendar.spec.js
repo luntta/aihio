@@ -152,6 +152,21 @@ test('weeks start where the language starts them, unless first-day-of-week says 
   await expect(page.locator('#us tbody tr:last-child')).toHaveAttribute('aria-hidden', 'true');
 });
 
+test.describe('in a browser set to Chinese in Taiwan', () => {
+  test.use({ locale: 'zh-TW' });
+
+  test('a lang with no region takes the browser\'s region for its weeks, and keeps its own script', async ({ page }) => {
+    await mount(page, `
+      <aihio-calendar id="zh" aria-label="交货日期" lang="zh" value="2026-10-14"></aihio-calendar>
+      <aihio-calendar id="cn" aria-label="交货日期" lang="zh-CN" value="2026-10-14"></aihio-calendar>
+    `);
+    // Taiwan's weeks start on Sunday, named in the page's Simplified characters
+    // (周, not Taiwan's 週). A region the page names is kept.
+    await expect(page.locator('#zh th').first()).toHaveText('周日');
+    await expect(page.locator('#cn th').first()).toHaveText('周一');
+  });
+});
+
 test('a day of another month, clicked, takes the calendar to that month', async ({ page }) => {
   await mount(page, '<aihio-calendar id="day" aria-label="Day" value="2026-10-14"></aihio-calendar>');
   await page.locator('#day td[data-outside][data-date="2026-11-02"]').click();

@@ -49,7 +49,7 @@
         "sat",
         "sun"
       ],
-      "description": "The day the weeks start on. Defaults to the page's language: Monday in Finland, Sunday in the US, Saturday in Egypt."
+      "description": "The day the weeks start on. Defaults to the page's language and region: Monday in Finland, Sunday in the US, Saturday in Egypt. Where lang names no region (en), the browser's region for that language fills it in."
     },
     "previous-month-text": {
       "type": "string",
@@ -131,7 +131,7 @@
       "The grid is one tab stop, on the chosen date or today. Arrow keys move a day or a week (mirrored right to left), Home and End go to the ends of the week, Page Up and Page Down move a month and, with Shift, a year; Enter or Space chooses the day",
       "Each day is named by its full date (\"Friday, October 9, 2026\") and carries aria-selected for the chosen date, aria-current=\"date\" for today, and aria-disabled for a day outside min and max or ruled out by isDateDisabled, which is struck through, not only greyed",
       "Previous and next month buttons and native month and year selects head the grid; a step is announced in a polite status region, and the buttons are never disabled under focus",
-      "Weeks start on the language's first day, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl in the page's language (the closest lang)",
+      "Weeks start on the first day of the language's region, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl in the page's language (the closest lang). Where lang names no region (en), the browser's region for that language fills it in",
       "The grid is the same height every month, so the controls above it stay under the pointer",
       "readonly sets aria-readonly and leaves the months browsable; disabled takes the grid out of the tab order",
       "The chosen date submits as YYYY-MM-DD through a hidden input under name; form reset, <fieldset disabled>, and the form attribute behave natively",

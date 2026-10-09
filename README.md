@@ -339,6 +339,11 @@ form in `value`, `min`, and `max`:
   `9. lokakuuta`), a two-digit year, no year (this one), the language's own
   digits, and no separators at all (`09102026`). The placeholder is the format,
   written the language's way: `mm/dd/yyyy`, `pp.kk.vvvv`, `tt.mm.jjjj`.
+- Where `lang` names no region, as `en` does on most English pages, the
+  browser's region for that language fills it in. `en` is British English in a
+  browser set to `en-GB`, where `09/10/2026` is 9 October, and stays American
+  English in one that asks only for `fi-FI`. A region the page names (`en-US`)
+  is kept, and so is its script.
 - Leaving the field, or Enter, commits what was typed and writes it back in
   full. Text that is not a date is kept, to be corrected rather than typed
   again, and the field is invalid until it is.
@@ -349,10 +354,10 @@ form in `value`, `min`, and `max`:
   opens it from the field.
 - Previous and next buttons step a month at a time, and native month and year
   selects jump to any of them, so a birth year is one choice away.
-- The calendar follows the language: the day its week starts on (Monday in
-  Finland, Sunday in the US, Saturday in Egypt), its month and weekday names,
-  and the arrow keys mirrored right to left. The Gregorian calendar is used
-  whatever the language's own.
+- The calendar follows the language and its region: the day its week starts on
+  (Monday in Finland, Sunday in the US, Saturday in Egypt), its month and
+  weekday names, and the arrow keys mirrored right to left. The Gregorian
+  calendar is used whatever the language's own.
 - `min` and `max` strike out the days outside them, keep the keyboard between
   them, and bound the months and years the selects offer. A date typed outside
   them stays the value, as with a native date input, and the field is invalid
