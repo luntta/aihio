@@ -589,7 +589,9 @@ export class AihioDatePicker extends AihioElement {
     if (!this._isOpen) return;
 
     const popup = this._popup;
-    const anchor = this.getBoundingClientRect();
+    // The field, not the element, which a grid or flex row can stretch
+    // taller: the calendar would open that far below the field.
+    const anchor = this._input.getBoundingClientRect();
     const view = visibleArea();
 
     popup.style.removeProperty('--aihio-date-picker-available-height');

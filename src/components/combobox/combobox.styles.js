@@ -85,15 +85,17 @@ export default {
     }
 
     /* A pointer affordance only: it is out of the tab order, and the keyboard
-       opens the list from the input itself. */
+       opens the list from the input itself. As tall as the field, not the
+       element, which a grid or flex row can stretch past the field. */
     aihio-combobox [data-combobox-part="toggle"] {
       position: absolute;
-      inset-block: 0;
+      inset-block-start: 0;
       inset-inline-end: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: var(--aihio-input-height-md);
+      height: var(--aihio-input-height-md);
       margin: 0;
       padding: 0;
       border: 0;
@@ -105,9 +107,11 @@ export default {
     }
     aihio-combobox[size="sm"] [data-combobox-part="toggle"] {
       width: var(--aihio-input-height-sm);
+      height: var(--aihio-input-height-sm);
     }
     aihio-combobox[size="lg"] [data-combobox-part="toggle"] {
       width: var(--aihio-input-height-lg);
+      height: var(--aihio-input-height-lg);
     }
     aihio-combobox [data-combobox-part="toggle"]:hover {
       color: var(--aihio-color-page-fg);

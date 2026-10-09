@@ -255,6 +255,38 @@ test('the list renders in the top layer and flips above a field near the bottom'
   }
 });
 
+test('the toggle and the list stay with the field when a row stretches the element taller', async ({ page }) => {
+  await mount(page, `
+    <div style="display: flex; gap: 16px; height: 200px">
+      <aihio-combobox id="small" aria-label="Home country" size="sm">${COUNTRIES}</aihio-combobox>
+      <aihio-combobox id="country" aria-label="Country">${COUNTRIES}</aihio-combobox>
+      <aihio-combobox id="large" aria-label="Destination" size="lg">${COUNTRIES}</aihio-combobox>
+    </div>
+  `);
+  for (const id of ['small', 'country', 'large']) {
+    const [hostBox, fieldBox, toggleBox] = await Promise.all([
+      page.locator(`#${id}`).boundingBox(),
+      field(page, id).boundingBox(),
+      page.locator(`#${id} [data-combobox-part="toggle"]`).boundingBox(),
+    ]);
+    expect(hostBox.height, 'the row stretches the element').toBe(200);
+    expect(toggleBox.y).toBeCloseTo(fieldBox.y, 1);
+    expect(toggleBox.height).toBeCloseTo(fieldBox.height, 1);
+    expect(toggleBox.x + toggleBox.width).toBeCloseTo(fieldBox.x + fieldBox.width, 1);
+  }
+
+  await field(page).click();
+  const popup = page.locator('#country [data-combobox-part="popup"]');
+  await expect(popup).toHaveAttribute('data-side', 'bottom');
+  await popup.evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+  );
+  const [fieldBox, popupBox] = await Promise.all([field(page).boundingBox(), popup.boundingBox()]);
+  const gap = popupBox.y - (fieldBox.y + fieldBox.height);
+  expect(gap, 'the list opens under the field, not under the element').toBeGreaterThanOrEqual(0);
+  expect(gap, 'the list opens under the field, not under the element').toBeLessThanOrEqual(8);
+});
+
 test('aihio-field wires the label to the input, the list, and the toggle', async ({ page }) => {
   await mount(page, countryField);
   const host = page.locator('#country');

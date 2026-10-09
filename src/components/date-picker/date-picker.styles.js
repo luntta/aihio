@@ -84,15 +84,18 @@ export default {
     }
 
     /* Inside the field's box, at its end. Unlike the combobox's chevron it is
-       a tab stop: the keyboard opens the calendar from it. */
+       a tab stop: the keyboard opens the calendar from it. It is as tall as
+       the field, not the element, which a grid or flex row can stretch past
+       the field. */
     ${toggle()} {
       position: absolute;
-      inset-block: 0;
+      inset-block-start: 0;
       inset-inline-end: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: var(--aihio-input-height-md);
+      height: var(--aihio-input-height-md);
       margin: 0;
       padding: 0;
       border: 0;
@@ -104,9 +107,11 @@ export default {
     }
     aihio-date-picker[size="sm"] [data-date-picker-part="toggle"] {
       width: var(--aihio-input-height-sm);
+      height: var(--aihio-input-height-sm);
     }
     aihio-date-picker[size="lg"] [data-date-picker-part="toggle"] {
       width: var(--aihio-input-height-lg);
+      height: var(--aihio-input-height-lg);
     }
 
     ${toggle(':hover')},

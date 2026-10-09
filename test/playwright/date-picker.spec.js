@@ -447,6 +447,37 @@ test('the calendar renders in the top layer and flips above a field near the bot
   }
 });
 
+test('the button and the calendar stay with the field when a row stretches the element taller', async ({ page }) => {
+  await mount(page, `
+    <div style="display: flex; gap: 16px; height: 200px">
+      <aihio-date-picker id="small" aria-label="Start date" size="sm"></aihio-date-picker>
+      <aihio-date-picker id="due" aria-label="Due date"></aihio-date-picker>
+      <aihio-date-picker id="large" aria-label="End date" size="lg"></aihio-date-picker>
+    </div>
+  `);
+  for (const id of ['small', 'due', 'large']) {
+    const [hostBox, fieldBox, toggleBox] = await Promise.all([
+      page.locator(`#${id}`).boundingBox(),
+      field(page, id).boundingBox(),
+      toggle(page, id).boundingBox(),
+    ]);
+    expect(hostBox.height, 'the row stretches the element').toBe(200);
+    expect(toggleBox.y).toBeCloseTo(fieldBox.y, 1);
+    expect(toggleBox.height).toBeCloseTo(fieldBox.height, 1);
+    expect(toggleBox.x + toggleBox.width).toBeCloseTo(fieldBox.x + fieldBox.width, 1);
+  }
+
+  await toggle(page).click();
+  await expect(popup(page)).toHaveAttribute('data-side', 'bottom');
+  await popup(page).evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+  );
+  const [fieldBox, popupBox] = await Promise.all([field(page).boundingBox(), popup(page).boundingBox()]);
+  const gap = popupBox.y - (fieldBox.y + fieldBox.height);
+  expect(gap, 'the calendar opens under the field, not under the element').toBeGreaterThanOrEqual(0);
+  expect(gap, 'the calendar opens under the field, not under the element').toBeLessThanOrEqual(8);
+});
+
 test('right to left, the arrow keys follow the reading direction', async ({ page }) => {
   await mount(page, '<div dir="rtl"><aihio-date-picker id="due" aria-label="تاريخ" lang="ar-EG" value="2026-10-14"></aihio-date-picker></div>');
   await expect(field(page)).toHaveValue('١٤‏/١٠‏/٢٠٢٦');
