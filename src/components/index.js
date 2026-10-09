@@ -2,9 +2,11 @@ import { AihioAlert } from './alert/alert.js';
 import { AihioAvatar } from './avatar/avatar.js';
 import { AihioBadge } from './badge/badge.js';
 import { AihioButton } from './button/button.js';
+import { AihioCalendar } from './calendar/calendar.js';
 import { AihioCluster } from './cluster/cluster.js';
 import { AihioDataGrid } from './data-grid/data-grid.js';
 import { AihioCombobox, AihioOption } from './combobox/combobox.js';
+import { AihioDatePicker } from './date-picker/date-picker.js';
 import {
   AihioCard,
   AihioCardContent,
@@ -44,6 +46,7 @@ export { AihioAlert };
 export { AihioAvatar };
 export { AihioBadge };
 export { AihioButton };
+export { AihioCalendar };
 export {
   AihioCard,
   AihioCardContent,
@@ -67,6 +70,7 @@ export {
 export { AihioCluster };
 export { AihioDataGrid };
 export { AihioCombobox, AihioOption };
+export { AihioDatePicker };
 export { AihioField };
 export { AihioGrid };
 export { AihioInput };

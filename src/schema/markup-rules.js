@@ -4,7 +4,7 @@
 // rules. Each violation carries its own rule id, which the linter reports as
 // the issue's ruleId.
 
-export const MARKUP_RULE_IDS = new Set(['boolean-attribute-value', 'cluster-needs-grow', 'table-sortable-header']);
+export const MARKUP_RULE_IDS = new Set(['boolean-attribute-value', 'cluster-needs-grow', 'date-range', 'date-value', 'table-sortable-header']);
 
 // Values that read as "off" but, on a boolean attribute, switch it on: the
 // attribute is on whenever it is present.
@@ -18,7 +18,17 @@ const FLEX_FOOTERS = new Set(['aihio-card-footer', 'aihio-dialog-footer']);
 const INVENTED_SORT_ATTRIBUTES = ['sortable', 'sort', 'data-sort', 'data-sort-key', 'data-sort-by'];
 
 // Controls a sortable header cannot hold: its content becomes a <button>.
-const HEADER_CONTROLS = new Set(['a', 'button', 'input', 'select', 'textarea', 'aihio-button', 'aihio-combobox', 'aihio-input', 'aihio-switch', 'aihio-toggle', 'aihio-dropdown']);
+const HEADER_CONTROLS = new Set(['a', 'button', 'input', 'select', 'textarea', 'aihio-button', 'aihio-calendar', 'aihio-combobox', 'aihio-date-picker', 'aihio-input', 'aihio-switch', 'aihio-toggle', 'aihio-dropdown']);
+
+// Components whose value, min, and max are dates, written YYYY-MM-DD.
+const DATE_HOSTS = new Set(['aihio-calendar', 'aihio-date-picker']);
+const DATE_ATTRIBUTES = ['value', 'min', 'max'];
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+// A date with the year first is year, month, day in any language, so it can
+// be rewritten: 2026/10/9, 2026.10.09, 2026-10-9.
+const YEAR_FIRST_DATE = /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\.?$/;
+// Template syntax ({due}, {{ due }}, ${due}) is a value set at runtime.
+const BOUND_VALUE = /[{}$]/;
 
 /**
  * @param {object} node
@@ -67,6 +77,10 @@ export function collectMarkupRuleViolations(node, attributes, api) {
 
   if (api.tag(node) === 'aihio-table' || api.tag(node) === 'aihio-data-grid') {
     violations.push(...collectSortableHeaderViolations(node, api));
+  }
+
+  if (DATE_HOSTS.has(api.tag(node))) {
+    violations.push(...collectDateViolations(node, api));
   }
 
   return violations;
@@ -132,6 +146,65 @@ function collectSortableHeaderViolations(node, api) {
     }
   }
   return violations;
+}
+
+/**
+ * Dates in attributes are YYYY-MM-DD, as a native date input's are, whatever
+ * the page's language: the component shows them the page's way. Anything
+ * else is no date at all to it, and 10/09/2026 is a different day in Helsinki
+ * and in New York.
+ */
+function collectDateViolations(node, api) {
+  const violations = [];
+  const dates = {};
+
+  for (const name of DATE_ATTRIBUTES) {
+    if (!api.hasAttr(node, name)) continue;
+    const value = (api.attr(node, name) ?? '').trim();
+    if (value === '' || BOUND_VALUE.test(value)) continue;
+    if (isIsoDate(value)) {
+      dates[name] = value;
+      continue;
+    }
+
+    const fixed = rewriteYearFirst(value);
+    violations.push({
+      ruleId: 'date-value',
+      severity: 'error',
+      key: `date-value:${name}`,
+      message: fixed
+        ? `${name}="${value}" is not a date the component reads. Write it YYYY-MM-DD: ${name}="${fixed}".`
+        : `${name}="${value}" is not a date the component reads. Write it YYYY-MM-DD (2026-10-09), whatever the page's language; the component shows it the page's way.`,
+      suggestion: fixed ? `${name}="${fixed}"` : undefined,
+    });
+  }
+
+  if (dates.min && dates.max && dates.min > dates.max) {
+    violations.push({
+      ruleId: 'date-range',
+      severity: 'error',
+      key: 'date-range',
+      message: `min="${dates.min}" is after max="${dates.max}", so no date can be chosen.`,
+    });
+  }
+
+  return violations;
+}
+
+function isIsoDate(value) {
+  const match = ISO_DATE.exec(value);
+  if (!match) return false;
+  const [year, month, day] = match.slice(1).map(Number);
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1] ?? 0;
+  return year >= 1 && day >= 1 && day <= days;
+}
+
+function rewriteYearFirst(value) {
+  const match = YEAR_FIRST_DATE.exec(value);
+  if (!match) return null;
+  const date = `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+  return isIsoDate(date) ? date : null;
 }
 
 function hasControl(node, api) {

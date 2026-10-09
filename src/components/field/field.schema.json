@@ -24,10 +24,12 @@
       ]
     },
     "default": {
-      "description": "The control itself, normally aihio-input or aihio-combobox.",
+      "description": "The control itself, normally aihio-input, aihio-combobox, or aihio-date-picker.",
       "accepts": [
         "aihio-input",
         "aihio-combobox",
+        "aihio-date-picker",
+        "aihio-calendar",
         "input",
         "select",
         "textarea"
@@ -56,6 +58,8 @@
     "allowedChildren": [
       "aihio-input",
       "aihio-combobox",
+      "aihio-date-picker",
+      "aihio-calendar",
       "aihio-switch",
       "label",
       "span",

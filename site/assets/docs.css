@@ -730,7 +730,7 @@ a {
   max-width: 100%;
 }
 
-.docs-component-card__preview > :is(aihio-field, aihio-alert, aihio-card, aihio-tabs, aihio-stack, aihio-grid, aihio-combobox, aihio-input) {
+.docs-component-card__preview > :is(aihio-field, aihio-alert, aihio-card, aihio-tabs, aihio-stack, aihio-grid, aihio-combobox, aihio-date-picker, aihio-input) {
   width: 100%;
 }
 

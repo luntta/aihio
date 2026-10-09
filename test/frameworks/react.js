@@ -6,6 +6,9 @@ import '../../dist/aihio.js';
 const GRID_ROWS = Array.from({ length: 100000 }, (_, index) => ({ id: index + 1, name: `Item ${index + 1}` }));
 const GRID_ROWS_REVERSED = [...GRID_ROWS].reverse();
 
+// A function prop: React 19 sets it as a property, as it does value.
+const isWeekend = (date) => [0, 6].includes(new Date(date).getUTCDay());
+
 const FRUITS_INITIAL = ['Apple', 'Banana'];
 const FRUITS_UPDATED = ['Banana', 'Cherry', 'Date'];
 
@@ -54,6 +57,15 @@ function App() {
     }, (value === 'updated' ? FRUITS_UPDATED : FRUITS_INITIAL).map((fruit) =>
       React.createElement('aihio-option', { key: fruit, value: fruit.toLowerCase() }, fruit)
     )),
+    React.createElement('aihio-date-picker', {
+      id: 'framework-date',
+      'aria-label': 'Delivery',
+      value: '2026-10-14',
+      isDateDisabled: isWeekend,
+      'onaihio-change': (event) => {
+        document.body.dataset.dateValue = event.detail.value;
+      },
+    }),
     // The app sorts: rows and aria-sort both render from its state, and the
     // header's text changes after mount, as a translation loading would.
     React.createElement('aihio-table', {

@@ -2,6 +2,7 @@ import { Fragment, createApp, h, nextTick, onMounted, ref } from 'vue';
 import '../../dist/aihio.js';
 
 const FRUITS = ['Banana', 'Cherry', 'Date'];
+const isWeekend = (date) => [0, 6].includes(new Date(date).getUTCDay());
 const GRID_ROWS = Array.from({ length: 100000 }, (_, index) => ({ id: index + 1, name: `Item ${index + 1}` }));
 const GRID_ROWS_REVERSED = [...GRID_ROWS].reverse();
 
@@ -42,6 +43,15 @@ createApp({
       }, (value.value === 'updated' ? ['Banana', 'Cherry', 'Date'] : ['Apple', 'Banana']).map((fruit) =>
         h('aihio-option', { key: fruit, value: fruit.toLowerCase() }, fruit)
       )),
+      h('aihio-date-picker', {
+        id: 'framework-date',
+        'aria-label': 'Delivery',
+        value: '2026-10-14',
+        isDateDisabled: isWeekend,
+        onAihioChange: (event) => {
+          document.body.dataset.dateValue = event.detail.value;
+        },
+      }),
       h('aihio-table', {
         id: 'framework-manual-table',
         'manual-sort': '',

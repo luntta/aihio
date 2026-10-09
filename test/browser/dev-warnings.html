@@ -90,6 +90,8 @@
             </table>
           </aihio-data-grid>
           <aihio-pagination id="bad-pagination" page="13" pages="12" href="/invoices?page="></aihio-pagination>
+          <aihio-date-picker id="bad-date" placeholder="Due date" value="10/09/2026"></aihio-date-picker>
+          <aihio-calendar id="bad-calendar" min="2026-12-01" max="2026-11-01"></aihio-calendar>
           <aihio-table id="bad-sort">
             <table aria-label="Amounts">
               <thead><tr><th scope="col" aria-sort="asc" data-sortable data-numeric="false">Amount</th></tr></thead>
@@ -166,6 +168,22 @@
         assert(
           warnings.some((message) => message.includes('aihio-pagination') && message.includes('Put {page} where the page number goes')),
           'a pagination should warn when its href has no {page}'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-date-picker') && message.includes('fold the open calendar')),
+          'a date picker should warn when it has no label'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-date-picker') && message.includes('value="10/09/2026" is not a date')),
+          'a date picker should warn when a date attribute is not YYYY-MM-DD'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-calendar') && message.includes('Name it after what the date is for')),
+          'a calendar should warn when nothing names it'
+        );
+        assert(
+          warnings.some((message) => message.includes('aihio-calendar') && message.includes('is after max')),
+          'a calendar should warn when min is after max'
         );
         assert(
           warnings.some((message) => message.includes('aihio-table') && message.includes('Name the table')),

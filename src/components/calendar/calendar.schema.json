@@ -1,0 +1,192 @@
+{
+  "$component": "aihio-calendar",
+  "version": "1.0.0",
+  "description": "A month calendar on the page for choosing one date where the choice is the point of the page: a booking day, a delivery day, an appointment. The chosen date submits as YYYY-MM-DD under name. For a date entered in a form field, typed as often as picked, use aihio-date-picker, which opens the same calendar under a field.",
+  "intents": [
+    "form-field",
+    "date-entry",
+    "selection"
+  ],
+  "attributes": {
+    "value": {
+      "type": "string",
+      "description": "The initially chosen date as YYYY-MM-DD, whatever the page's language, and the date a form reset returns to. The calendar opens on its month. The value property carries the live choice."
+    },
+    "name": {
+      "type": "string",
+      "description": "Form field name. The chosen date submits under it as YYYY-MM-DD. Without it the calendar submits nothing."
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the calendar."
+    },
+    "min": {
+      "type": "string",
+      "description": "The earliest date that can be chosen, as YYYY-MM-DD. Earlier days are struck through, and the months and years offered stop at it."
+    },
+    "max": {
+      "type": "string",
+      "description": "The latest date that can be chosen, as YYYY-MM-DD."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows the calendar dimmed, out of the tab order, and submits nothing."
+    },
+    "readonly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows the chosen date and lets the months be browsed, without letting the date change. The date still submits."
+    },
+    "first-day-of-week": {
+      "type": "enum",
+      "values": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "description": "The day the weeks start on. Defaults to the page's language: Monday in Finland, Sunday in the US, Saturday in Egypt."
+    },
+    "previous-month-text": {
+      "type": "string",
+      "default": "Previous month",
+      "description": "The previous month button's name. For localisation."
+    },
+    "next-month-text": {
+      "type": "string",
+      "default": "Next month",
+      "description": "The next month button's name. For localisation."
+    }
+  },
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Get or set the chosen date as YYYY-MM-DD, or \"\" for none. Anything that is not a date clears it. Setting it shows its month and does not fire aihio-change."
+    },
+    "defaultValue": {
+      "type": "string",
+      "description": "Get or set the reset value reflected by the value attribute"
+    },
+    "valueAsDate": {
+      "type": "Date | null",
+      "description": "Get or set the chosen date as the UTC midnight it starts at, as a native date input's valueAsDate is."
+    },
+    "isDateDisabled": {
+      "type": "((date: string) => boolean) | null",
+      "description": "Called with each date shown, as YYYY-MM-DD. A date it returns true for is struck through and cannot be chosen. Set it again when the dates it rules out change. Read a weekday as new Date(date).getUTCDay()."
+    },
+    "month": {
+      "type": "string",
+      "description": "Get or set the month shown, as YYYY-MM. Setting it shows that month without choosing a date, and fires aihio-month."
+    },
+    "form": {
+      "type": "HTMLFormElement | null",
+      "readonly": true,
+      "description": "The owning form, or null outside one"
+    }
+  },
+  "methods": {
+    "focus()": {
+      "description": "Moves focus to the grid's tab stop: the chosen date, or else today.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "events": {
+    "aihio-change": {
+      "description": "Fired when the person chooses a different date, or when a form reset changes it. Not fired for programmatic changes.",
+      "detail": {
+        "value": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-month": {
+      "description": "Fired when the calendar shows another month: the month as YYYY-MM, and its first and last day. Fetch the dates to rule out for that month here, then set isDateDisabled again. The month property has the one shown first.",
+      "detail": {
+        "month": "string",
+        "start": "string",
+        "end": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "The calendar is a group, named by its label, holding the month controls and a <table role=\"grid\"> named by the month it shows",
+      "The grid is one tab stop, on the chosen date or today. Arrow keys move a day or a week (mirrored right to left), Home and End go to the ends of the week, Page Up and Page Down move a month and, with Shift, a year; Enter or Space chooses the day",
+      "Each day is named by its full date (\"Friday, October 9, 2026\") and carries aria-selected for the chosen date, aria-current=\"date\" for today, and aria-disabled for a day outside min and max or ruled out by isDateDisabled, which is struck through, not only greyed",
+      "Previous and next month buttons and native month and year selects head the grid; a step is announced in a polite status region, and the buttons are never disabled under focus",
+      "Weeks start on the language's first day, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl in the page's language (the closest lang)",
+      "The grid is the same height every month, so the controls above it stay under the pointer",
+      "readonly sets aria-readonly and leaves the months browsable; disabled takes the grid out of the tab order",
+      "The chosen date submits as YYYY-MM-DD through a hidden input under name; form reset, <fieldset disabled>, and the form attribute behave natively",
+      "Forced colours restate the chosen, today, and unavailable days with system colours"
+    ],
+    "required": [
+      {
+        "when": "the calendar is not inside an aihio-field",
+        "requirement": "Name it after what the date is for, with aria-labelledby pointing at visible text or aria-label. Without a name, its group says nothing about the date it holds.",
+        "severity": "error",
+        "rule": "calendar-label"
+      },
+      {
+        "when": "the calendar is inside a <form> and its date should be submitted",
+        "requirement": "Set name. A calendar without a name is omitted from FormData.",
+        "severity": "warn",
+        "rule": "calendar-form-name"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<h2>Choose a day</h2>\n<aihio-calendar name=\"delivery-day\"></aihio-calendar>",
+      "reason": "The heading is not associated with the calendar, so its group is unnamed. Point aria-labelledby at the heading, or put the calendar in aihio-field.",
+      "fix": "<h2 id=\"delivery-day-heading\">Choose a day</h2>\n<aihio-calendar name=\"delivery-day\" aria-labelledby=\"delivery-day-heading\"></aihio-calendar>",
+      "rule": "calendar-label"
+    },
+    {
+      "markup": "<aihio-calendar aria-label=\"Delivery day\" value=\"9.10.2026\"></aihio-calendar>",
+      "reason": "Dates in attributes are YYYY-MM-DD whatever the page's language. The calendar shows the date the page's way.",
+      "fix": "<aihio-calendar aria-label=\"Delivery day\" value=\"2026-10-09\"></aihio-calendar>",
+      "rule": "date-value"
+    },
+    {
+      "markup": "<aihio-calendar aria-label=\"Delivery day\" min-date=\"2026-10-12\"></aihio-calendar>",
+      "reason": "The earliest date is min. Nothing reads min-date, so every day stays open.",
+      "fix": "<aihio-calendar aria-label=\"Delivery day\" min=\"2026-10-12\"></aihio-calendar>",
+      "rule": "unknown-attribute"
+    }
+  ],
+  "examples": [
+    {
+      "title": "A booking day",
+      "description": "In a field, named by its label. Days outside min and max are struck through.",
+      "markup": "<form>\n  <aihio-field>\n    <span slot=\"label\">Delivery day</span>\n    <aihio-calendar name=\"delivery-day\" min=\"2026-10-12\" max=\"2026-11-27\"></aihio-calendar>\n    <span slot=\"description\">Deliveries run until 27 November.</span>\n  </aihio-field>\n</form>"
+    },
+    {
+      "title": "A chosen date, read only",
+      "description": "readonly keeps the months browsable and the date fixed.",
+      "markup": "<aihio-calendar aria-label=\"Contract start\" value=\"2026-11-02\" readonly></aihio-calendar>"
+    },
+    {
+      "title": "Weeks from Monday",
+      "description": "first-day-of-week overrides the language's own first day.",
+      "markup": "<aihio-calendar aria-label=\"Week starting\" first-day-of-week=\"mon\" lang=\"en-US\"></aihio-calendar>"
+    }
+  ]
+}

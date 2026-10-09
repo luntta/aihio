@@ -168,6 +168,41 @@ const fixtures = [
     ],
   },
   {
+    file: 'date-picker-missing-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-date-picker' },
+    ],
+  },
+  {
+    // Dates written the way the page shows them, rather than YYYY-MM-DD.
+    file: 'date-picker-locale-value.html',
+    expectedIssues: [
+      { ruleId: 'date-value', component: 'aihio-date-picker' },
+      { ruleId: 'date-value', component: 'aihio-date-picker' },
+    ],
+  },
+  {
+    // Options carried over from other date pickers.
+    file: 'date-picker-invented-attributes.html',
+    expectedIssues: [
+      { ruleId: 'unknown-attribute', component: 'aihio-date-picker' },
+      { ruleId: 'unknown-attribute', component: 'aihio-date-picker' },
+      { ruleId: 'unknown-attribute', component: 'aihio-date-picker' },
+    ],
+  },
+  {
+    file: 'calendar-without-label.html',
+    expectedIssues: [
+      { ruleId: 'a11y-contract', component: 'aihio-calendar' },
+    ],
+  },
+  {
+    file: 'date-range-inverted.html',
+    expectedIssues: [
+      { ruleId: 'date-range', component: 'aihio-calendar' },
+    ],
+  },
+  {
     // Row and cell components, the shape shadcn/ui's Table is written in.
     file: 'table-shadcn-rows.html',
     expectedIssues: [
@@ -268,6 +303,24 @@ test('issues carry a suggestion an agent can apply without reading the message',
   assert.deepEqual(pagination(':page="page" :pages="pageCount"'), []);
   assert.deepEqual(pagination('page="{page}" pages="{pageCount}"'), []);
   assert.deepEqual(pagination('page="13" pages="12"'), ['pagination-pages']);
+
+  // Dates: other systems' names for the components and their options, and a
+  // date that can be rewritten as YYYY-MM-DD without guessing the order.
+  const picker = (attributes) => `<aihio-date-picker aria-label="Due date" ${attributes}></aihio-date-picker>`;
+  assert.equal(suggestionFor('<aihio-datepicker></aihio-datepicker>', 'unknown-component'), '<aihio-date-picker>');
+  assert.equal(suggestionFor('<aihio-date-input></aihio-date-input>', 'unknown-component'), '<aihio-date-picker>');
+  assert.equal(suggestionFor('<aihio-day-picker></aihio-day-picker>', 'unknown-component'), '<aihio-calendar>');
+  assert.equal(suggestionFor(picker('min-date="2026-10-01"'), 'unknown-attribute'), 'min');
+  assert.equal(suggestionFor(picker('week-start="mon"'), 'unknown-attribute'), 'first-day-of-week');
+  assert.equal(suggestionFor(picker('first-day-of-week="monday"'), 'invalid-enum-attribute'), 'first-day-of-week="mon"');
+  assert.equal(suggestionFor(picker('first-day-of-week="0"'), 'invalid-enum-attribute'), 'first-day-of-week="sun"');
+  assert.equal(suggestionFor(picker('value="2026/10/9"'), 'date-value'), 'value="2026-10-09"');
+  assert.equal(suggestionFor(picker('max="2026-1-31"'), 'date-value'), 'max="2026-01-31"');
+  assert.equal(suggestionFor(picker('value="10/09/2026"'), 'date-value'), undefined, 'day and month could be either way round');
+  assert.deepEqual(lintMarkup(picker('value="2026-02-30"')).issues.map((issue) => issue.ruleId), ['date-value'], 'not a day');
+  assert.deepEqual(lintMarkup(picker('value="2028-02-29" min="2026-01-01" max="2030-12-31"')).issues, [], 'a leap day');
+  assert.deepEqual(lintMarkup(picker(':value="due" min="{today}" max="{{ last }}"')).issues, [], 'bound dates are set at runtime');
+  assert.deepEqual(lintMarkup(picker('value=""')).issues, [], 'an empty value is no date, which is fine');
 
   // No suggestion rather than a wrong one.
   assert.equal(suggestionFor('<aihio-button icon="plus">Add</aihio-button>', 'unknown-attribute'), undefined);

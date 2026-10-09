@@ -8,12 +8,16 @@ export const A11Y_RULE_IDS = new Set([
   'button-link-attributes',
   'button-link-href',
   'button-link-navigation',
+  'calendar-form-name',
+  'calendar-label',
   'card-click-handler',
   'combobox-form-name',
   'combobox-label',
   'combobox-option-values',
   'data-grid-row-count',
   'data-grid-row-limit',
+  'date-picker-form-name',
+  'date-picker-label',
   'dialog-accessible-name',
   'dropdown-trigger-name',
   'field-error-message',
@@ -84,6 +88,16 @@ const RULES = {
   'button-link-navigation': (node, api) =>
     NAVIGATION_HANDLER_ATTRIBUTES.some((name) => NAVIGATION_HANDLER.test(api.attr(node, name) ?? '')),
 
+  'calendar-form-name': (node, api) =>
+    api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
+
+  // The calendar is a group, which nothing names on its own: a wrapping
+  // <label> does not label a group, and its text would include every day.
+  'calendar-label': (node, api) =>
+    !findAncestor(node, 'aihio-field', api) &&
+    !hasNonEmptyAttribute(node, 'aria-label', api) &&
+    !referencesExistingIds(node, 'aria-labelledby', api),
+
   // A click handler on the card is reachable by pointer only. Giving the card
   // a role and a tab stop is the author's way out; a link inside it is better.
   'card-click-handler': (node, api) =>
@@ -124,6 +138,16 @@ const RULES = {
   'data-grid-row-limit': (node, api) =>
     (wholeNumber(api.attr(node, 'row-count')) ?? 0) > DATA_GRID_ROW_LIMIT,
 
+  'date-picker-form-name': (node, api) =>
+    api.tag(owningForm(node, api)) === 'form' && !hasNonEmptyAttribute(node, 'name', api),
+
+  // As combobox-label: a wrapping <label> would take the open calendar's
+  // month, weekdays, and days into the field's name.
+  'date-picker-label': (node, api) =>
+    !findAncestor(node, 'aihio-field', api) &&
+    !hasNonEmptyAttribute(node, 'aria-label', api) &&
+    !referencesExistingIds(node, 'aria-labelledby', api),
+
   'dialog-accessible-name': (node, api) =>
     ownedDescendants(node, 'aihio-dialog-title', 'aihio-dialog', api).length === 0 &&
     !hasNonEmptyAttribute(node, 'aria-label', api),
@@ -155,7 +179,7 @@ const RULES = {
     const label = owned.find((child) => api.attr(child, 'slot') === 'label');
     if (label && hasContent(label, api)) return false;
     const control = owned.find((child) =>
-      ['aihio-input', 'aihio-combobox', 'aihio-switch', 'input', 'select', 'textarea'].includes(api.tag(child))
+      ['aihio-input', 'aihio-combobox', 'aihio-date-picker', 'aihio-calendar', 'aihio-switch', 'input', 'select', 'textarea'].includes(api.tag(child))
     );
     return !control || !hasNonEmptyAttribute(control, 'aria-label', api);
   },
@@ -271,7 +295,9 @@ const INTERACTIVE_TAGS = new Set([
   'select',
   'textarea',
   'aihio-button',
+  'aihio-calendar',
   'aihio-combobox',
+  'aihio-date-picker',
   'aihio-input',
   'aihio-switch',
   'aihio-toggle',

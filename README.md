@@ -54,7 +54,7 @@ if (!customElements.get(AihioButton.tag)) {
 }
 ```
 
-The same form is available for all 19 top-level components. Import
+The same form is available for all 21 top-level components. Import
 `aihio/runtime` when schema inspection is needed without importing component
 implementations.
 
@@ -180,6 +180,8 @@ In Claude Code: `claude mcp add aihio -- npx -y @luntta/aihio mcp`.
 | `aihio-data-grid` | Data grid for more rows than a page can hold: renders only the rows in view, with the WAI-ARIA grid keyboard |
 | `aihio-pagination` | Previous, next, and the pages around the current one, as links (with `href`) or buttons |
 | `aihio-combobox` | Filterable single-select field with keyboard navigation, async options, and optional free text |
+| `aihio-date-picker` | Date field: typed the way the page's language writes dates, or picked from a calendar under it; submits `YYYY-MM-DD` |
+| `aihio-calendar` | Month calendar on the page for choosing one date, such as a delivery day; submits `YYYY-MM-DD` |
 | `aihio-card` | Content container with header, title, description, content, and footer sub-components |
 | `aihio-badge` | Small status indicator with 6 variants (default, secondary, outline, success, warning, destructive) |
 | `aihio-alert` | Callout with title/description slots and 4 variants; only `destructive` announces assertively |
@@ -315,6 +317,71 @@ Svelte own them: the framework adds and removes its own nodes, and the
 component re-renders the list from them. `host.replaceChildren(...options)`
 is fine too. The component puts back the input it would otherwise take with
 it, and focus with it, so typing is not interrupted.
+
+### Dates
+
+`aihio-date-picker` is the field for a date that is typed as often as it is
+picked: a due date, a birth date. `aihio-calendar` is the same month grid on
+the page, for a date chosen there, such as a delivery day. Both submit the date
+as `YYYY-MM-DD`, as a native `<input type="date">` does, and take it in that
+form in `value`, `min`, and `max`:
+
+```html
+<aihio-field>
+  <label slot="label">Due date</label>
+  <aihio-date-picker name="due-date" value="2026-10-30" min="2026-10-01"></aihio-date-picker>
+</aihio-field>
+```
+
+- The field reads a date the way the page's language writes one (the closest
+  `lang`): `9.10.2026` in Finland, `10/9/2026` in the US, and `2026-10-09`
+  anywhere. Any separator works, and so do a month name (`9 Oct 2026`,
+  `9. lokakuuta`), a two-digit year, no year (this one), the language's own
+  digits, and no separators at all (`09102026`). The placeholder is the format,
+  written the language's way: `mm/dd/yyyy`, `pp.kk.vvvv`, `tt.mm.jjjj`.
+- Leaving the field, or Enter, commits what was typed and writes it back in
+  full. Text that is not a date is kept, to be corrected rather than typed
+  again, and the field is invalid until it is.
+- The button opens the calendar under the field, with focus on the chosen date
+  or today. The arrow keys move a day or a week, Home and End go to the ends of
+  the week, Page Up and Page Down move a month (a year with Shift), and Enter
+  picks. Escape closes it and focus goes back to the button. Alt+ArrowDown
+  opens it from the field.
+- Previous and next buttons step a month at a time, and native month and year
+  selects jump to any of them, so a birth year is one choice away.
+- The calendar follows the language: the day its week starts on (Monday in
+  Finland, Sunday in the US, Saturday in Egypt), its month and weekday names,
+  and the arrow keys mirrored right to left. The Gregorian calendar is used
+  whatever the language's own.
+- `min` and `max` strike out the days outside them, keep the keyboard between
+  them, and bound the months and years the selects offer. A date typed outside
+  them stays the value, as with a native date input, and the field is invalid
+  until it changes.
+
+For anything finer (weekends, holidays, days already booked), give
+`isDateDisabled` a function. It is called with each date shown, as
+`YYYY-MM-DD`, and a date it returns true for is struck through and cannot be
+picked:
+
+```js
+picker.isDateDisabled = (date) => [0, 6].includes(new Date(date).getUTCDay());
+
+// Booked days from a server, a month at a time.
+picker.addEventListener('aihio-month', async ({ detail }) => {
+  const booked = new Set(await fetchBookedDays(detail.start, detail.end));
+  picker.isDateDisabled = (date) => booked.has(date);
+});
+```
+
+`new Date('2026-10-10')` is midnight UTC, so read the weekday with
+`getUTCDay()`: `getDay()` is a day early anywhere west of Greenwich.
+
+Month and weekday names, and the Month and Year labels, come from `Intl`. The
+rest is in attributes for localisation: `choose-text`, `previous-month-text`,
+`next-month-text`, and the validation messages `invalid-text`, `min-text`,
+`max-text`, and `unavailable-text`. Listen for `aihio-change`: the native
+`input` and `change` events come from the text field and carry its text, not
+the date.
 
 ## Dialogs
 
@@ -515,12 +582,14 @@ Every event a component dispatches carries an `aihio-` prefix:
 | `aihio-input` | `aihio-input` | `{ value }` |
 | `aihio-change` | `aihio-input` | `{ value }` |
 | `aihio-change` | `aihio-combobox` | `{ value, label }` |
+| `aihio-change` | `aihio-date-picker`, `aihio-calendar` | `{ value }` |
 | `aihio-change` | `aihio-switch` | `{ checked }` |
 | `aihio-search` | `aihio-combobox` | `{ query }` |
 | `aihio-toggle` | `aihio-toggle` | `{ pressed }` |
 | `aihio-open`, `aihio-close` | `aihio-dialog`, `aihio-dropdown` | — |
-| `aihio-open` | `aihio-combobox` | — |
-| `aihio-close` | `aihio-combobox` | `{ reason }` |
+| `aihio-open` | `aihio-combobox`, `aihio-date-picker` | — |
+| `aihio-close` | `aihio-combobox`, `aihio-date-picker` | `{ reason }` |
+| `aihio-month` | `aihio-date-picker`, `aihio-calendar` | `{ month, start, end }` |
 | `aihio-before-close` | `aihio-dialog`, `aihio-dropdown` | `{ reason }` |
 | `aihio-select` | `aihio-dropdown-item` | `{ value }` |
 | `aihio-tab-select` | `aihio-tab` | `{ value }` |
@@ -546,7 +615,9 @@ to the prefixed pair when you want `detail`.
 Components are light DOM unless they need a shadow root (only `aihio-dialog`,
 `aihio-dropdown`, and `aihio-tabs` do), every attribute is a string or boolean,
 and nothing takes an object or array prop. That is the shape that survives a
-virtual DOM without a wrapper layer.
+virtual DOM without a wrapper layer. The one function, `isDateDisabled` on the
+date components, is a property, and React 19, Vue, and Svelte each set it as
+one.
 
 React 19, Vue 3, and Svelte 5 are exercised in the browser test suite. Each can
 set the `value` property and receive the native bubbling `input` event without

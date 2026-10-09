@@ -102,7 +102,7 @@ test('schema output is sorted and includes all components', () => {
   const sorted = [...components].sort((left, right) => left.localeCompare(right));
 
   assert.deepEqual(components, sorted);
-  assert.equal(components.length, 19);
+  assert.equal(components.length, 21);
   assert.equal(components[0], 'aihio-alert');
   assert.equal(components.at(-1), 'aihio-toggle');
 
@@ -320,7 +320,7 @@ test('package exports include generated declaration entrypoints', () => {
   assert.equal(pkg.exports['./lint'].default, './dist/lint.js');
   assert.equal(pkg.exports['./prompt'].types, './dist/prompt.d.ts');
   assert.equal(pkg.exports['./prompt'].default, './dist/prompt.js');
-  for (const component of ['alert', 'avatar', 'badge', 'button', 'card', 'cluster', 'combobox', 'data-grid', 'dialog', 'dropdown', 'field', 'input', 'pagination', 'stack', 'table', 'tabs', 'toggle']) {
+  for (const component of ['alert', 'avatar', 'badge', 'button', 'calendar', 'card', 'cluster', 'combobox', 'data-grid', 'date-picker', 'dialog', 'dropdown', 'field', 'input', 'pagination', 'stack', 'table', 'tabs', 'toggle']) {
     assert.equal(pkg.exports[`./${component}`].types, `./dist/${component}.d.ts`);
     assert.equal(pkg.exports[`./${component}`].default, `./dist/${component}.js`);
   }
@@ -339,9 +339,10 @@ test('granular component entrypoints do not pull the whole library into the bund
   assert.doesNotMatch(button, /aihio-dialog|aihio-tabs|aihio-dropdown/);
   assert.ok(Buffer.byteLength(table) < 15_000, 'table entry stays below its focused bundle budget');
   assert.doesNotMatch(table, /aihio-dialog|aihio-tabs|aihio-dropdown|aihio-button/);
-  // The grid carries a keyboard model and its virtualization, so its budget
-  // is larger; what each budget catches is an entry that pulls in the rest.
-  for (const [name, budget] of [['pagination', 15_000], ['data-grid', 20_000]]) {
+  // The grid carries a keyboard model and its virtualization, and the date
+  // components their calendar and every language's dates, so their budgets
+  // are larger; what each budget catches is an entry that pulls in the rest.
+  for (const [name, budget] of [['pagination', 15_000], ['data-grid', 20_000], ['calendar', 20_000], ['date-picker', 30_000]]) {
     const entry = readFileSync(resolve(root, `dist/${name}.js`), 'utf8');
     assert.ok(Buffer.byteLength(entry) < budget, `${name} entry stays below its focused bundle budget`);
     assert.doesNotMatch(entry, /aihio-dialog|aihio-tabs|aihio-dropdown|aihio-button/);
@@ -441,7 +442,7 @@ test('every counterexample is caught by the rule it names, and its fix is clean'
 test('minified schema is emitted without prose and is well-formed JSON', () => {
   const minified = JSON.parse(readFileSync(resolve(root, 'dist/schema.min.json'), 'utf8'));
 
-  assert.equal(minified.components.length, 19);
+  assert.equal(minified.components.length, 21);
   assert.ok(Array.isArray(minified.intents), 'minified intents is a flat array of names');
   assert.equal(minified.patterns.length, 9);
 

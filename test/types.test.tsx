@@ -3,6 +3,8 @@ import { AihioDialog } from '@luntta/aihio/dialog';
 import { AihioTable } from '@luntta/aihio/table';
 import { AihioDataGrid } from '@luntta/aihio/data-grid';
 import { AihioPagination } from '@luntta/aihio/pagination';
+import { AihioDatePicker } from '@luntta/aihio/date-picker';
+import { AihioCalendar } from '@luntta/aihio/calendar';
 
 declare const input: AihioInput;
 
@@ -61,4 +63,22 @@ pagination.page = 3;
 const pages: number = pagination.pages;
 const paginationJsx = <aihio-pagination page={3} pages={12} href="/invoices?page={page}" aria-label="Invoice pages" />;
 
-void [currentValue, defaultValue, form, validity, valid, reported, a11yRule, buttonProps, dialog, jsx, tableElement, tableJsx, badDensity, window, gridBody, gridJsx, pages, paginationJsx];
+const picker = new AihioDatePicker();
+picker.value = '2026-10-09';
+const pickedDate: Date | null = picker.valueAsDate;
+picker.isDateDisabled = (date) => date.endsWith('-25');
+picker.isDateDisabled = null;
+// @ts-expect-error isDateDisabled is called with a YYYY-MM-DD string
+picker.isDateDisabled = (date: Date) => date.getUTCDay() === 0;
+const pickerControl: HTMLInputElement | null = picker.control;
+picker.open();
+const pickerJsx = <aihio-date-picker name="due" value="2026-10-09" min="2026-10-01" first-day-of-week="mon" size="sm" />;
+// @ts-expect-error first-day-of-week is a three-letter day
+const badWeekStart = <aihio-date-picker first-day-of-week="monday" />;
+
+const calendar = new AihioCalendar();
+calendar.month = '2026-12';
+const shownMonth: string = calendar.month;
+const calendarJsx = <aihio-calendar aria-label="Delivery day" name="day" readonly first-day-of-week="sun" />;
+
+void [currentValue, defaultValue, form, validity, valid, reported, a11yRule, buttonProps, dialog, jsx, tableElement, tableJsx, badDensity, window, gridBody, gridJsx, pages, paginationJsx, pickedDate, pickerControl, pickerJsx, badWeekStart, shownMonth, calendarJsx];

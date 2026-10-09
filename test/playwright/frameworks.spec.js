@@ -36,6 +36,23 @@ for (const framework of ['react', 'vue', 'svelte']) {
     await expect(input).toHaveValue('Cherry');
   });
 
+  test(`${framework} sets a date picker's value and isDateDisabled as properties, and hears aihio-change`, async ({ page }) => {
+    await page.goto(`/test/frameworks/framework.html?framework=${framework}`);
+    await expect(page.locator('body')).toHaveAttribute('data-status', 'ready');
+
+    const picker = page.locator('#framework-date');
+    await expect(picker).toHaveJSProperty('value', '2026-10-14');
+    await expect(picker.locator('[data-date-picker-part="input"]')).toHaveValue('10/14/2026');
+    expect(await picker.evaluate((element) => typeof element.isDateDisabled)).toBe('function');
+    expect(await picker.evaluate((element) => element.hasAttribute('isdatedisabled'))).toBe(false);
+
+    await picker.locator('[data-date-picker-part="toggle"]').click();
+    await expect(picker.locator('td[data-date="2026-10-17"]:not([data-outside])'), 'a Saturday').toHaveAttribute('aria-disabled', 'true');
+    await picker.locator('td[data-date="2026-10-16"]:not([data-outside])').click();
+    await expect(page.locator('body')).toHaveAttribute('data-date-value', '2026-10-16');
+    await expect(picker.locator('[data-date-picker-part="input"]')).toHaveValue('10/16/2026');
+  });
+
   test(`${framework} sorts a manual-sort table's rows from state, and its header keeps one button`, async ({ page }) => {
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));

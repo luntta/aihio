@@ -1,0 +1,329 @@
+{
+  "$component": "aihio-date-picker",
+  "version": "1.0.0",
+  "description": "A form field for one date (a due date, a birth date, a travel date), typed in the page's language or picked from a month calendar that a button opens under the field. The date submits as YYYY-MM-DD, as a native date input's does. For a date chosen on the page itself, such as a booking day, use aihio-calendar.",
+  "intents": [
+    "form-field",
+    "date-entry",
+    "text-entry"
+  ],
+  "attributes": {
+    "value": {
+      "type": "string",
+      "description": "The initial date as YYYY-MM-DD, whatever the page's language, and the date a form reset returns to. The value property carries the live date."
+    },
+    "name": {
+      "type": "string",
+      "description": "Form field name. The date submits under it as YYYY-MM-DD, not as the text on show. Without it the field submits nothing."
+    },
+    "form": {
+      "type": "string",
+      "description": "Id of an external form that owns the field."
+    },
+    "min": {
+      "type": "string",
+      "description": "The earliest date that can be chosen, as YYYY-MM-DD. Earlier days are struck through in the calendar, and a typed earlier date makes the field invalid."
+    },
+    "max": {
+      "type": "string",
+      "description": "The latest date that can be chosen, as YYYY-MM-DD."
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Placeholder text. Defaults to the date format in the page's language, such as mm/dd/yyyy or pp.kk.vvvv. It is not a label."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disables the field and its calendar. A disabled field submits nothing."
+    },
+    "readonly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows the date without letting it change. The date still submits."
+    },
+    "required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Requires a date for native constraint validation."
+    },
+    "error": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows error styling and sets aria-invalid. aihio-field sets this from its error slot."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Field size, matching aihio-input."
+    },
+    "open": {
+      "type": "boolean",
+      "default": false,
+      "description": "Reflects whether the calendar is showing. Set or remove it to open or close the calendar."
+    },
+    "autocomplete": {
+      "type": "string",
+      "default": "off",
+      "description": "Forwarded to the text field. Off by default, so the browser's list of past entries does not cover the calendar; bday lets the browser fill in a birth date."
+    },
+    "first-day-of-week": {
+      "type": "enum",
+      "values": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "description": "The day the calendar's weeks start on. Defaults to the page's language: Monday in Finland, Sunday in the US, Saturday in Egypt."
+    },
+    "choose-text": {
+      "type": "string",
+      "default": "Choose date",
+      "description": "The calendar button's name and the calendar's, each followed by the field's label. For localisation."
+    },
+    "previous-month-text": {
+      "type": "string",
+      "default": "Previous month",
+      "description": "The previous month button's name. For localisation."
+    },
+    "next-month-text": {
+      "type": "string",
+      "default": "Next month",
+      "description": "The next month button's name. For localisation."
+    },
+    "invalid-text": {
+      "type": "string",
+      "default": "Enter a date as {format}.",
+      "description": "Validation message for text that is not a date, with {format} for the date format (dd.mm.yyyy). For localisation."
+    },
+    "min-text": {
+      "type": "string",
+      "default": "Choose {min} or later.",
+      "description": "Validation message for a date before min, with {min} for it. For localisation."
+    },
+    "max-text": {
+      "type": "string",
+      "default": "Choose {max} or earlier.",
+      "description": "Validation message for a date after max, with {max} for it. For localisation."
+    },
+    "unavailable-text": {
+      "type": "string",
+      "default": "{date} is not available.",
+      "description": "Validation message for a date isDateDisabled rules out, with {date} for it. For localisation."
+    }
+  },
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Get or set the date as YYYY-MM-DD, or \"\" for none. Anything that is not a date clears it, as with a native date input. Setting it does not fire aihio-change."
+    },
+    "defaultValue": {
+      "type": "string",
+      "description": "Get or set the reset value reflected by the value attribute"
+    },
+    "valueAsDate": {
+      "type": "Date | null",
+      "description": "Get or set the date as the UTC midnight it starts at, as a native date input's valueAsDate is."
+    },
+    "isDateDisabled": {
+      "type": "((date: string) => boolean) | null",
+      "description": "Called with each date the calendar shows, as YYYY-MM-DD. A date it returns true for is struck through and cannot be chosen, and typing it makes the field invalid. Set it again when the dates it rules out change. Read a weekday as new Date(date).getUTCDay()."
+    },
+    "control": {
+      "type": "HTMLInputElement | null",
+      "readonly": true,
+      "description": "The native text field the date is typed into"
+    },
+    "form": {
+      "type": "HTMLFormElement | null",
+      "readonly": true,
+      "description": "The owning form, or null outside one"
+    },
+    "validity": {
+      "type": "ValidityState | null",
+      "readonly": true,
+      "description": "Native constraint validation state, including the field's own checks: text that is not a date, a date outside min and max, and one isDateDisabled rules out"
+    },
+    "validationMessage": {
+      "type": "string",
+      "readonly": true,
+      "description": "Native validation message"
+    },
+    "willValidate": {
+      "type": "boolean",
+      "readonly": true,
+      "description": "Whether the field participates in constraint validation"
+    }
+  },
+  "methods": {
+    "open()": {
+      "description": "Opens the calendar and moves focus into it, on the chosen date or today. Focus goes back to whatever had it when the calendar closes.",
+      "returns": "void"
+    },
+    "close()": {
+      "description": "Closes the calendar.",
+      "returns": "void"
+    },
+    "toggle()": {
+      "description": "Opens or closes the calendar.",
+      "returns": "void"
+    },
+    "focus()": {
+      "description": "Moves focus to the text field.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "FocusOptions",
+          "optional": true
+        }
+      ],
+      "returns": "void"
+    },
+    "checkValidity()": {
+      "description": "Runs native constraint validation and returns whether the field is valid.",
+      "returns": "boolean"
+    },
+    "reportValidity()": {
+      "description": "Runs native constraint validation and shows the browser message if invalid.",
+      "returns": "boolean"
+    },
+    "setCustomValidity()": {
+      "description": "Sets a custom validation message, which wins over the field's own. An empty message hands validation back to the field.",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "returns": "void"
+    }
+  },
+  "events": {
+    "aihio-change": {
+      "description": "Fired when the person commits a different date: picks one, or leaves the field (or presses Enter) after typing. Text that is not a date commits as \"\". Also fired when a form reset changes the date, and not for programmatic changes. The native input and change events come from the text field and carry its text.",
+      "detail": {
+        "value": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-month": {
+      "description": "Fired when the calendar opens, and whenever it shows another month: the month as YYYY-MM, and its first and last day. Fetch the dates to rule out for that month here, then set isDateDisabled again.",
+      "detail": {
+        "month": "string",
+        "start": "string",
+        "end": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-open": {
+      "description": "Fired after the calendar opens.",
+      "bubbles": true,
+      "composed": true
+    },
+    "aihio-close": {
+      "description": "Fired after the calendar closes, with why: select, escape, outside, blur, toggle, reset, or api.",
+      "detail": {
+        "reason": "string"
+      },
+      "bubbles": true,
+      "composed": true
+    }
+  },
+  "composition": {
+    "allowedChildren": []
+  },
+  "a11yContract": {
+    "handled": [
+      "A real text <input> to type into, and a real <button> with aria-haspopup=\"dialog\", aria-expanded, and aria-controls that opens the calendar. The button is named \"Choose date\" followed by the field's label, and described by the chosen date in words",
+      "Typed dates are read in the page's language (the closest lang): 9.10.2026 in Finland, 10/9/2026 in the US, and 2026-10-09 anywhere, with any separator, a month name (\"9 Oct 2026\", \"9. lokakuuta\"), two-digit years, no year (this year), the language's own digits, or no separators at all (09102026). The placeholder is the format, written the language's way (mm/dd/yyyy, pp.kk.vvvv, tt.mm.jjjj)",
+      "Text that is not a date is kept to be corrected, not thrown away, and the field reports it through native validation; so does a date outside min and max or one isDateDisabled rules out, with a localisable message",
+      "The calendar is a dialog named \"Choose date\" and the field's label. Focus moves into its grid on the chosen date, or today, and goes back to the button (or the field, when Alt+ArrowDown opened it) when a date is picked or Escape closes it. Focus leaving the field closes it",
+      "The grid is a <table role=\"grid\"> with one tab stop. Arrow keys move a day or a week (mirrored right to left), Home and End go to the ends of the week, Page Up and Page Down move a month and, with Shift, a year; Enter or Space picks the day",
+      "Each day is named by its full date (\"Friday, October 9, 2026\") and carries aria-selected for the chosen date, aria-current=\"date\" for today, and aria-disabled for a day outside min and max or ruled out by isDateDisabled, which is struck through, not only greyed",
+      "Previous and next month buttons and native month and year selects head the grid; a step is announced in a polite status region. Weeks start on the language's first day, the Gregorian calendar is used whatever the language's own, and month and weekday names come from Intl",
+      "Escape on a closed field is left alone, so a surrounding dialog still closes. Keys pressed while an IME is composing are left to the IME",
+      "The date submits as YYYY-MM-DD through a hidden input under name; required, form reset, <fieldset disabled>, and the form attribute behave natively",
+      "The calendar renders in the top layer, flips above the field when there is more room there, and stays inside the visual viewport; on touch screens its days are larger",
+      "Forced colours restate the chosen, today, and unavailable days with system colours; reduced motion removes the open animation"
+    ],
+    "required": [
+      {
+        "when": "the date picker is not inside an aihio-field",
+        "requirement": "Label it with aria-labelledby pointing at visible text, or aria-label. Placeholder is not a label, and a wrapping <label> would fold the open calendar's text into the field's name.",
+        "severity": "error",
+        "rule": "date-picker-label"
+      },
+      {
+        "when": "the date picker is inside a <form> and its date should be submitted",
+        "requirement": "Set name. A date picker without a name is omitted from FormData.",
+        "severity": "warn",
+        "rule": "date-picker-form-name"
+      }
+    ]
+  },
+  "counterExamples": [
+    {
+      "markup": "<aihio-date-picker placeholder=\"Due date\"></aihio-date-picker>",
+      "reason": "Placeholder is not a label, and this one hides the date format the field would show there. Put the picker in aihio-field with a label.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Due date</label>\n  <aihio-date-picker name=\"due-date\"></aihio-date-picker>\n</aihio-field>",
+      "rule": "date-picker-label"
+    },
+    {
+      "markup": "<label>\n  Due date\n  <aihio-date-picker name=\"due-date\"></aihio-date-picker>\n</label>",
+      "reason": "A wrapping <label> takes its name from all of its text, so the open calendar's month, weekdays, and days become part of the field's name. Use aihio-field instead.",
+      "fix": "<aihio-field>\n  <label slot=\"label\">Due date</label>\n  <aihio-date-picker name=\"due-date\"></aihio-date-picker>\n</aihio-field>",
+      "rule": "date-picker-label"
+    },
+    {
+      "markup": "<aihio-date-picker aria-label=\"Due date\" value=\"10/09/2026\"></aihio-date-picker>",
+      "reason": "Dates in attributes are YYYY-MM-DD whatever the page's language: 10/09/2026 is 9 October in Finland and 10 September in the US. The field shows the date the page's way.",
+      "fix": "<aihio-date-picker aria-label=\"Due date\" value=\"2026-10-09\"></aihio-date-picker>",
+      "rule": "date-value"
+    },
+    {
+      "markup": "<aihio-date-picker aria-label=\"Check-in\" min=\"2026-12-31\" max=\"2026-01-01\"></aihio-date-picker>",
+      "reason": "min is after max, so there is no date to choose.",
+      "fix": "<aihio-date-picker aria-label=\"Check-in\" min=\"2026-01-01\" max=\"2026-12-31\"></aihio-date-picker>",
+      "rule": "date-range"
+    },
+    {
+      "markup": "<aihio-date-picker aria-label=\"Start date\" format=\"dd.MM.yyyy\" locale=\"fi\"></aihio-date-picker>",
+      "reason": "Nothing reads format or locale. The field writes and reads dates the way the page's language does: set lang, on the page or the picker.",
+      "fix": "<aihio-date-picker aria-label=\"Alkupäivä\" lang=\"fi\"></aihio-date-picker>",
+      "rule": "unknown-attribute"
+    }
+  ],
+  "examples": [
+    {
+      "title": "In a field",
+      "description": "The placeholder shows the date format in the page's language, and the date submits as YYYY-MM-DD.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Due date</label>\n  <aihio-date-picker name=\"due-date\" value=\"2026-10-30\"></aihio-date-picker>\n  <span slot=\"description\">Invoices are sent on this day.</span>\n</aihio-field>"
+    },
+    {
+      "title": "A range of dates",
+      "description": "Days outside min and max are struck through in the calendar, and the months and years it offers stop at them.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Appointment</label>\n  <aihio-date-picker name=\"appointment\" min=\"2026-10-12\" max=\"2026-12-18\" required></aihio-date-picker>\n</aihio-field>"
+    },
+    {
+      "title": "A birth date",
+      "description": "Most people type it. autocomplete=\"bday\" lets the browser fill it in, and the year select reaches back a century.",
+      "markup": "<aihio-field>\n  <label slot=\"label\">Date of birth</label>\n  <aihio-date-picker name=\"birth-date\" autocomplete=\"bday\" max=\"2026-10-09\"></aihio-date-picker>\n</aihio-field>"
+    },
+    {
+      "title": "In another language",
+      "description": "lang sets how dates are written and read, the names of months and weekdays, and the first day of the week. The text attributes put the rest in the same language.",
+      "markup": "<aihio-field lang=\"fi\">\n  <label slot=\"label\">Eräpäivä</label>\n  <aihio-date-picker name=\"due-date\" choose-text=\"Valitse päivä\" previous-month-text=\"Edellinen kuukausi\" next-month-text=\"Seuraava kuukausi\" invalid-text=\"Kirjoita päivä muodossa {format}.\" min-text=\"Valitse {min} tai myöhemmin.\" max-text=\"Valitse {max} tai aiemmin.\" unavailable-text=\"{date} ei ole valittavissa.\"></aihio-date-picker>\n</aihio-field>"
+    }
+  ]
+}

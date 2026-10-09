@@ -41,6 +41,10 @@
       "types": "./dist/button.d.ts",
       "default": "./dist/button.js"
     },
+    "./calendar": {
+      "types": "./dist/calendar.d.ts",
+      "default": "./dist/calendar.js"
+    },
     "./card": {
       "types": "./dist/card.d.ts",
       "default": "./dist/card.js"
@@ -56,6 +60,10 @@
     "./data-grid": {
       "types": "./dist/data-grid.d.ts",
       "default": "./dist/data-grid.js"
+    },
+    "./date-picker": {
+      "types": "./dist/date-picker.d.ts",
+      "default": "./dist/date-picker.js"
     },
     "./dialog": {
       "types": "./dist/dialog.d.ts",

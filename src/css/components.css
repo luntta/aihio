@@ -404,6 +404,300 @@ aihio-button:defined,
       }
     }
 
+/* aihio-calendar */
+aihio-calendar {
+      /* The fill a hovered day or control takes. The date picker's popup sets
+         its own, because on the overlay surface this one is invisible in the
+         dark theme. */
+      --aihio-calendar-highlight-bg: var(--aihio-color-control-highlight-bg);
+
+      display: inline-block;
+      vertical-align: top;
+      padding: var(--aihio-spacing-control-gap);
+      border: 1px solid var(--aihio-color-border-subtle);
+      border-radius: var(--aihio-radius-surface);
+      color: var(--aihio-color-page-fg);
+    }
+
+    /* Hold the calendar's box before upgrade, so server-rendered markup does
+       not jump when the grid appears. */
+    aihio-calendar:not(:defined) {
+      box-sizing: content-box;
+      width: calc(var(--aihio-calendar-cell-size) * 7);
+      height: calc(var(--aihio-calendar-cell-size) * 8 + var(--aihio-spacing-cluster-gap-tight));
+    }
+
+    /* In a field the calendar keeps its own width, under its label. */
+    aihio-field > aihio-calendar {
+      align-self: flex-start;
+    }
+
+    aihio-calendar[error] {
+      border-color: var(--aihio-color-destructive-bg);
+    }
+
+    aihio-calendar[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="header"] {
+      display: flex;
+      align-items: center;
+      gap: var(--aihio-spacing-cluster-gap-tight);
+      margin-block-end: var(--aihio-spacing-cluster-gap-tight);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="caption"] {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]) {
+      box-sizing: border-box;
+      height: var(--aihio-calendar-cell-size);
+      margin: 0;
+      border: 1px solid transparent;
+      border-radius: var(--aihio-radius-interactive-compact);
+      background-color: transparent;
+      color: inherit;
+      font-family: inherit;
+      font-size: var(--aihio-font-size-control);
+      font-weight: var(--aihio-font-weight-control);
+      line-height: var(--aihio-line-height-compact);
+      cursor: pointer;
+      transition: background-color var(--aihio-duration-feedback-fast) ease;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"]) {
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: var(--aihio-calendar-cell-size);
+      padding: 0;
+    }
+
+    /* The chevrons point the way the months run. */
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"]) svg:dir(rtl) {
+      transform: scaleX(-1);
+    }
+
+    /* The month and year read as the heading they replace, each with the
+       chevron of a select. It is two gradient triangles in currentColor, so
+       it follows the theme and forced colours without an image. */
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="month"], [data-calendar-part="year"]) {
+      appearance: none;
+      min-width: 0;
+      padding-inline: var(--aihio-spacing-field-padding-inline-sm) calc(var(--aihio-spacing-field-padding-inline-sm) + 0.875rem);
+      background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position:
+        right calc(var(--aihio-spacing-field-padding-inline-sm) + 4px) center,
+        right var(--aihio-spacing-field-padding-inline-sm) center;
+      background-size: 4px 4px;
+      background-repeat: no-repeat;
+      field-sizing: content;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="month"], [data-calendar-part="year"]):dir(rtl) {
+      background-position:
+        left var(--aihio-spacing-field-padding-inline-sm) center,
+        left calc(var(--aihio-spacing-field-padding-inline-sm) + 4px) center;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]):hover {
+      background-color: var(--aihio-calendar-highlight-bg);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]):focus-visible {
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: 0;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"])[aria-disabled="true"],
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]):disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"])[aria-disabled="true"]:hover {
+      background-color: transparent;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] {
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: var(--aihio-font-size-control);
+      line-height: var(--aihio-line-height-compact);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] :is(th, td) {
+      box-sizing: border-box;
+      width: var(--aihio-calendar-cell-size);
+      height: var(--aihio-calendar-cell-size);
+      padding: 0;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] th {
+      color: var(--aihio-color-muted-fg);
+      font-size: var(--aihio-font-size-control-sm);
+      font-weight: var(--aihio-font-weight-body);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date] {
+      position: relative;
+      border-radius: var(--aihio-radius-interactive-compact);
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--aihio-duration-feedback-fast) ease;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date]:hover {
+      background-color: var(--aihio-calendar-highlight-bg);
+    }
+
+    /* Outside the cell, so the ring still shows around a chosen day's fill,
+       and above the days beside it, which would otherwise paint over it. */
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date]:focus-visible {
+      z-index: 1;
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: 1px;
+    }
+
+    /* The days of the months either side, muted. */
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][data-outside] {
+      color: var(--aihio-color-muted-fg);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-selected="true"] {
+      background-color: var(--aihio-color-primary-action-bg);
+      color: var(--aihio-color-primary-action-fg);
+      font-weight: var(--aihio-font-weight-control);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-selected="true"]:hover {
+      background-color: color-mix(in oklch, var(--aihio-color-primary-action-bg) 90%, transparent);
+    }
+
+    /* Today is marked by weight and a dot, not by a colour. The dot is a
+       border, so forced colours keep it. */
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-current="date"] {
+      font-weight: var(--aihio-font-weight-heading);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-current="date"]::after {
+      content: "";
+      position: absolute;
+      inset-block-end: 0.25rem;
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      border: 2px solid currentColor;
+      border-radius: var(--aihio-radius-pill);
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-current="date"]:dir(rtl)::after {
+      translate: 50% 0;
+    }
+
+    /* A day that cannot be chosen is struck through, which reads without
+       colour, and keeps a text colour held to 4.5:1. */
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-disabled="true"] {
+      color: var(--aihio-color-muted-fg);
+      text-decoration: line-through;
+      cursor: not-allowed;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-disabled="true"]:not([aria-selected="true"]):hover,
+    :is(aihio-calendar[readonly], aihio-calendar[disabled]) [data-calendar-part="grid"] td[data-date]:not([aria-selected="true"]):hover {
+      background-color: transparent;
+    }
+
+    aihio-calendar[readonly] [data-calendar-part="grid"] td[data-date] {
+      cursor: default;
+    }
+
+    aihio-calendar[disabled] [data-calendar-part="grid"] td[data-date] {
+      cursor: not-allowed;
+    }
+
+    :is(aihio-calendar, aihio-date-picker) [data-calendar-part="status"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* A finger needs a larger target than a pointer. Seven days of it still
+       fit a 320px phone. */
+    @media (pointer: coarse) {
+      :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] :is(th, td),
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"]) {
+        width: calc(var(--aihio-calendar-cell-size) + 0.25rem);
+      }
+
+      :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td,
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]) {
+        height: calc(var(--aihio-calendar-cell-size) + 0.25rem);
+      }
+    }
+
+    @media (forced-colors: active) {
+      aihio-calendar {
+        border-color: CanvasText;
+      }
+
+      aihio-calendar[error] {
+        border-width: 2px;
+      }
+
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]) {
+        color: ButtonText;
+      }
+
+      /* Forced colours drop the gradient chevron, so the selects go back to
+         the platform's own drawing, arrow and all. */
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="month"], [data-calendar-part="year"]) {
+        appearance: auto;
+      }
+
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"])[aria-disabled="true"],
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]):disabled {
+        color: GrayText;
+        opacity: 1;
+      }
+
+      :is(aihio-calendar, aihio-date-picker) :is([data-calendar-part="previous"], [data-calendar-part="next"], [data-calendar-part="month"], [data-calendar-part="year"]):focus-visible,
+      :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date]:focus-visible {
+        outline-color: Highlight;
+      }
+
+      /* Opt the chosen day out of adjustment, which would draw a Canvas
+         backplate behind its text, and state its colours instead. */
+      :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date][aria-selected="true"] {
+        forced-color-adjust: none;
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      /* The only muted system colour, so the days around the month still
+         read as another month's. */
+      :is(aihio-calendar, aihio-date-picker) [data-calendar-part="grid"] td[data-date]:is([data-outside], [aria-disabled="true"]) {
+        color: GrayText;
+      }
+    }
+
 /* aihio-card */
 /* The card owns the spacing: one --aihio-card-padding at every edge and
        between every section. When each section padded itself it left one side
@@ -870,6 +1164,222 @@ aihio-combobox {
     @media (forced-colors: active) {
       aihio-data-grid > table > :is(thead, tbody) > tr > :is(th, td):focus-visible {
         outline-color: Highlight;
+      }
+    }
+
+/* aihio-date-picker */
+aihio-date-picker {
+      display: inline-flex;
+      position: relative;
+      width: 100%;
+    }
+
+    /* Hold the field's box before upgrade so server-rendered markup does not
+       jump when the input appears. */
+    aihio-date-picker:not(:defined) {
+      box-sizing: border-box;
+      height: var(--aihio-input-height-md);
+      border: 1px solid var(--aihio-color-field-border);
+      border-radius: var(--aihio-radius-interactive);
+    }
+
+    aihio-date-picker [data-date-picker-part="input"] {
+      display: flex;
+      width: 100%;
+      height: var(--aihio-input-height-md);
+      margin: 0;
+      border-radius: var(--aihio-radius-interactive);
+      border: 1px solid var(--aihio-color-field-border);
+      background-color: transparent;
+      padding-block: var(--aihio-spacing-field-padding-block);
+      padding-inline: var(--aihio-spacing-field-padding-inline) var(--aihio-input-height-md);
+      font: inherit;
+      font-size: var(--aihio-font-size-control);
+      font-variant-numeric: tabular-nums;
+      line-height: var(--aihio-line-height-body);
+      color: var(--aihio-color-page-fg);
+      text-overflow: ellipsis;
+      transition: border-color var(--aihio-duration-feedback) ease,
+                  box-shadow var(--aihio-duration-feedback) ease;
+    }
+
+    aihio-date-picker [data-date-picker-part="input"]::placeholder {
+      color: var(--aihio-color-muted-fg);
+    }
+
+    aihio-date-picker [data-date-picker-part="input"]:focus-visible {
+      outline: none;
+      border-color: var(--aihio-color-focus-ring);
+      box-shadow: 0 0 0 1px var(--aihio-color-focus-ring);
+    }
+
+    aihio-date-picker [data-date-picker-part="input"]:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    aihio-date-picker[size="sm"] [data-date-picker-part="input"] {
+      height: var(--aihio-input-height-sm);
+      font-size: var(--aihio-font-size-control-sm);
+      padding-block: var(--aihio-spacing-field-padding-block-sm);
+      padding-inline: var(--aihio-spacing-field-padding-inline-sm) var(--aihio-input-height-sm);
+    }
+    aihio-date-picker[size="lg"] [data-date-picker-part="input"] {
+      height: var(--aihio-input-height-lg);
+      font-size: var(--aihio-font-size-control-lg);
+      padding-block: var(--aihio-spacing-field-padding-block-lg);
+      padding-inline: var(--aihio-spacing-field-padding-inline-lg) var(--aihio-input-height-lg);
+    }
+
+    aihio-date-picker[error] [data-date-picker-part="input"] {
+      border-color: var(--aihio-color-destructive-bg);
+    }
+    aihio-date-picker[error] [data-date-picker-part="input"]:focus-visible {
+      border-color: var(--aihio-color-destructive-bg);
+      box-shadow: 0 0 0 1px var(--aihio-color-destructive-bg);
+    }
+
+    /* Inside the field's box, at its end. Unlike the combobox's chevron it is
+       a tab stop: the keyboard opens the calendar from it. */
+    aihio-date-picker [data-date-picker-part="toggle"] {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--aihio-input-height-md);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: var(--aihio-radius-interactive);
+      background: none;
+      color: var(--aihio-color-muted-fg);
+      cursor: pointer;
+      transition: color var(--aihio-duration-feedback-fast) ease;
+    }
+    aihio-date-picker[size="sm"] [data-date-picker-part="toggle"] {
+      width: var(--aihio-input-height-sm);
+    }
+    aihio-date-picker[size="lg"] [data-date-picker-part="toggle"] {
+      width: var(--aihio-input-height-lg);
+    }
+
+    aihio-date-picker [data-date-picker-part="toggle"]:hover,
+    aihio-date-picker[open] [data-date-picker-part="toggle"] {
+      color: var(--aihio-color-page-fg);
+    }
+
+    /* Inset, so the ring sits inside the field's border rather than across it. */
+    aihio-date-picker [data-date-picker-part="toggle"]:focus-visible {
+      outline: 2px solid var(--aihio-color-focus-ring);
+      outline-offset: -4px;
+    }
+
+    aihio-date-picker [data-date-picker-part="toggle"]:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    aihio-date-picker [data-date-picker-part="toggle-label"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* Shown in the top layer as a manual popover, so it escapes overflow
+       clipping and sits above an open dialog. Selector specificity beats the
+       UA [popover] rules (inset: 0, margin: auto) it has to undo. */
+    aihio-date-picker [data-date-picker-part="popup"] {
+      --aihio-calendar-highlight-bg: var(--aihio-color-overlay-highlight-bg);
+      --aihio-date-picker-shift: calc(var(--aihio-spacing-cluster-gap-tight) * -1);
+
+      display: none;
+      position: fixed;
+      inset: auto;
+      z-index: 50;
+      box-sizing: border-box;
+      width: max-content;
+      max-width: calc(100vw - 1rem);
+      max-height: var(--aihio-date-picker-available-height, none);
+      margin: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: var(--aihio-spacing-control-gap);
+      border: 1px solid var(--aihio-color-border-subtle);
+      border-radius: var(--aihio-radius-surface);
+      background-color: var(--aihio-color-overlay-bg);
+      color: var(--aihio-color-overlay-fg);
+      box-shadow: var(--aihio-shadow-overlay);
+    }
+    aihio-date-picker [data-date-picker-part="popup"][data-side="top"] {
+      --aihio-date-picker-shift: var(--aihio-spacing-cluster-gap-tight);
+    }
+    aihio-date-picker [data-date-picker-part="popup"]:popover-open,
+    aihio-date-picker [data-date-picker-part="popup"][data-fallback-open] {
+      display: block;
+      animation: aihio-date-picker-in var(--aihio-duration-feedback) ease;
+    }
+
+    @keyframes aihio-date-picker-in {
+      from {
+        opacity: 0;
+        transform: translateY(var(--aihio-date-picker-shift));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      aihio-date-picker [data-date-picker-part="popup"]:popover-open,
+      aihio-date-picker [data-date-picker-part="popup"][data-fallback-open] {
+        animation: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      aihio-date-picker [data-date-picker-part="input"] {
+        background-color: Field;
+        color: FieldText;
+        border-color: FieldText;
+      }
+
+      aihio-date-picker [data-date-picker-part="input"]:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+        box-shadow: none;
+      }
+
+      aihio-date-picker [data-date-picker-part="input"]:disabled {
+        color: GrayText;
+        border-color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-date-picker[error] [data-date-picker-part="input"] {
+        border-width: 2px;
+        border-color: FieldText;
+      }
+
+      aihio-date-picker [data-date-picker-part="toggle"] {
+        color: ButtonText;
+      }
+
+      aihio-date-picker [data-date-picker-part="toggle"]:focus-visible {
+        outline-color: Highlight;
+      }
+
+      aihio-date-picker [data-date-picker-part="toggle"]:disabled {
+        color: GrayText;
+        opacity: 1;
+      }
+
+      aihio-date-picker [data-date-picker-part="popup"] {
+        border-color: CanvasText;
       }
     }
 

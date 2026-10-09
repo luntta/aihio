@@ -23,6 +23,8 @@ export const LINT_RULE_IDS = new Set([
   'unknown-attribute',
   'boolean-attribute-value',
   'cluster-needs-grow',
+  'date-range',
+  'date-value',
   'table-sortable-header',
   'hand-rolled-layout',
 ]);

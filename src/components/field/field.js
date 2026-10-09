@@ -4,11 +4,11 @@ let fieldInstanceId = 0;
 
 // Aihio controls come first in document order, ahead of the native inputs
 // they render inside themselves, so the host is the control that is found.
-const CONTROL_SELECTOR = 'aihio-input, aihio-combobox, aihio-switch, input, select, textarea';
+const CONTROL_SELECTOR = 'aihio-input, aihio-combobox, aihio-date-picker, aihio-calendar, aihio-switch, input, select, textarea';
 
 // Hosts that take the error state as an attribute and restate it on the
 // control they render.
-const ERROR_ATTRIBUTE_HOSTS = new Set(['AIHIO-INPUT', 'AIHIO-COMBOBOX']);
+const ERROR_ATTRIBUTE_HOSTS = new Set(['AIHIO-INPUT', 'AIHIO-COMBOBOX', 'AIHIO-DATE-PICKER', 'AIHIO-CALENDAR']);
 
 export class AihioField extends AihioElement {
   static tag = 'aihio-field';
@@ -87,11 +87,17 @@ export class AihioField extends AihioElement {
     if (!label.id) label.id = `aihio-field-${this._fieldId}-label`;
 
     // Point a native label at the actual labelable control. A custom-element
-    // host is not labelable merely because it contains an input.
+    // host is not labelable merely because it contains an input, and a
+    // calendar holds no control a label can point at (its input is hidden):
+    // aria-labelledby names it, and a click on the label focuses it.
     if (label.tagName === 'LABEL') {
       const labelTarget = control.control ?? control.querySelector?.('input') ?? control;
-      if (!labelTarget.id) labelTarget.id = `${control.id}-native`;
-      label.setAttribute('for', labelTarget.id);
+      if (isLabelable(labelTarget)) {
+        if (!labelTarget.id) labelTarget.id = `${control.id}-native`;
+        label.setAttribute('for', labelTarget.id);
+      } else {
+        label.removeAttribute('for');
+      }
     }
 
     control.setAttribute('aria-labelledby', label.id);
@@ -115,6 +121,10 @@ export class AihioField extends AihioElement {
 
     control.setAttribute('aria-describedby', ids.join(' '));
   }
+}
+
+function isLabelable(element) {
+  return element.matches?.('button, meter, output, progress, select, textarea, input:not([type="hidden"])') ?? false;
 }
 
 function hasContent(node) {

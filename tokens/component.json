@@ -38,6 +38,13 @@
       "lg":   { "$value": "3rem", "$type": "dimension" }
     }
   },
+  "calendar": {
+    "cell-size": {
+      "$value": "2.25rem",
+      "$type": "dimension",
+      "$description": "The width and height of a day in a month grid, in aihio-calendar and the aihio-date-picker popup. A quarter rem larger on touch screens."
+    }
+  },
   "card": {
     "padding": { "$value": "1.5rem", "$type": "dimension" }
   },

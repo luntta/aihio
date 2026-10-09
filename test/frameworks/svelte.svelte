@@ -22,6 +22,8 @@
   $: sortedFruits = ['Banana', 'Cherry', 'Date']
     .sort((left, right) => left.localeCompare(right) * (direction === 'ascending' ? 1 : -1));
 
+  const isWeekend = (date) => [0, 6].includes(new Date(date).getUTCDay());
+
   function handleInput(event) {
     document.body.dataset.eventValue = event.target.value;
   }
@@ -41,6 +43,14 @@
     <aihio-option value={fruit.toLowerCase()}>{fruit}</aihio-option>
   {/each}
 </aihio-combobox>
+
+<aihio-date-picker
+  id="framework-date"
+  aria-label="Delivery"
+  value="2026-10-14"
+  isDateDisabled={isWeekend}
+  onaihio-change={(event) => document.body.dataset.dateValue = event.detail.value}
+></aihio-date-picker>
 
 <aihio-table id="framework-manual-table" manual-sort onaihio-sort={(event) => direction = event.detail.direction}>
   <table>

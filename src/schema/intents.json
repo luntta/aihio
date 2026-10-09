@@ -11,6 +11,7 @@
     "selection": "Lets the user pick one item from a set.",
     "form-field": "Collects a single value from the user as part of a form.",
     "text-entry": "A form field specifically for free-form text.",
+    "date-entry": "A form field for a calendar date, typed or picked from a month grid.",
     "status": "Displays current state (badges, pills, counts).",
     "informational": "Non-blocking guidance or context.",
     "alert": "Important message that requires attention.",

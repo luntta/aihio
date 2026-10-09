@@ -53,6 +53,10 @@ export default {
     },
     thumbnail: '<aihio-cluster><aihio-button variant="outline">Cancel</aihio-button><aihio-button>Save</aihio-button></aihio-cluster>',
   },
+  // Smaller days than the default, so the month fits a card on the index.
+  'aihio-calendar': {
+    thumbnail: '<aihio-calendar aria-label="Delivery day preview" value="2026-10-14" min="2026-10-05" style="--aihio-calendar-cell-size: 1.75rem"></aihio-calendar>',
+  },
   'aihio-card': {
     layout: 'wide',
     variants: {
@@ -75,6 +79,12 @@ export default {
   },
   'aihio-data-grid': {
     thumbnail: '<aihio-data-grid row-count="3" density="compact" style="--aihio-data-grid-height: auto"><table aria-label="Requests preview"><thead><tr><th scope="col" data-sortable="id" aria-sort="ascending">Request</th><th scope="col" data-numeric>Duration</th></tr></thead><tbody><tr><th scope="row">#1</th><td data-numeric>38</td></tr><tr><th scope="row">#2</th><td data-numeric>412</td></tr><tr><th scope="row">#3</th><td data-numeric>17</td></tr></tbody></table></aihio-data-grid>',
+  },
+  'aihio-date-picker': {
+    variants: {
+      size: (value) => `<aihio-date-picker size="${value}" aria-label="Due date, size ${value}" value="2026-10-14"></aihio-date-picker>`,
+    },
+    thumbnail: '<aihio-date-picker aria-label="Due date preview" value="2026-10-14"></aihio-date-picker>',
   },
   'aihio-dialog': {
     thumbnail: '<aihio-button commandfor="thumbnail-dialog" command="--open" variant="outline">Open dialog</aihio-button><aihio-dialog id="thumbnail-dialog"><aihio-dialog-header><aihio-dialog-title>A dialog</aihio-dialog-title><aihio-dialog-description>Opened from markup, with no script.</aihio-dialog-description></aihio-dialog-header><aihio-dialog-footer><aihio-button commandfor="thumbnail-dialog" command="--close">Close</aihio-button></aihio-dialog-footer></aihio-dialog>',

@@ -140,6 +140,22 @@ on the headers that no keyboard reaches.
 - [ ] Row selection: a select-all checkbox with a mixed state, shift-click ranges, and an announced count, that does not fight a framework holding the checkboxes' state in its own
 - [ ] Data grid: rows of more than one line, and more than about 389,000 rows. Firefox stops a box's height at 17.9 million pixels (Chromium and WebKit at 33.5 million), so rows past it cannot be scrolled to; lint and the dev build warn above 350,000
 
+## Phase 12 — Dates
+
+A date had nothing in the system to reach for. A model asked for one wrote
+`<aihio-input type="date">`, whose calendar no stylesheet reaches and whose
+format follows the browser rather than the page, or a calendar from scratch,
+with click handlers on its days.
+
+- [x] `aihio-date-picker`: a date typed the way the page's language writes it (any separator, month names, two-digit years, the language's own digits) or picked from a calendar a button opens under the field. `YYYY-MM-DD` submits through a hidden input, as a native date input submits it; text that is not a date is kept and reported through native validation, with localisable messages
+- [x] `aihio-calendar`: the same month grid on the page, a group named by its label, for a date chosen there
+- [x] One grid for both (`src/components/calendar-grid.js`), the WAI-ARIA date picker's: a `<table role="grid">` with one tab stop and the arrow, Home, End, and Page keys; each day named by its full date, with `aria-selected`, `aria-current="date"`, and `aria-disabled`; previous and next month buttons and native month and year selects; six weeks always, the days of the months either side filling them, so nothing around it moves
+- [x] Languages from `Intl` and the closest `lang` (`src/components/dates.js`): the format, a placeholder written the language's way (`pp.kk.vvvv`, `tt.mm.jjjj`), month and weekday names, the first day of the week (from `Intl.Locale`, or CLDR's regions where the browser cannot say), and always the Gregorian calendar
+- [x] `min`, `max`, and an `isDateDisabled` function: days struck through, a keyboard held between min and max, typed dates outside them invalid, and `aihio-month` to load a month's availability. React 19, Vue, and Svelte all set the function as a property, which the browser suite checks
+- [x] Linter: `date-picker-label`, `date-picker-form-name`, `calendar-label`, `calendar-form-name`, `date-value` (a date not written `YYYY-MM-DD`, with the rewrite where the order is certain), `date-range` (min after max), and suggestions for other systems' names (`<aihio-datepicker>`, `min-date`, `week-start`)
+- [ ] Range selection: a start and an end in one calendar, two months side by side, and the span previewed under the pointer
+- [ ] `required` on `aihio-calendar`: it has no text field to carry native validity. ElementInternals would, at the price of a second way of joining a form
+
 ## Sequencing notes
 
 - Phase 1 is the keystone. Everything else depends on its format.
