@@ -2,13 +2,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONTRAST_REQUIREMENTS, checkTheme } from './contrast.js';
+import { readTokens } from './dtcg.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '../..');
 
-const base = readJson('tokens/base.json');
-const component = readJson('tokens/component.json');
-const semantic = readJson('tokens/semantic.json');
 const packageVersion = readJson('package.json').version;
 
 // Every custom property Aihio defines is --aihio-<group>-<name>: prefixed, so
@@ -17,47 +15,30 @@ const packageVersion = readJson('package.json').version;
 // and never needs escaping. The build refuses any other shape.
 const NAME_PATTERN = /^--aihio-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const TIERS = [
-  ['primitive', base],
-  ['component', component],
-  ['semantic', semantic.shared],
-];
+// tokens/aihio.resolver.json names one set per tier, in this order, and a
+// theme modifier: its light context is what :root carries, and its dark context
+// is what data-theme="dark" and prefers-color-scheme switch to.
+const TIERS = ['primitive', 'component', 'semantic'];
+const { sets, modifiers } = readTokens(resolve(root, 'tokens/aihio.resolver.json'));
+const theme = modifiers.get('theme');
+
+if ([...sets.keys()].join() !== TIERS.join()) {
+  throw new Error(`aihio.resolver.json: the sets must be ${TIERS.join(', ')}, in that order`);
+}
+if (modifiers.size !== 1 || theme?.default !== 'light' || [...theme.contexts.keys()].sort().join() !== 'dark,light') {
+  throw new Error('aihio.resolver.json: the one modifier must be theme, with a light context, the default, and a dark one');
+}
 
 // References ({spacing.4}) resolve against primitives, component tokens, and
 // the shared semantic tokens. Themed colours are only ever read from CSS.
-const tokenRoot = {};
-for (const [, tier] of TIERS) mergeTier(tokenRoot, tier);
+const tokensByPath = new Map([...sets.values()].flat().map((token) => [token.path, token]));
 
 function readJson(path) {
   return JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 }
 
-function isToken(node) {
-  return Boolean(node) && typeof node === 'object' && Object.prototype.hasOwnProperty.call(node, '$value');
-}
-
-function mergeTier(target, source, path = []) {
-  for (const [key, value] of Object.entries(source)) {
-    if (key.startsWith('$')) continue;
-    if (key.includes('.')) {
-      throw new Error(`Token key ${JSON.stringify([...path, key].join('.'))} contains a dot; write half steps with a hyphen (1-5).`);
-    }
-    if (isToken(value)) {
-      if (target[key] !== undefined) throw new Error(`Token ${[...path, key].join('.')} is defined twice`);
-      target[key] = value;
-      continue;
-    }
-    target[key] ??= {};
-    mergeTier(target[key], value, [...path, key]);
-  }
-}
-
 function lookup(path) {
-  let node = tokenRoot;
-  for (const key of path.split('.')) {
-    node = node?.[key];
-  }
-  return isToken(node) ? node : null;
+  return tokensByPath.get(path) ?? null;
 }
 
 function toVarName(path) {
@@ -72,7 +53,7 @@ function toCssValue(value, trail = []) {
     if (trail.includes(path)) throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
     const target = lookup(path);
     if (!target) throw new Error(`Unresolved token reference: ${path}`);
-    toCssValue(target.$value, [...trail, path]);
+    toCssValue(target.value, [...trail, path]);
     return `var(${toVarName(path)})`;
   });
 }
@@ -81,7 +62,7 @@ function toCssValue(value, trail = []) {
 function resolveValue(value, trail = []) {
   return String(value).replace(/\{([^}]+)\}/g, (_, path) => {
     if (trail.includes(path)) throw new Error(`Circular token reference: ${[...trail, path].join(' -> ')}`);
-    return resolveValue(lookup(path).$value, [...trail, path]);
+    return resolveValue(lookup(path).value, [...trail, path]);
   });
 }
 
@@ -90,37 +71,27 @@ function referencesOf(value) {
   return [...String(value).matchAll(/\{([^}]+)\}/g)].map(([, path]) => toVarName(path));
 }
 
-function listTokens(node, path = []) {
-  const tokens = [];
-  for (const [key, value] of Object.entries(node)) {
-    if (key.startsWith('$') || !value || typeof value !== 'object') continue;
-    const next = [...path, key];
-    if (isToken(value)) {
-      tokens.push({
-        path: next.join('.'),
-        group: next[0],
-        name: toVarName(next.join('.')),
-        type: value.$type,
-        raw: value.$value,
-        css: toCssValue(value.$value),
-        description: value.$description ?? '',
-      });
-    } else {
-      tokens.push(...listTokens(value, next));
-    }
-  }
-  return tokens;
+function compileTokens(tokens) {
+  return tokens.map((token) => ({
+    path: token.path,
+    group: token.path.split('.')[0],
+    name: toVarName(token.path),
+    type: token.type,
+    raw: token.value,
+    css: toCssValue(token.value),
+    description: token.description ?? '',
+  }));
 }
 
-const primitiveTokens = listTokens(base);
-const componentTokens = listTokens(component);
-const sharedSemanticTokens = listTokens(semantic.shared);
-const lightTokens = listTokens(semantic.light);
-const darkTokens = listTokens(semantic.dark);
+const primitiveTokens = compileTokens(sets.get('primitive'));
+const componentTokens = compileTokens(sets.get('component'));
+const sharedSemanticTokens = compileTokens(sets.get('semantic'));
+const lightTokens = compileTokens(theme.contexts.get('light'));
+const darkTokens = compileTokens(theme.contexts.get('dark'));
 
 const lightNames = lightTokens.map((token) => token.name).sort().join();
 if (lightNames !== darkTokens.map((token) => token.name).sort().join()) {
-  throw new Error('semantic.json: light and dark must define the same tokens');
+  throw new Error('theme/light.tokens.json and theme/dark.tokens.json must define the same tokens');
 }
 
 function declarations(tokens, indent = '  ') {
@@ -300,7 +271,7 @@ function buildMarkdown() {
   const lines = [
     '# Aihio Semantic Tokens',
     '',
-    'Generated from `tokens/semantic.json` by `src/tokens/build.js`. The same data, with resolved values for both themes, is in `tokens.json`.',
+    'Generated from `tokens/semantic.tokens.json` and `tokens/theme/` by `src/tokens/build.js`. The same data, with resolved values for both themes, is in `tokens.json`.',
     '',
     'Semantic tokens name what a value is for: `--aihio-color-surface-bg`, `--aihio-spacing-stack-md`. Components read only these and their own component tokens; the primitive scales beneath them are wiring. Write them exactly as listed: every name is `--aihio-<group>-<name>`, lowercase and hyphenated.',
     '',

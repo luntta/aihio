@@ -568,22 +568,116 @@ test('palette meets its contrast contract in both themes', async () => {
   const { checkTheme } = await import(
     pathToFileURL(resolve(root, 'src/tokens/contrast.js')).href
   );
-  const base = JSON.parse(readFileSync(resolve(root, 'tokens/base.json'), 'utf8'));
-  const semantic = JSON.parse(readFileSync(resolve(root, 'tokens/semantic.json'), 'utf8'));
+  const { readTokens } = await import(pathToFileURL(resolve(root, 'src/tokens/dtcg.js')).href);
+  const { sets, modifiers } = readTokens(resolve(root, 'tokens/aihio.resolver.json'));
 
-  const resolveValue = (value) => {
-    const match = String(value).match(/^\{color\.([a-z]+)\.([0-9]+)\}$/);
-    return match ? base.color[match[1]][match[2]].$value : value;
-  };
+  const primitives = new Map(sets.get('primitive').map((token) => [token.path, token.value]));
+  const resolveValue = (value) => value.replace(/^\{(color\.[^}]+)\}$/, (_, path) => primitives.get(path));
 
-  for (const theme of ['light', 'dark']) {
+  for (const [theme, tokens] of modifiers.get('theme').contexts) {
     const colors = Object.fromEntries(
-      Object.entries(semantic[theme].color).map(([name, token]) => [name, resolveValue(token.$value)])
+      tokens.map((token) => [token.path.replace(/^color\./, ''), resolveValue(token.value)])
     );
 
     for (const result of checkTheme(theme, colors)) {
       assert.ok(result.pass, `${theme}/${result.id}: ${result.message} — ${result.note}`);
     }
+  }
+});
+
+test('the token files are DTCG 2025.10, and the token build refuses what the format does not allow', async () => {
+  const { readTokens } = await import(pathToFileURL(resolve(root, 'src/tokens/dtcg.js')).href);
+  const dir = mkdtempSync(resolve(tmpdir(), 'aihio-dtcg-'));
+  const read = (tokens, themed = {}) => {
+    writeFileSync(resolve(dir, 'set.tokens.json'), JSON.stringify(tokens));
+    writeFileSync(resolve(dir, 'light.tokens.json'), JSON.stringify(themed));
+    writeFileSync(resolve(dir, 'test.resolver.json'), JSON.stringify({
+      version: '2025.10',
+      sets: { primitive: { sources: [{ $ref: 'set.tokens.json' }] } },
+      modifiers: { theme: { contexts: { light: [{ $ref: 'light.tokens.json' }] }, default: 'light' } },
+      resolutionOrder: [{ $ref: '#/sets/primitive' }, { $ref: '#/modifiers/theme' }],
+    }));
+    return readTokens(resolve(dir, 'test.resolver.json'));
+  };
+  const radius = (base, more = {}) => ({ radius: { $type: 'dimension', base: { $value: base }, ...more } });
+
+  try {
+    assert.equal(read(radius({ value: 0.5, unit: 'rem' })).sets.get('primitive')[0].value, '0.5rem');
+
+    // The draft syntax the files used before 2025.10.
+    assert.throws(() => read(radius('0.5rem')), /radius\.base is not a valid dimension: "0\.5rem"\. Write \{ "value": <number>, "unit": "px" \| "rem" \}/);
+    assert.throws(() => read(radius({ value: 0.5, unit: 'rem' }, { sm: { $value: 'calc({radius.base} - 4px)' } })), /radius\.sm is not a valid dimension/);
+    assert.throws(() => read(radius({ value: 1, unit: 'em' })), /radius\.base is not a valid dimension/);
+    assert.throws(() => read(radius({ value: 0.5, unit: 'rem' }, { sm: { $value: '{radius.base}', $type: 'color' } })), /radius\.sm references \{radius\.base\}, a dimension, where a color belongs/);
+
+    // Themed tokens are read from CSS, so a token built on one would freeze it at one theme.
+    assert.throws(
+      () => read({ color: { $type: 'color', ink: { $value: '{color.page-fg}' } } }, { color: { $type: 'color', 'page-fg': { $value: { colorSpace: 'oklch', components: [0, 0, 0] } } } }),
+      /color\.ink references \{color\.page-fg\}, a themed token/
+    );
+    assert.throws(() => read(radius({ value: 0.5, unit: 'rem' }, { sm: { $value: { value: 4, unit: 'px' }, $deprecated: true } })), /radius\.sm has \$deprecated, which the token build does not read/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The CSS the format cannot express lives in an extension, and $value carries
+// the nearest standard value for tools that read only that. These are the rules
+// for nearest; a CSS-only token that matches none of them fails until it has one.
+test('every CSS-only token carries the nearest standard value as its $value', () => {
+  const resolver = JSON.parse(readFileSync(resolve(root, 'tokens/aihio.resolver.json'), 'utf8'));
+  const tokens = new Map();
+  const walk = (node, path) => {
+    for (const [key, child] of Object.entries(node)) {
+      if (key.startsWith('$')) continue;
+      if (Object.hasOwn(child, '$value')) tokens.set([...path, key].join('.'), child);
+      else walk(child, [...path, key]);
+    }
+  };
+  for (const { sources } of Object.values(resolver.sets)) {
+    for (const { $ref } of sources) walk(JSON.parse(readFileSync(resolve(root, 'tokens', $ref), 'utf8')), []);
+  }
+
+  const rem = ({ value, unit }) => (unit === 'rem' ? value : value / 16);
+  const cssOnly = [...tokens].filter(([, token]) => token.$extensions?.['io.github.luntta.aihio']);
+  assert.ok(cssOnly.length > 0);
+  for (const [path, token] of cssOnly) {
+    const { css } = token.$extensions['io.github.luntta.aihio'];
+    let match;
+    let expected;
+    if ((match = /^calc\(\{([^}]+)\} ([+-]) (\d*\.?\d+)px\)$/.exec(css))) {
+      // The step at the default base, on a 16px root.
+      expected = rem(tokens.get(match[1]).$value) + (match[2] === '+' ? 1 : -1) * Number(match[3]) / 16;
+    } else if ((match = /^(-?\d*\.?\d+)em$/.exec(css))) {
+      // The same tracking for 16px text.
+      expected = Number(match[1]);
+    } else if ((match = /^min\((\d*\.?\d+)rem, /.exec(css))) {
+      // The cap.
+      expected = Number(match[1]);
+    } else {
+      assert.fail(`${path}: no rule for the standard value of ${css}`);
+    }
+    assert.equal(rem(token.$value), expected, `${path}: ${css}`);
+  }
+});
+
+test('the token files ship as they are, with the resolver that ties them together', () => {
+  const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
+  assert.equal(pkg.exports['./dtcg/*'], './dist/dtcg/*');
+
+  const resolver = JSON.parse(readFileSync(resolve(root, 'dist/dtcg/aihio.resolver.json'), 'utf8'));
+  assert.equal(resolver.version, '2025.10');
+  const sources = [
+    ...Object.values(resolver.sets).flatMap((set) => set.sources),
+    ...Object.values(resolver.modifiers).flatMap((modifier) => Object.values(modifier.contexts).flat()),
+  ];
+  assert.equal(sources.length, 5);
+  for (const { $ref } of sources) {
+    assert.equal(
+      readFileSync(resolve(root, 'dist/dtcg', $ref), 'utf8'),
+      readFileSync(resolve(root, 'tokens', $ref), 'utf8'),
+      `${$ref} ships as written`
+    );
   }
 });
 

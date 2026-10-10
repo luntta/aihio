@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, rmSync } from 'node:fs';
 
 import * as esbuild from 'esbuild';
 
@@ -96,6 +96,9 @@ await esbuild.build({
 
 copyFileSync('docs/semantic-tokens.md', 'dist/semantic-tokens.md');
 copyFileSync('docs/tokens.json', 'dist/tokens.json');
+// The token sources are W3C design tokens (DTCG 2025.10), so they ship as they
+// are, for Style Dictionary, Terrazzo, and design tools to read.
+cpSync('tokens', 'dist/dtcg', { recursive: true });
 copyFileSync('src/lint/index.d.ts', 'dist/lint.d.ts');
 
 console.log('build → package, component, lint, CLI, schema runtime, and CSS entrypoints in dist/');

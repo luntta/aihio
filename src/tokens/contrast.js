@@ -1,8 +1,8 @@
 // Build-time colour-contrast math. Not bundled into dist — src/tokens/* runs
 // only under `npm run tokens`, so this stays out of the shipped runtime.
 //
-// Token colour values are written as oklch(L C H), the same string that ships
-// in the CSS, so what the contract checks is what renders.
+// The contract checks each colour as the oklch(L C H) string it compiles to,
+// the same string that ships in the CSS, so what it checks is what renders.
 
 /** Parse an oklch(L C H) token value (or a bare "L C H") into numeric components. */
 export function parseOklch(value) {
@@ -63,7 +63,7 @@ export function contrastRatio(foreground, background) {
 // for that pair's role: 4.5 for body-size text (1.4.3), 3 for the boundary of
 // an interactive control (1.4.11).
 //
-// Pairs name semantic colour tokens (tokens/semantic.json), which are themed.
+// Pairs name semantic colour tokens (tokens/theme/), which are themed.
 //
 // Decorative framing — `border-subtle`, used for card and alert edges — is deliberately
 // absent. 1.4.11 covers boundaries that carry meaning; a card edge that also

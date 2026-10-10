@@ -1,0 +1,213 @@
+{
+  "$description": "Semantic tokens: what a value is for, not where it sits on a scale. Components read only these, the themed colours in theme/, and their own component tokens. Every token compiles to --aihio-<group>-<name>.",
+  "color": {
+    "$type": "color",
+    "overlay-scrim": {
+      "$value": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.8 },
+      "$description": "Modal backdrop scrim behind blocking overlays."
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "surface": {
+      "$value": "{radius.lg}",
+      "$description": "Corner radius for cards, alerts, and other framed surfaces."
+    },
+    "interactive": {
+      "$value": "{radius.md}",
+      "$description": "Default corner radius for buttons, inputs, toggles, and menus."
+    },
+    "interactive-compact": {
+      "$value": "{radius.sm}",
+      "$description": "Tighter radius for dense interactive children such as tabs and menu items."
+    },
+    "pill": {
+      "$value": "{radius.full}",
+      "$description": "Fully rounded presentation for badges, avatars, and pill-shaped affordances."
+    }
+  },
+  "spacing": {
+    "$type": "dimension",
+    "cluster-gap-tight": {
+      "$value": "{spacing.1}",
+      "$description": "Tight spacing inside grouped interactive controls and menu chrome."
+    },
+    "stack-tight": {
+      "$value": "{spacing.1-5}",
+      "$description": "Compact vertical rhythm for headings with short supporting copy."
+    },
+    "control-gap": {
+      "$value": "{spacing.2}",
+      "$description": "Default inline gap between icons, labels, and grouped actions."
+    },
+    "stack-sm": {
+      "$value": "{spacing.3}",
+      "$description": "Short vertical separation between related blocks such as alert content and panels."
+    },
+    "stack-md": {
+      "$value": "{spacing.4}",
+      "$description": "Standard section spacing within surfaced components."
+    },
+    "stack-lg": {
+      "$value": "{spacing.6}",
+      "$description": "Large separation for footer action areas and major section breaks."
+    },
+    "field-padding-inline-sm": {
+      "$value": "{spacing.2}",
+      "$description": "Inline padding for compact form fields."
+    },
+    "field-padding-inline": {
+      "$value": "{spacing.3}",
+      "$description": "Inline padding for default form fields."
+    },
+    "field-padding-inline-lg": {
+      "$value": "{spacing.4}",
+      "$description": "Inline padding for spacious form fields."
+    },
+    "field-padding-block-sm": {
+      "$value": "{spacing.1}",
+      "$description": "Block padding for compact form fields."
+    },
+    "field-padding-block": {
+      "$value": "{spacing.2}",
+      "$description": "Block padding for default form fields."
+    },
+    "field-padding-block-lg": {
+      "$value": "{spacing.2-5}",
+      "$description": "Block padding for spacious form fields."
+    },
+    "form-field-gap": {
+      "$value": "{spacing.3}",
+      "$description": "Recommended gap between labels, help text, and form controls."
+    }
+  },
+  "font-family": {
+    "$type": "fontFamily",
+    "body": {
+      "$value": "{font-family.sans}",
+      "$description": "Interface and body typeface for every component and page surface."
+    },
+    "code": {
+      "$value": "{font-family.mono}",
+      "$description": "Typeface for code samples, markup, token names, and other fixed-width data."
+    }
+  },
+  "letter-spacing": {
+    "$type": "dimension",
+    "body": {
+      "$value": "{letter-spacing.normal}",
+      "$description": "Default body and control tracking. Slightly negative, because the system stack sets a touch wide at UI sizes."
+    },
+    "heading": {
+      "$value": "{letter-spacing.tight}",
+      "$description": "Tracking for surface titles and section headings."
+    },
+    "display": {
+      "$value": "{letter-spacing.tighter}",
+      "$description": "Tracking for large display type, where glyph gaps open up as size grows."
+    },
+    "label": {
+      "$value": "{letter-spacing.wide}",
+      "$description": "Positive tracking for the one place it earns its keep: small capitalised labels."
+    }
+  },
+  "font-size": {
+    "$type": "dimension",
+    "body": {
+      "$value": "{font-size.base}",
+      "$description": "Default document body text size."
+    },
+    "body-sm": {
+      "$value": "{font-size.sm}",
+      "$description": "Supporting text size for descriptions and secondary copy."
+    },
+    "control": {
+      "$value": "{font-size.sm}",
+      "$description": "Default text size for controls."
+    },
+    "control-sm": {
+      "$value": "{font-size.xs}",
+      "$description": "Compact text size for small controls."
+    },
+    "control-lg": {
+      "$value": "{font-size.base}",
+      "$description": "Larger text size for prominent controls."
+    },
+    "badge": {
+      "$value": "{font-size.xs}",
+      "$description": "Dense label size for badges and tiny metadata chips."
+    },
+    "heading": {
+      "$value": "{font-size.xl}",
+      "$description": "Large surface title size. Sized to lead a card, not to headline a page — a title much larger than this stops reading as part of the surface it sits on."
+    },
+    "heading-sm": {
+      "$value": "{font-size.lg}",
+      "$description": "Compact surface title size for dialogs and smaller panels."
+    }
+  },
+  "font-weight": {
+    "$type": "fontWeight",
+    "body": {
+      "$value": "{font-weight.normal}",
+      "$description": "Default document body weight."
+    },
+    "control": {
+      "$value": "{font-weight.medium}",
+      "$description": "Emphasized but compact weight for controls and inline titles."
+    },
+    "heading": {
+      "$value": "{font-weight.semibold}",
+      "$description": "Strong surface-heading weight."
+    },
+    "badge": {
+      "$value": "{font-weight.semibold}",
+      "$description": "Dense emphasis weight for badges."
+    }
+  },
+  "line-height": {
+    "$type": "number",
+    "body": {
+      "$value": "{line-height.normal}",
+      "$description": "Default readable line height for body and field text."
+    },
+    "compact": {
+      "$value": "{line-height.none}",
+      "$description": "Tight line height for headings, labels, and short control text."
+    }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "surface": {
+      "$value": "{shadow.sm}",
+      "$description": "Subtle elevation for surfaced content."
+    },
+    "overlay": {
+      "$value": "{shadow.md}",
+      "$description": "Elevation for popovers and transient overlays."
+    },
+    "modal": {
+      "$value": "{shadow.lg}",
+      "$description": "Deeper elevation for blocking modal dialogs."
+    }
+  },
+  "duration": {
+    "$type": "duration",
+    "feedback-fast": {
+      "$value": "{duration.fast}",
+      "$description": "Fast hover and menu-item feedback transitions."
+    },
+    "feedback": {
+      "$value": "{duration.normal}",
+      "$description": "Default control feedback transition duration."
+    },
+    "overlay": {
+      "$value": "{duration.slow}",
+      "$description": "Entrance timing for larger blocking overlays."
+    },
+    "spinner": {
+      "$value": "{duration.spin}",
+      "$description": "One full rotation of an indeterminate busy indicator."
+    }
+  }
+}

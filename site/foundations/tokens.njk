@@ -9,8 +9,8 @@ description: Every design token Aihio defines, by tier.
   <p>
     Primitive scales give values, semantic tokens give them a purpose, and components read only the purpose:
     <code>--aihio-color-surface-bg</code>, <code>--aihio-spacing-stack-md</code>, never a position on a scale. Every
-    name is <code>--aihio-&lt;group&gt;-&lt;name&gt;</code>, and everything below is generated from
-    <code>tokens/semantic.json</code>.
+    name is <code>--aihio-&lt;group&gt;-&lt;name&gt;</code>, and everything below is generated from the token files in
+    <code>tokens/</code>, which are W3C design tokens (DTCG 2025.10).
   </p>
 </section>
 
@@ -57,7 +57,7 @@ description: Every design token Aihio defines, by tier.
   <div class="docs-section-heading">
     <div>
       <h2>Component tokens</h2>
-      <p>Sizes specific to one component, from <code>tokens/component.json</code>.</p>
+      <p>Sizes specific to one component, from <code>tokens/component.tokens.json</code>.</p>
     </div>
     <span class="docs-muted">{{ docs.foundations.component.length }} tokens</span>
   </div>
@@ -77,7 +77,7 @@ description: Every design token Aihio defines, by tier.
   <div class="docs-section-heading">
     <div>
       <h2>Primitives</h2>
-      <p>The raw scales the semantic tokens resolve to, from <code>tokens/base.json</code>. Components never read them directly.</p>
+      <p>The raw scales the semantic tokens resolve to, from <code>tokens/base.tokens.json</code>. Components never read them directly.</p>
     </div>
   </div>
   {% for group in ['spacing', 'radius', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height', 'shadow', 'duration'] %}
@@ -99,12 +99,13 @@ description: Every design token Aihio defines, by tier.
 <section>
   <div class="docs-section-heading">
     <div>
-      <h2>Generated artifact</h2>
-      <p>The same reference ships inside the package, as markdown and as JSON with resolved values for both themes, so agents read it without scraping this site.</p>
+      <h2>In the package</h2>
+      <p>The same reference ships inside the package, as markdown and as JSON with resolved values for both themes, so agents read it without scraping this site. The token files ship as written, for tools that read DTCG.</p>
     </div>
     <aihio-cluster>
       <a class="docs-inline-link" href="{{ '/dist/semantic-tokens.md' | docsUrl(page.url) }}">semantic-tokens.md</a>
       <a class="docs-inline-link" href="{{ '/dist/tokens.json' | docsUrl(page.url) }}">tokens.json</a>
+      <a class="docs-inline-link" href="{{ '/dist/dtcg/aihio.resolver.json' | docsUrl(page.url) }}">aihio.resolver.json</a>
     </aihio-cluster>
   </div>
 </section>

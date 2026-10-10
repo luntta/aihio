@@ -1,0 +1,82 @@
+{
+  "$description": "Component tokens: sizes specific to one component. They compile to --aihio-<component>-<name>.",
+  "button": {
+    "$type": "dimension",
+    "height": {
+      "sm":   { "$value": { "value": 2.25, "unit": "rem" } },
+      "md":   { "$value": { "value": 2.5, "unit": "rem" } },
+      "lg":   { "$value": { "value": 2.75, "unit": "rem" } },
+      "icon": { "$value": { "value": 2.5, "unit": "rem" } }
+    },
+    "padding-x": {
+      "sm":   { "$value": { "value": 0.75, "unit": "rem" } },
+      "md":   { "$value": { "value": 1, "unit": "rem" } },
+      "lg":   { "$value": { "value": 2, "unit": "rem" } },
+      "icon": { "$value": { "value": 0, "unit": "px" } }
+    },
+    "font-size": {
+      "sm": { "$value": "{font-size.sm}" },
+      "md": { "$value": "{font-size.sm}" },
+      "lg": { "$value": "{font-size.base}" }
+    }
+  },
+  "input": {
+    "$type": "dimension",
+    "height": {
+      "sm": { "$value": { "value": 2.25, "unit": "rem" } },
+      "md": { "$value": { "value": 2.5, "unit": "rem" } },
+      "lg": { "$value": { "value": 2.75, "unit": "rem" } }
+    }
+  },
+  "badge": {
+    "$type": "dimension",
+    "padding-x": { "$value": { "value": 0.625, "unit": "rem" } },
+    "padding-y": { "$value": { "value": 0.125, "unit": "rem" } },
+    "font-size": { "$value": "{font-size.xs}" }
+  },
+  "avatar": {
+    "$type": "dimension",
+    "size": {
+      "sm": { "$value": { "value": 2, "unit": "rem" } },
+      "md": { "$value": { "value": 2.5, "unit": "rem" } },
+      "lg": { "$value": { "value": 3, "unit": "rem" } }
+    }
+  },
+  "calendar": {
+    "$type": "dimension",
+    "cell-size": {
+      "$value": { "value": 2.25, "unit": "rem" },
+      "$description": "The width and height of a day in a month grid, in aihio-calendar and the aihio-date-picker popup. A quarter rem larger on touch screens."
+    }
+  },
+  "card": {
+    "$type": "dimension",
+    "padding": { "$value": { "value": 1.5, "unit": "rem" } }
+  },
+  "dialog": {
+    "$type": "dimension",
+    "width":   { "$value": { "value": 32, "unit": "rem" } },
+    "padding": { "$value": { "value": 1.5, "unit": "rem" } }
+  },
+  "data-grid": {
+    "$type": "dimension",
+    "height": {
+      "$value": { "value": 32, "unit": "rem" },
+      "$description": "How tall a data grid is: the box its rows scroll in.",
+      "$extensions": { "io.github.luntta.aihio": { "css": "min(32rem, 75dvh)" } }
+    }
+  },
+  "table": {
+    "$type": "dimension",
+    "cell-padding-y": {
+      "default": { "$value": "{spacing.3}" },
+      "compact": { "$value": "{spacing.1-5}" }
+    },
+    "cell-padding-x": { "$value": "{spacing.3}" },
+    "max-height": {
+      "$value": { "value": 32, "unit": "rem" },
+      "$description": "How tall a table with sticky-header grows before its rows scroll under the header.",
+      "$extensions": { "io.github.luntta.aihio": { "css": "min(32rem, 75dvh)" } }
+    }
+  }
+}

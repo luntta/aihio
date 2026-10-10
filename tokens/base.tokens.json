@@ -1,0 +1,231 @@
+{
+  "$description": "Primitive tokens: raw scales with no meaning attached. Components never read these directly; the semantic tokens give them meaning. Every token compiles to --aihio-<group>-<name>, lowercase and hyphenated, so a name needs no escaping where it is read.",
+  "color": {
+    "$type": "color",
+    "zinc": {
+      "$description": "Neutral ramp. Hue 286 with near-zero chroma gives the cool, almost-achromatic grey the system reads as 'no colour', and the 0/1000 ends are true white and true black so page canvases are pure rather than tinted.",
+      "0":    { "$value": { "colorSpace": "oklch", "components": [1, 0, 0] } },
+      "50":   { "$value": { "colorSpace": "oklch", "components": [0.9707, 0.0027, 286] } },
+      "100":  { "$value": { "colorSpace": "oklch", "components": [0.9406, 0.0027, 286] } },
+      "200":  { "$value": { "colorSpace": "oklch", "components": [0.902, 0.004, 286] } },
+      "300":  { "$value": { "colorSpace": "oklch", "components": [0.87, 0.006, 286] } },
+      "400":  { "$value": { "colorSpace": "oklch", "components": [0.76, 0.007, 286] } },
+      "450":  { "$value": { "colorSpace": "oklch", "components": [0.7105, 0.0072, 286] } },
+      "500":  { "$value": { "colorSpace": "oklch", "components": [0.6217, 0.0074, 286] } },
+      "550":  { "$value": { "colorSpace": "oklch", "components": [0.5399, 0.0077, 286] } },
+      "600":  { "$value": { "colorSpace": "oklch", "components": [0.48, 0.007, 286] } },
+      "700":  { "$value": { "colorSpace": "oklch", "components": [0.4, 0.006, 286] } },
+      "800":  { "$value": { "colorSpace": "oklch", "components": [0.32, 0.005, 286] } },
+      "850":  { "$value": { "colorSpace": "oklch", "components": [0.2603, 0.004, 286] } },
+      "900":  { "$value": { "colorSpace": "oklch", "components": [0.2316, 0.0038, 286] } },
+      "950":  { "$value": { "colorSpace": "oklch", "components": [0.2006, 0.002, 286] } },
+      "1000": { "$value": { "colorSpace": "oklch", "components": [0, 0, 0] } }
+    },
+    "red": {
+      "50":  { "$value": { "colorSpace": "oklch", "components": [0.97, 0.013, 18] } },
+      "100": { "$value": { "colorSpace": "oklch", "components": [0.94, 0.028, 22] } },
+      "200": { "$value": { "colorSpace": "oklch", "components": [0.89, 0.055, 22] } },
+      "300": { "$value": { "colorSpace": "oklch", "components": [0.82, 0.095, 22] } },
+      "400": { "$value": { "colorSpace": "oklch", "components": [0.71, 0.155, 25] } },
+      "500": { "$value": { "colorSpace": "oklch", "components": [0.63, 0.196, 25] } },
+      "600": { "$value": { "colorSpace": "oklch", "components": [0.56, 0.2, 27] } },
+      "700": { "$value": { "colorSpace": "oklch", "components": [0.47, 0.17, 27] } },
+      "800": { "$value": { "colorSpace": "oklch", "components": [0.4, 0.14, 25] } },
+      "900": { "$value": { "colorSpace": "oklch", "components": [0.35, 0.11, 25] } },
+      "950": { "$value": { "colorSpace": "oklch", "components": [0.22, 0.08, 25] } }
+    },
+    "green": {
+      "300": { "$value": { "colorSpace": "oklch", "components": [0.84, 0.12, 150] } },
+      "400": { "$value": { "colorSpace": "oklch", "components": [0.72, 0.15, 150] } },
+      "500": { "$value": { "colorSpace": "oklch", "components": [0.62, 0.15, 150] } },
+      "600": { "$value": { "colorSpace": "oklch", "components": [0.52, 0.14, 150] } },
+      "700": { "$value": { "colorSpace": "oklch", "components": [0.44, 0.12, 150] } }
+    },
+    "amber": {
+      "300": { "$value": { "colorSpace": "oklch", "components": [0.88, 0.1, 75] } },
+      "400": { "$value": { "colorSpace": "oklch", "components": [0.8, 0.16, 75] } },
+      "500": { "$value": { "colorSpace": "oklch", "components": [0.74, 0.155, 75] } },
+      "600": { "$value": { "colorSpace": "oklch", "components": [0.6, 0.12, 75] } },
+      "700": { "$value": { "colorSpace": "oklch", "components": [0.52, 0.1, 75] } }
+    }
+  },
+  "radius": {
+    "$description": "Every step is computed from base in CSS, so one override rounds the whole system. The format has no arithmetic, so each step's calc() is in the io.github.luntta.aihio extension, and its $value is the same step at the default base on a 16px root.",
+    "$type": "dimension",
+    "base": { "$value": { "value": 0.5, "unit": "rem" } },
+    "none": { "$value": { "value": 0, "unit": "px" } },
+    "sm": {
+      "$value": { "value": 0.25, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "calc({radius.base} - 4px)" } }
+    },
+    "md": {
+      "$value": { "value": 0.375, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "calc({radius.base} - 2px)" } }
+    },
+    "lg":   { "$value": "{radius.base}" },
+    "xl": {
+      "$value": { "value": 0.75, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "calc({radius.base} + 4px)" } }
+    },
+    "2xl": {
+      "$value": { "value": 1, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "calc({radius.base} + 8px)" } }
+    },
+    "full": { "$value": { "value": 9999, "unit": "px" } }
+  },
+  "spacing": {
+    "$description": "Steps of 0.25rem. Half steps are written with a hyphen, so 1-5 is 0.375rem.",
+    "$type": "dimension",
+    "0":   { "$value": { "value": 0, "unit": "px" } },
+    "0-5": { "$value": { "value": 0.125, "unit": "rem" } },
+    "1":   { "$value": { "value": 0.25, "unit": "rem" } },
+    "1-5": { "$value": { "value": 0.375, "unit": "rem" } },
+    "2":   { "$value": { "value": 0.5, "unit": "rem" } },
+    "2-5": { "$value": { "value": 0.625, "unit": "rem" } },
+    "3":   { "$value": { "value": 0.75, "unit": "rem" } },
+    "3-5": { "$value": { "value": 0.875, "unit": "rem" } },
+    "4":   { "$value": { "value": 1, "unit": "rem" } },
+    "5":   { "$value": { "value": 1.25, "unit": "rem" } },
+    "6":   { "$value": { "value": 1.5, "unit": "rem" } },
+    "8":   { "$value": { "value": 2, "unit": "rem" } },
+    "10":  { "$value": { "value": 2.5, "unit": "rem" } },
+    "12":  { "$value": { "value": 3, "unit": "rem" } },
+    "16":  { "$value": { "value": 4, "unit": "rem" } },
+    "20":  { "$value": { "value": 5, "unit": "rem" } },
+    "24":  { "$value": { "value": 6, "unit": "rem" } }
+  },
+  "font-family": {
+    "$type": "fontFamily",
+    "sans": {
+      "$value": [
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "SF Pro Text",
+        "SF Pro Display",
+        "Inter",
+        "Segoe UI",
+        "Roboto",
+        "Helvetica Neue",
+        "Arial",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji"
+      ],
+      "$description": "System-grade UI stack. The platform face leads so text renders in the grey the OS already optimises for; no webfont is shipped, which keeps the package zero-dependency."
+    },
+    "mono": {
+      "$value": [
+        "ui-monospace",
+        "SF Mono",
+        "Cascadia Code",
+        "JetBrains Mono",
+        "Menlo",
+        "Consolas",
+        "Liberation Mono",
+        "monospace"
+      ],
+      "$description": "Monospace stack for code, markup samples, and token values."
+    }
+  },
+  "font-size": {
+    "$type": "dimension",
+    "xs":   { "$value": { "value": 0.75, "unit": "rem" } },
+    "sm":   { "$value": { "value": 0.875, "unit": "rem" } },
+    "base": { "$value": { "value": 1, "unit": "rem" } },
+    "lg":   { "$value": { "value": 1.125, "unit": "rem" } },
+    "xl":   { "$value": { "value": 1.25, "unit": "rem" } },
+    "2xl":  { "$value": { "value": 1.5, "unit": "rem" } },
+    "3xl":  { "$value": { "value": 1.875, "unit": "rem" } },
+    "4xl":  { "$value": { "value": 2.25, "unit": "rem" } }
+  },
+  "font-weight": {
+    "$type": "fontWeight",
+    "normal":   { "$value": 400 },
+    "medium":   { "$value": 500 },
+    "semibold": { "$value": 600 },
+    "bold":     { "$value": 700 }
+  },
+  "line-height": {
+    "$type": "number",
+    "none":    { "$value": 1 },
+    "tight":   { "$value": 1.25 },
+    "snug":    { "$value": 1.375 },
+    "normal":  { "$value": 1.5 },
+    "relaxed": { "$value": 1.625 }
+  },
+  "letter-spacing": {
+    "$description": "Optical tracking. Large type is set tighter than small type, because the same em value reads looser as glyphs grow. The format has no em unit, so the em value Aihio writes is in the io.github.luntta.aihio extension, and $value is the same tracking for 16px text.",
+    "$type": "dimension",
+    "tighter": {
+      "$value": { "value": -0.025, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "-0.025em" } }
+    },
+    "tight": {
+      "$value": { "value": -0.018, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "-0.018em" } }
+    },
+    "normal": {
+      "$value": { "value": -0.011, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "-0.011em" } }
+    },
+    "wide": {
+      "$value": { "value": 0.02, "unit": "rem" },
+      "$extensions": { "io.github.luntta.aihio": { "css": "0.02em" } }
+    }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "sm": {
+      "$value": {
+        "color": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.05 },
+        "offsetX": { "value": 0, "unit": "px" },
+        "offsetY": { "value": 1, "unit": "px" },
+        "blur": { "value": 2, "unit": "px" },
+        "spread": { "value": 0, "unit": "px" }
+      }
+    },
+    "md": {
+      "$value": [
+        {
+          "color": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.12 },
+          "offsetX": { "value": 0, "unit": "px" },
+          "offsetY": { "value": 8, "unit": "px" },
+          "blur": { "value": 24, "unit": "px" },
+          "spread": { "value": -6, "unit": "px" }
+        },
+        {
+          "color": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.08 },
+          "offsetX": { "value": 0, "unit": "px" },
+          "offsetY": { "value": 2, "unit": "px" },
+          "blur": { "value": 6, "unit": "px" },
+          "spread": { "value": -2, "unit": "px" }
+        }
+      ]
+    },
+    "lg": {
+      "$value": [
+        {
+          "color": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.22 },
+          "offsetX": { "value": 0, "unit": "px" },
+          "offsetY": { "value": 24, "unit": "px" },
+          "blur": { "value": 64, "unit": "px" },
+          "spread": { "value": -12, "unit": "px" }
+        },
+        {
+          "color": { "colorSpace": "oklch", "components": [0, 0, 0], "alpha": 0.12 },
+          "offsetX": { "value": 0, "unit": "px" },
+          "offsetY": { "value": 6, "unit": "px" },
+          "blur": { "value": 16, "unit": "px" },
+          "spread": { "value": -6, "unit": "px" }
+        }
+      ]
+    }
+  },
+  "duration": {
+    "$type": "duration",
+    "fast":   { "$value": { "value": 100, "unit": "ms" } },
+    "normal": { "$value": { "value": 150, "unit": "ms" } },
+    "slow":   { "$value": { "value": 200, "unit": "ms" } },
+    "spin":   { "$value": { "value": 700, "unit": "ms" } }
+  }
+}

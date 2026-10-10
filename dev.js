@@ -60,7 +60,7 @@ const rebuildStyles = debounce(() => runNodeScript('src/css/build.js'));
 const rebuildSchema = debounce(() => runNodeScript('src/schema/build.js'));
 
 const watchers = [
-  ...['tokens/base.json', 'tokens/semantic.json', 'tokens/component.json']
+  ...walk('tokens')
     .map((file) => watch(file, rebuildTokens)),
   ...['package.json']
     .map((file) => watch(file, rebuildSchema)),

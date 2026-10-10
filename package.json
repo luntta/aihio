@@ -126,6 +126,7 @@
     "./schema/min": "./dist/schema.min.json",
     "./tokens": "./dist/tokens.json",
     "./tokens.md": "./dist/semantic-tokens.md",
+    "./dtcg/*": "./dist/dtcg/*",
     "./prompt.md": "./dist/aihio.prompt.md"
   },
   "files": [

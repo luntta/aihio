@@ -156,6 +156,18 @@ with click handlers on its days.
 - [ ] Range selection: a start and an end in one calendar, two months side by side, and the span previewed under the pointer
 - [ ] `required` on `aihio-calendar`: it has no text field to carry native validity. ElementInternals would, at the price of a second way of joining a form
 
+## Phase 13 — Standard tokens
+
+The token files were written in the draft DTCG syntax, which the format's first
+stable version, 2025.10, no longer accepts: values as CSS strings, a reference
+inside `calc()`, and light and dark as keys of one file. Nothing but Aihio's own
+build could read them.
+
+- [x] Token files in DTCG 2025.10 (`tokens/*.tokens.json`): values as the format's objects (`{ "value": 0.5, "unit": "rem" }`, oklch colours as components), `$type` set on groups, and a resolver (`tokens/aihio.resolver.json`) with one set per tier and a `theme` modifier whose light and dark contexts hold the themed colours
+- [x] The token build reads them through `src/tokens/dtcg.js`, which checks every value against its type, refuses anything in a file it does not read, and keeps the rule that no token references a themed one. The CSS it writes is unchanged but for number formatting
+- [x] Ten values the format cannot express (radius steps as `calc()` over `radius.base`, tracking in em, heights capped at 75dvh) keep their CSS in an `io.github.luntta.aihio` extension and carry the nearest standard value as `$value`; a test holds the two together
+- [x] The files ship as written in `dist/dtcg/` (`@luntta/aihio/dtcg/*`), for Style Dictionary, Terrazzo, and design tools
+
 ## Sequencing notes
 
 - Phase 1 is the keystone. Everything else depends on its format.

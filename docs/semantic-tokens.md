@@ -1,6 +1,6 @@
 # Aihio Semantic Tokens
 
-Generated from `tokens/semantic.json` by `src/tokens/build.js`. The same data, with resolved values for both themes, is in `tokens.json`.
+Generated from `tokens/semantic.tokens.json` and `tokens/theme/` by `src/tokens/build.js`. The same data, with resolved values for both themes, is in `tokens.json`.
 
 Semantic tokens name what a value is for: `--aihio-color-surface-bg`, `--aihio-spacing-stack-md`. Components read only these and their own component tokens; the primitive scales beneath them are wiring. Write them exactly as listed: every name is `--aihio-<group>-<name>`, lowercase and hyphenated.
 

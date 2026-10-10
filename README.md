@@ -730,12 +730,24 @@ pipeline, including documentation and automated accessibility checks.
 
 ## Tokens
 
-Design tokens follow the [W3C Design Token Community Group](https://tr.designtokens.org/format/) format, defined in JSON and compiled to CSS custom properties. Colors use Oklch for perceptual uniformity.
+Design tokens are written in the W3C Design Tokens Community Group's stable
+[format](https://www.designtokens.org/tr/2025.10/format/) (DTCG 2025.10) and
+compiled to CSS custom properties. Colors use Oklch for perceptual uniformity.
 
-Three tiers:
-- **Primitive** (`tokens/base.json`) — raw scales: the colour ramps, spacing, type, radius, shadow, and duration steps
-- **Semantic** (`tokens/semantic.json`) — what a value is for: `color.surface-bg`, `spacing.stack-md`, `radius.interactive`, with light and dark values for every colour
-- **Component** (`tokens/component.json`) — sizes specific to one component (button height, input height, and so on)
+Three tiers, each a set in the
+[resolver](https://www.designtokens.org/tr/2025.10/resolver/),
+`tokens/aihio.resolver.json`:
+- **Primitive** (`tokens/base.tokens.json`) — raw scales: the colour ramps, spacing, type, radius, shadow, and duration steps
+- **Semantic** (`tokens/semantic.tokens.json`) — what a value is for: `color.surface-bg`, `spacing.stack-md`, `radius.interactive`. Every semantic colour has a light and a dark value, in `tokens/theme/light.tokens.json` and `tokens/theme/dark.tokens.json`, the two contexts of the resolver's `theme` modifier
+- **Component** (`tokens/component.tokens.json`) — sizes specific to one component (button height, input height, and so on)
+
+`npm run tokens` checks every value against its type and refuses anything in a
+token file it does not read, rather than skipping it. Ten values need CSS the
+format cannot express: the radius steps are `calc()` over `radius.base`, so one
+override rounds the whole system; tracking is in `em`, so it scales with the
+type; and two heights are capped at `75dvh`. Each keeps that CSS in an
+`io.github.luntta.aihio` extension, which is what the build writes, and carries
+the nearest standard value as its `$value` for tools that read only that.
 
 Components read only semantic and component tokens. Every token compiles to
 `--aihio-<group>-<name>`, lowercase and hyphenated:
@@ -772,6 +784,10 @@ The full reference ships in the package as `dist/semantic-tokens.md` (`aihio/tok
 and as `dist/tokens.json` (`aihio/tokens`), which carries every token's resolved light
 and dark values, the token it reads, and the measured contrast of each pair in
 the contract.
+
+The token files ship too, as written, in `dist/dtcg/`
+(`@luntta/aihio/dtcg/aihio.resolver.json`), for Style Dictionary, Terrazzo,
+design tools, and anything else that reads DTCG.
 
 ### Palette
 
@@ -923,7 +939,7 @@ npm run docs:test   # Validate generated docs HTML assumptions
 npm run test      # Rebuild dist/ and run node and headless browser checks
 npm run check     # Run tests, build docs, and validate the docs output
 node dist/cli.js mcp  # Start the local MCP server over stdio
-npm run tokens    # Rebuild tokens and their references (also enforces the contrast contract)
+npm run tokens    # Rebuild tokens and their references (also enforces the token format and the contrast contract)
 npm run styles    # Rebuild generated component CSS
 npm run schema    # Rebuild schema only
 ```

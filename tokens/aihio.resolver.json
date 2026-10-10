@@ -1,0 +1,36 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
+  "name": "Aihio",
+  "version": "2025.10",
+  "description": "Aihio's design tokens: one set per tier, and a theme modifier for the colours that differ between light and dark. Each token compiles to the CSS custom property --aihio-<its path, joined with hyphens>.",
+  "sets": {
+    "primitive": {
+      "description": "Raw scales with no meaning attached.",
+      "sources": [{ "$ref": "base.tokens.json" }]
+    },
+    "component": {
+      "description": "Sizes specific to one component.",
+      "sources": [{ "$ref": "component.tokens.json" }]
+    },
+    "semantic": {
+      "description": "What a value is for, the same in both themes.",
+      "sources": [{ "$ref": "semantic.tokens.json" }]
+    }
+  },
+  "modifiers": {
+    "theme": {
+      "description": "Colour theme. Both contexts define the same colour tokens.",
+      "contexts": {
+        "light": [{ "$ref": "theme/light.tokens.json" }],
+        "dark": [{ "$ref": "theme/dark.tokens.json" }]
+      },
+      "default": "light"
+    }
+  },
+  "resolutionOrder": [
+    { "$ref": "#/sets/primitive" },
+    { "$ref": "#/sets/component" },
+    { "$ref": "#/sets/semantic" },
+    { "$ref": "#/modifiers/theme" }
+  ]
+}

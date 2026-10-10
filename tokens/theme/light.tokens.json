@@ -1,0 +1,122 @@
+{
+  "$description": "Semantic colours, light. Light and dark are built as mirror images: a pure canvas, an elevated surface one step off it, and a hairline that only just separates them. Colour names follow the schema's intent vocabulary where they meet it (primary-action, secondary-action, destructive, overlay, surface). dark.tokens.json defines the same tokens.",
+  "color": {
+    "$type": "color",
+    "page-bg": {
+      "$value": "{color.zinc.0}",
+      "$description": "Default page canvas and neutral active backgrounds."
+    },
+    "page-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Primary foreground on the page canvas."
+    },
+    "surface-bg": {
+      "$value": "{color.zinc.50}",
+      "$description": "Raised surface background for cards, alerts, and dialog panels."
+    },
+    "surface-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Primary foreground on raised surfaces."
+    },
+    "overlay-bg": {
+      "$value": "{color.zinc.0}",
+      "$description": "Surface background for transient overlays such as dropdowns."
+    },
+    "overlay-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Foreground on transient overlays."
+    },
+    "overlay-highlight-bg": {
+      "$value": "{color.zinc.100}",
+      "$description": "The highlighted item inside an overlay: the active combobox option or a hovered dropdown item. It has to differ from overlay-bg, which control-highlight-bg does not in the dark theme."
+    },
+    "muted-bg": {
+      "$value": "{color.zinc.50}",
+      "$description": "Muted fill for grouped controls and subdued surfaces."
+    },
+    "muted-fg": {
+      "$value": "{color.zinc.550}",
+      "$description": "Supporting foreground on muted fills."
+    },
+    "placeholder-bg": {
+      "$value": "{color.zinc.200}",
+      "$description": "Fill for something that stands in for missing content, such as an avatar's initials. One step off both the page and a surface, where muted-bg matches the surface and disappears into a card."
+    },
+    "placeholder-fg": {
+      "$value": "{color.zinc.700}",
+      "$description": "Text on the placeholder fill."
+    },
+    "primary-action-bg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Default filled action background."
+    },
+    "primary-action-fg": {
+      "$value": "{color.zinc.0}",
+      "$description": "Foreground on default filled actions."
+    },
+    "secondary-action-bg": {
+      "$value": "{color.zinc.100}",
+      "$description": "Lower-emphasis filled action background."
+    },
+    "secondary-action-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Foreground on lower-emphasis filled actions."
+    },
+    "control-highlight-bg": {
+      "$value": "{color.zinc.100}",
+      "$description": "Hover and pressed highlight background for neutral controls."
+    },
+    "control-highlight-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Foreground on hover and pressed highlight backgrounds."
+    },
+    "destructive-bg": {
+      "$value": "{color.red.600}",
+      "$description": "Destructive emphasis background and error color."
+    },
+    "destructive-fg": {
+      "$value": "{color.zinc.0}",
+      "$description": "Foreground on destructive emphasis backgrounds."
+    },
+    "destructive-text": {
+      "$value": "{color.red.600}",
+      "$description": "Destructive text and iconography drawn directly on page or surface backgrounds, where the emphasis background is not used."
+    },
+    "success-bg": {
+      "$value": "{color.green.600}",
+      "$description": "Emphasis background for confirmed and healthy states."
+    },
+    "success-fg": {
+      "$value": "{color.zinc.0}",
+      "$description": "Foreground on success emphasis backgrounds."
+    },
+    "success-text": {
+      "$value": "{color.green.600}",
+      "$description": "Success text and iconography drawn directly on page or surface backgrounds."
+    },
+    "warning-bg": {
+      "$value": "{color.amber.400}",
+      "$description": "Emphasis background for states that need attention but are not failures."
+    },
+    "warning-fg": {
+      "$value": "{color.zinc.900}",
+      "$description": "Foreground on warning emphasis backgrounds. Dark, because an accessible amber fill is light in both themes."
+    },
+    "warning-text": {
+      "$value": "{color.amber.700}",
+      "$description": "Warning text and iconography drawn directly on page or surface backgrounds."
+    },
+    "border-subtle": {
+      "$value": "{color.zinc.200}",
+      "$description": "Default border color for surfaces and outlines."
+    },
+    "field-border": {
+      "$value": "{color.zinc.500}",
+      "$description": "Default border color for editable form fields."
+    },
+    "focus-ring": {
+      "$value": "{color.zinc.900}",
+      "$description": "Focus indication ring for keyboard interactions."
+    }
+  }
+}
