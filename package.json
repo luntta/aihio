@@ -1,6 +1,6 @@
 {
   "name": "@luntta/aihio",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "AI-first design system built on native web components. Zero dependencies.",
   "type": "module",
   "main": "./dist/aihio.js",
